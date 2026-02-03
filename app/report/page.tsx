@@ -1,13 +1,25 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import NavBar from '@/components/NavBar'
 
-// Mock weekly report data
-const reportData = {
-  weekOf: 'Jan 22 - Jan 28',
-  userName: 'Alex',
+export default function WeeklyReport() {
+  const [showShareModal, setShowShareModal] = useState(false)
+  const [userName, setUserName] = useState('')
+
+  useEffect(() => {
+    const savedProfile = localStorage.getItem('youthai_profile')
+    if (savedProfile) {
+      const profile = JSON.parse(savedProfile)
+      setUserName(profile.name || 'User')
+    }
+  }, [])
+
+  // Mock weekly report data - uses dynamic userName
+  const reportData = {
+    weekOf: 'Jan 22 - Jan 28',
+    userName: userName || 'User',
   summary: {
     reflections: 12,
     goalsProgress: 67,
@@ -31,17 +43,14 @@ const reportData = {
     { topic: 'Friendships', count: 4, emoji: '👋' },
     { topic: 'Future Goals', count: 3, emoji: '🎯' },
   ],
-  aiObservation: "Alex showed great curiosity this week, especially when exploring questions about their future. They're getting better at sitting with uncertainty and considering multiple perspectives before jumping to conclusions. A standout moment was when they realized on their own that their stress about school was actually about something deeper.",
+  aiObservation: `${userName || 'This user'} showed great curiosity this week, especially when exploring questions about their future. They're getting better at sitting with uncertainty and considering multiple perspectives before jumping to conclusions. A standout moment was when they realized on their own that their stress about school was actually about something deeper.`,
   goalsUpdate: [
     { goal: 'Learn to code', status: 'on-track', progress: 45 },
     { goal: 'Make new friends', status: 'ahead', progress: 70 },
     { goal: 'Feel more confident', status: 'on-track', progress: 55 },
   ],
   parentNote: "This report is designed to spark conversation, not surveillance. Ask about the highlights - let them share what they're comfortable with.",
-}
-
-export default function WeeklyReport() {
-  const [showShareModal, setShowShareModal] = useState(false)
+  }
 
   return (
     <div className="min-h-screen pb-8 text-black" style={{ backgroundColor: '#FFB6C1' }}>
