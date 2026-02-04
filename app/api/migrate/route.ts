@@ -1,17 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { Pool } from 'pg'
 
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
-  ssl: { rejectUnauthorized: false }
-})
-
 export async function POST(request: NextRequest) {
   // Simple auth check
   const authHeader = request.headers.get('authorization')
   if (authHeader !== 'Bearer migrate-secret-2024') {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
+
+  // Create pool inside handler to ensure proper connection
+  const pool = new Pool({
+    connectionString: process.env.DATABASE_URL,
+    ssl: { rejectUnauthorized: false }
+  })
 
   try {
     const data = await request.json()
@@ -117,6 +118,7 @@ export async function POST(request: NextRequest) {
       })
     } finally {
       client.release()
+      await pool.end()
     }
   } catch (error) {
     console.error('Migration error:', error)
