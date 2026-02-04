@@ -3,9 +3,18 @@ import Anthropic from '@anthropic-ai/sdk'
 import { buildSystemPrompt, UserProfile, SessionContext } from '@/lib/prompts'
 import db from '@/lib/db'
 
-const anthropic = new Anthropic({
-  apiKey: process.env.ANTHROPIC_API_KEY,
-})
+// Lazy-load the Anthropic client to avoid initialization errors
+let anthropic: Anthropic | null = null
+function getAnthropicClient(): Anthropic {
+  if (!anthropic) {
+    const apiKey = process.env.ANTHROPIC_API_KEY
+    if (!apiKey) {
+      throw new Error('ANTHROPIC_API_KEY is not set')
+    }
+    anthropic = new Anthropic({ apiKey })
+  }
+  return anthropic
+}
 
 // Save a chat message to the database
 function saveMessage(userId: string, role: string, content: string) {
@@ -53,7 +62,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Create a streaming response
-    const stream = await anthropic.messages.stream({
+    const stream = await getAnthropicClient().messages.stream({
       model: 'claude-sonnet-4-20250514',
       max_tokens: 1024,
       system: systemPrompt,
