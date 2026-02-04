@@ -86,27 +86,41 @@ export async function GET(request: NextRequest) {
       lastMood: lastCheckin?.mood || null,
     }
 
-    // Generate personalized questions using Claude
-    const prompt = buildCheckinPrompt(context)
-    const response = await getAnthropicClient().messages.create({
-      model: 'claude-sonnet-4-20250514',
-      max_tokens: 500,
-      messages: [{ role: 'user', content: prompt }],
-    })
+    // Fallback questions in case AI fails
+    const fallbackQuestions = [
+      `Hey ${user.name}! What's one thing that happened today that you want to remember?`,
+      `How are you feeling about ${dayOfWeek} so far?`,
+      `Anything on your mind you'd like to think through?`,
+    ]
 
     let questions: string[] = []
-    const textContent = response.content.find(block => block.type === 'text')
-    if (textContent && textContent.type === 'text') {
-      try {
-        questions = JSON.parse(textContent.text)
-      } catch {
-        // Fallback questions if parsing fails
-        questions = [
-          `Hey ${user.name}! What's one thing that happened today that you want to remember?`,
-          `How are you feeling about ${dayOfWeek} so far?`,
-          `Anything on your mind you'd like to think through?`,
-        ]
+
+    // Generate personalized questions using Claude
+    try {
+      const prompt = buildCheckinPrompt(context)
+      const response = await getAnthropicClient().messages.create({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 500,
+        messages: [{ role: 'user', content: prompt }],
+      })
+
+      const textContent = response.content.find(block => block.type === 'text')
+      if (textContent && textContent.type === 'text') {
+        try {
+          questions = JSON.parse(textContent.text)
+        } catch {
+          // Fallback questions if parsing fails
+          questions = fallbackQuestions
+        }
       }
+    } catch (err) {
+      console.error('Failed to generate questions with AI:', err)
+      questions = fallbackQuestions
+    }
+
+    // Use fallback if questions is empty
+    if (!questions || questions.length === 0) {
+      questions = fallbackQuestions
     }
 
     return NextResponse.json({
