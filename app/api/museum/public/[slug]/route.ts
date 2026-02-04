@@ -51,7 +51,7 @@ export async function GET(
     // Get the museum items
     const items = db.prepare(`
       SELECT * FROM museum_items WHERE user_id = ? ORDER BY created_at DESC
-    `).all(museum.user_id) as MuseumItem[]
+    `).all(museum.user_id) as unknown as MuseumItem[]
 
     return NextResponse.json({
       museum: {
