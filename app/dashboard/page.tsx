@@ -85,9 +85,17 @@ export default function Dashboard() {
 
   const checkForDailyCheckIn = async (userId: string) => {
     try {
+      // Check if we already showed the check-in modal this session
+      const today = new Date().toISOString().split('T')[0]
+      const shownKey = `checkin_shown_${today}`
+      if (sessionStorage.getItem(shownKey)) {
+        return
+      }
+
       const res = await fetch(`/api/checkin?userId=${userId}`)
       const data = await res.json()
       if (!data.hasCheckedInToday) {
+        sessionStorage.setItem(shownKey, 'true')
         setShowCheckIn(true)
       } else {
         setCheckedInToday(true)
