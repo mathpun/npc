@@ -10,3 +10,4 @@ export async function GET() {
     nodeEnv: process.env.NODE_ENV,
   })
 }
+// Trigger redeploy Tue Feb  3 18:26:54 PST 2026
