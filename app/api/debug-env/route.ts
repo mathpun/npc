@@ -1,12 +1,13 @@
 import { NextResponse } from 'next/server'
 
 export async function GET() {
+  const dbUrl = process.env.DATABASE_URL || ''
   return NextResponse.json({
-    hasDbUrl: !!process.env.DATABASE_URL,
-    dbUrlPrefix: process.env.DATABASE_URL?.substring(0, 30) + '...',
-    hasPgHost: !!process.env.PGHOST,
-    pgHost: process.env.PGHOST,
-    hasPgDatabase: !!process.env.PGDATABASE,
+    hasDbUrl: !!dbUrl,
+    dbUrlLength: dbUrl.length,
+    hasLineBreak: dbUrl.includes('\n'),
+    hasCarriageReturn: dbUrl.includes('\r'),
+    hostPart: dbUrl.match(/@([^:\/]+)/)?.[1] || 'not found',
     nodeEnv: process.env.NODE_ENV,
   })
 }
