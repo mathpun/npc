@@ -10,7 +10,7 @@ export async function GET(request: NextRequest) {
   try {
     if (adminView) {
       // Get all prompts for admin view
-      const prompts = db.prepare(`
+      const prompts = await db.prepare(`
         SELECT pp.*, u.name as target_user_name,
           (SELECT COUNT(*) FROM prompt_responses WHERE prompt_id = pp.id) as response_count
         FROM parent_prompts pp
@@ -22,11 +22,11 @@ export async function GET(request: NextRequest) {
 
     if (userId) {
       // Get active prompts for this user (personal + global)
-      const prompts = db.prepare(`
+      const prompts = await db.prepare(`
         SELECT pp.* FROM parent_prompts pp
         WHERE pp.is_active = 1
         AND (pp.user_id = ? OR pp.is_global = 1)
-        AND (pp.expires_at IS NULL OR pp.expires_at > datetime('now'))
+        AND (pp.expires_at IS NULL OR pp.expires_at > CURRENT_TIMESTAMP)
         AND pp.id NOT IN (
           SELECT prompt_id FROM prompt_responses WHERE user_id = ?
         )
@@ -52,7 +52,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Title and promptType are required' }, { status: 400 })
     }
 
-    const result = db.prepare(`
+    await db.prepare(`
       INSERT INTO parent_prompts (user_id, prompt_type, title, description, emoji, is_global, expires_at)
       VALUES (?, ?, ?, ?, ?, ?, ?)
     `).run(
@@ -66,7 +66,6 @@ export async function POST(request: NextRequest) {
     )
 
     return NextResponse.json({
-      id: result.lastInsertRowid,
       title,
       promptType,
       success: true
@@ -85,19 +84,19 @@ export async function PUT(request: NextRequest) {
 
     // If updating active status (admin)
     if (isActive !== undefined && promptId) {
-      db.prepare('UPDATE parent_prompts SET is_active = ? WHERE id = ?').run(isActive ? 1 : 0, promptId)
+      await db.prepare('UPDATE parent_prompts SET is_active = ? WHERE id = ?').run(isActive ? 1 : 0, promptId)
       return NextResponse.json({ success: true })
     }
 
     // If responding to a prompt (teen)
     if (promptId && userId) {
-      db.prepare(`
+      await db.prepare(`
         INSERT INTO prompt_responses (prompt_id, user_id, response_type, response_text)
         VALUES (?, ?, ?, ?)
       `).run(promptId, userId, responseType || 'seen', responseText || null)
 
       // Log the activity
-      db.prepare(`
+      await db.prepare(`
         INSERT INTO activity_log (user_id, activity_type, activity_data)
         VALUES (?, 'prompt_response', ?)
       `).run(userId, JSON.stringify({ promptId, responseType }))
@@ -122,8 +121,8 @@ export async function DELETE(request: NextRequest) {
   }
 
   try {
-    db.prepare('DELETE FROM prompt_responses WHERE prompt_id = ?').run(promptId)
-    db.prepare('DELETE FROM parent_prompts WHERE id = ?').run(promptId)
+    await db.prepare('DELETE FROM prompt_responses WHERE prompt_id = ?').run(promptId)
+    await db.prepare('DELETE FROM parent_prompts WHERE id = ?').run(promptId)
     return NextResponse.json({ success: true })
   } catch (error) {
     console.error('Error deleting prompt:', error)

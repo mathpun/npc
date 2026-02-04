@@ -11,7 +11,7 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    const items = db.prepare(`
+    const items = await db.prepare(`
       SELECT * FROM museum_items
       WHERE user_id = ?
       ORDER BY created_at DESC
@@ -34,29 +34,28 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'User ID, emoji, name, and description are required' }, { status: 400 })
     }
 
-    const result = db.prepare(`
+    await db.prepare(`
       INSERT INTO museum_items (user_id, emoji, name, description, origin_story)
       VALUES (?, ?, ?, ?, ?)
     `).run(userId, emoji, name, description, originStory || null)
 
     // Log the activity
-    db.prepare(`
+    await db.prepare(`
       INSERT INTO activity_log (user_id, activity_type, activity_data)
       VALUES (?, 'museum_item_added', ?)
     `).run(userId, JSON.stringify({ name, emoji }))
 
     // Check if this is their first museum item
-    const itemCount = db.prepare(`
+    const itemCount = await db.prepare(`
       SELECT COUNT(*) as count FROM museum_items WHERE user_id = ?
-    `).get(userId) as { count: number }
+    `).get(userId) as { count: number } | undefined
 
     return NextResponse.json({
-      id: result.lastInsertRowid,
       emoji,
       name,
       description,
       originStory: originStory || null,
-      isFirstItem: itemCount.count === 1
+      isFirstItem: itemCount?.count === 1
     })
   } catch (error) {
     console.error('Error creating museum item:', error)
@@ -74,7 +73,7 @@ export async function PUT(request: NextRequest) {
       return NextResponse.json({ error: 'Item ID is required' }, { status: 400 })
     }
 
-    db.prepare(`
+    await db.prepare(`
       UPDATE museum_items
       SET emoji = COALESCE(?, emoji),
           name = COALESCE(?, name),
@@ -100,7 +99,7 @@ export async function DELETE(request: NextRequest) {
   }
 
   try {
-    db.prepare('DELETE FROM museum_items WHERE id = ?').run(itemId)
+    await db.prepare('DELETE FROM museum_items WHERE id = ?').run(itemId)
     return NextResponse.json({ success: true })
   } catch (error) {
     console.error('Error deleting museum item:', error)

@@ -20,7 +20,7 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    const museum = db.prepare(`
+    const museum = await db.prepare(`
       SELECT * FROM museums WHERE user_id = ?
     `).get(userId) as { id: number; user_id: string; share_slug: string | null; museum_name: string | null; tagline: string | null; is_public: number } | undefined
 
@@ -56,7 +56,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Check if museum record exists
-    const existing = db.prepare(`
+    const existing = await db.prepare(`
       SELECT * FROM museums WHERE user_id = ?
     `).get(userId) as { id: number; share_slug: string | null } | undefined
 
@@ -69,7 +69,7 @@ export async function POST(request: NextRequest) {
       // Make sure slug is unique
       let attempts = 0
       while (attempts < 10) {
-        const existingSlug = db.prepare('SELECT id FROM museums WHERE share_slug = ?').get(shareSlug)
+        const existingSlug = await db.prepare('SELECT id FROM museums WHERE share_slug = ?').get(shareSlug)
         if (!existingSlug) break
         shareSlug = generateSlug()
         attempts++
@@ -78,7 +78,7 @@ export async function POST(request: NextRequest) {
 
     if (existing) {
       // Update existing record
-      db.prepare(`
+      await db.prepare(`
         UPDATE museums
         SET is_public = ?,
             share_slug = COALESCE(?, share_slug),
@@ -88,7 +88,7 @@ export async function POST(request: NextRequest) {
       `).run(isPublic ? 1 : 0, shareSlug, museumName, tagline, userId)
     } else {
       // Create new record
-      db.prepare(`
+      await db.prepare(`
         INSERT INTO museums (user_id, share_slug, museum_name, tagline, is_public)
         VALUES (?, ?, ?, ?, ?)
       `).run(userId, shareSlug, museumName, tagline, isPublic ? 1 : 0)

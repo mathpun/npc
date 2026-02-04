@@ -35,7 +35,7 @@ export async function GET(
 
   try {
     // Find the museum by slug
-    const museum = db.prepare(`
+    const museum = await db.prepare(`
       SELECT * FROM museums WHERE share_slug = ? AND is_public = 1
     `).get(slug) as Museum | undefined
 
@@ -44,12 +44,12 @@ export async function GET(
     }
 
     // Get the user's name
-    const user = db.prepare(`
+    const user = await db.prepare(`
       SELECT name FROM users WHERE id = ?
     `).get(museum.user_id) as User | undefined
 
     // Get the museum items
-    const items = db.prepare(`
+    const items = await db.prepare(`
       SELECT * FROM museum_items WHERE user_id = ? ORDER BY created_at DESC
     `).all(museum.user_id) as unknown as MuseumItem[]
 

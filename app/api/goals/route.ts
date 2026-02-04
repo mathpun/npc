@@ -11,7 +11,7 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    const goals = db.prepare(`
+    const goals = await db.prepare(`
       SELECT * FROM user_goals
       WHERE user_id = ?
       ORDER BY created_at DESC
@@ -35,40 +35,40 @@ export async function POST(request: NextRequest) {
     }
 
     // Insert the goal
-    const result = db.prepare(`
+    await db.prepare(`
       INSERT INTO user_goals (user_id, title, progress, status)
       VALUES (?, ?, 0, 'active')
     `).run(userId, title)
 
     // Log the activity
-    db.prepare(`
+    await db.prepare(`
       INSERT INTO activity_log (user_id, activity_type, activity_data)
       VALUES (?, 'goal_created', ?)
     `).run(userId, JSON.stringify({ title }))
 
     // Check if this is their first goal - grant achievement
-    const goalCount = db.prepare(`
+    const goalCount = await db.prepare(`
       SELECT COUNT(*) as count FROM user_goals WHERE user_id = ?
-    `).get(userId) as { count: number }
+    `).get(userId) as { count: number } | undefined
 
-    if (goalCount.count === 1) {
-      db.prepare(`
-        INSERT OR IGNORE INTO achievements (user_id, achievement_key)
+    if (goalCount?.count === 1) {
+      await db.prepare(`
+        INSERT INTO achievements (user_id, achievement_key)
         VALUES (?, 'goal_setter')
+        ON CONFLICT (user_id, achievement_key) DO NOTHING
       `).run(userId)
 
-      db.prepare(`
+      await db.prepare(`
         INSERT INTO milestones (user_id, milestone_type, title, description, color)
         VALUES (?, 'first_goal', 'Set First Goal', 'Started working towards something!', '#FF69B4')
       `).run(userId)
     }
 
     return NextResponse.json({
-      id: result.lastInsertRowid,
       title,
       progress: 0,
       status: 'active',
-      isFirstGoal: goalCount.count === 1
+      isFirstGoal: goalCount?.count === 1
     })
   } catch (error) {
     console.error('Error creating goal:', error)
@@ -88,36 +88,39 @@ export async function PUT(request: NextRequest) {
 
     // Update the goal
     if (progress !== undefined) {
-      db.prepare(`
+      await db.prepare(`
         UPDATE user_goals SET progress = ? WHERE id = ?
       `).run(progress, goalId)
     }
 
     if (status) {
-      db.prepare(`
+      await db.prepare(`
         UPDATE user_goals SET status = ?, completed_at = CASE WHEN ? = 'completed' THEN CURRENT_TIMESTAMP ELSE NULL END
         WHERE id = ?
       `).run(status, status, goalId)
 
       // If completing a goal, log it and check for achievement
       if (status === 'completed' && userId) {
-        db.prepare(`
+        await db.prepare(`
           INSERT INTO activity_log (user_id, activity_type, activity_data)
           VALUES (?, 'goal_completed', ?)
         `).run(userId, JSON.stringify({ goalId }))
 
         // Grant goal_getter achievement
-        db.prepare(`
-          INSERT OR IGNORE INTO achievements (user_id, achievement_key)
+        await db.prepare(`
+          INSERT INTO achievements (user_id, achievement_key)
           VALUES (?, 'goal_getter')
+          ON CONFLICT (user_id, achievement_key) DO NOTHING
         `).run(userId)
 
         // Add milestone
-        const goal = db.prepare('SELECT title FROM user_goals WHERE id = ?').get(goalId) as { title: string }
-        db.prepare(`
-          INSERT INTO milestones (user_id, milestone_type, title, description, color)
-          VALUES (?, 'goal_complete', 'Goal Completed!', ?, '#FFA500')
-        `).run(userId, `Finished: ${goal.title}`)
+        const goal = await db.prepare('SELECT title FROM user_goals WHERE id = ?').get(goalId) as { title: string } | undefined
+        if (goal) {
+          await db.prepare(`
+            INSERT INTO milestones (user_id, milestone_type, title, description, color)
+            VALUES (?, 'goal_complete', 'Goal Completed!', ?, '#FFA500')
+          `).run(userId, `Finished: ${goal.title}`)
+        }
       }
     }
 
@@ -138,7 +141,7 @@ export async function DELETE(request: NextRequest) {
   }
 
   try {
-    db.prepare('DELETE FROM user_goals WHERE id = ?').run(goalId)
+    await db.prepare('DELETE FROM user_goals WHERE id = ?').run(goalId)
     return NextResponse.json({ success: true })
   } catch (error) {
     console.error('Error deleting goal:', error)

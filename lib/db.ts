@@ -1,82 +1,241 @@
-// In-memory database for Railway deployment
-// Data persists only during the server process lifetime
-// For production, consider using Railway's PostgreSQL addon
+import { Pool, QueryResult } from 'pg'
 
-type Row = Record<string, unknown>
-const tables: Record<string, Row[]> = {}
+// Create connection pool
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+  ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
+})
 
-// Initialize empty tables
-const tableNames = [
-  'users', 'activity_log', 'chat_sessions', 'journal_entries',
-  'user_goals', 'milestones', 'daily_activity', 'achievements',
-  'parent_prompts', 'prompt_responses', 'museum_items', 'museums', 'chat_messages'
-]
-tableNames.forEach(name => { tables[name] = [] })
+// Initialize database tables
+async function initDb() {
+  const client = await pool.connect()
+  try {
+    await client.query(`
+      -- Users table
+      CREATE TABLE IF NOT EXISTS users (
+        id TEXT PRIMARY KEY,
+        name TEXT NOT NULL,
+        age INTEGER NOT NULL,
+        interests TEXT NOT NULL,
+        goals TEXT,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        last_active TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      );
 
-let idCounter = 1
+      -- Activity log
+      CREATE TABLE IF NOT EXISTS activity_log (
+        id SERIAL PRIMARY KEY,
+        user_id TEXT NOT NULL REFERENCES users(id),
+        activity_type TEXT NOT NULL,
+        activity_data TEXT,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      );
 
-// Simple wrapper that mimics better-sqlite3 API
+      -- Chat sessions
+      CREATE TABLE IF NOT EXISTS chat_sessions (
+        id SERIAL PRIMARY KEY,
+        user_id TEXT NOT NULL REFERENCES users(id),
+        session_goal TEXT,
+        session_topic TEXT,
+        message_count INTEGER DEFAULT 0,
+        started_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        ended_at TIMESTAMP
+      );
+
+      -- Journal entries
+      CREATE TABLE IF NOT EXISTS journal_entries (
+        id SERIAL PRIMARY KEY,
+        user_id TEXT NOT NULL REFERENCES users(id),
+        entry_type TEXT NOT NULL,
+        content TEXT NOT NULL,
+        context TEXT,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      );
+
+      -- User goals
+      CREATE TABLE IF NOT EXISTS user_goals (
+        id SERIAL PRIMARY KEY,
+        user_id TEXT NOT NULL REFERENCES users(id),
+        title TEXT NOT NULL,
+        progress INTEGER DEFAULT 0,
+        status TEXT DEFAULT 'active',
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        completed_at TIMESTAMP
+      );
+
+      -- Milestones
+      CREATE TABLE IF NOT EXISTS milestones (
+        id SERIAL PRIMARY KEY,
+        user_id TEXT NOT NULL REFERENCES users(id),
+        milestone_type TEXT NOT NULL,
+        title TEXT NOT NULL,
+        description TEXT,
+        color TEXT,
+        unlocked_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      );
+
+      -- Daily activity tracking
+      CREATE TABLE IF NOT EXISTS daily_activity (
+        id SERIAL PRIMARY KEY,
+        user_id TEXT NOT NULL REFERENCES users(id),
+        activity_date DATE NOT NULL,
+        chat_count INTEGER DEFAULT 0,
+        journal_count INTEGER DEFAULT 0,
+        UNIQUE(user_id, activity_date)
+      );
+
+      -- Achievements
+      CREATE TABLE IF NOT EXISTS achievements (
+        id SERIAL PRIMARY KEY,
+        user_id TEXT NOT NULL REFERENCES users(id),
+        achievement_key TEXT NOT NULL,
+        unlocked_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        UNIQUE(user_id, achievement_key)
+      );
+
+      -- Parent prompts
+      CREATE TABLE IF NOT EXISTS parent_prompts (
+        id SERIAL PRIMARY KEY,
+        user_id TEXT REFERENCES users(id),
+        prompt_type TEXT NOT NULL,
+        title TEXT NOT NULL,
+        description TEXT,
+        emoji TEXT DEFAULT '💭',
+        is_global INTEGER DEFAULT 0,
+        is_active INTEGER DEFAULT 1,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        expires_at TIMESTAMP
+      );
+
+      -- Prompt responses
+      CREATE TABLE IF NOT EXISTS prompt_responses (
+        id SERIAL PRIMARY KEY,
+        prompt_id INTEGER NOT NULL REFERENCES parent_prompts(id),
+        user_id TEXT NOT NULL REFERENCES users(id),
+        response_type TEXT,
+        response_text TEXT,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      );
+
+      -- Museum items
+      CREATE TABLE IF NOT EXISTS museum_items (
+        id SERIAL PRIMARY KEY,
+        user_id TEXT NOT NULL REFERENCES users(id),
+        emoji TEXT NOT NULL,
+        name TEXT NOT NULL,
+        description TEXT NOT NULL,
+        origin_story TEXT,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      );
+
+      -- Museums
+      CREATE TABLE IF NOT EXISTS museums (
+        id SERIAL PRIMARY KEY,
+        user_id TEXT NOT NULL UNIQUE REFERENCES users(id),
+        share_slug TEXT UNIQUE,
+        museum_name TEXT,
+        tagline TEXT,
+        is_public INTEGER DEFAULT 0,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      );
+
+      -- Chat messages
+      CREATE TABLE IF NOT EXISTS chat_messages (
+        id SERIAL PRIMARY KEY,
+        user_id TEXT NOT NULL REFERENCES users(id),
+        role TEXT NOT NULL,
+        content TEXT NOT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      );
+    `)
+    console.log('Database tables initialized')
+  } catch (error) {
+    console.error('Error initializing database:', error)
+  } finally {
+    client.release()
+  }
+}
+
+// Initialize on first import
+let dbInitialized = false
+async function ensureDbInitialized() {
+  if (!dbInitialized && process.env.DATABASE_URL) {
+    dbInitialized = true
+    await initDb()
+  }
+}
+
+// Wrapper that mimics better-sqlite3 API but uses PostgreSQL
 const db = {
   prepare: (sql: string) => {
+    // Convert SQLite syntax to PostgreSQL
+    let pgSql = sql
+      // Convert ? placeholders to $1, $2, etc.
+      .replace(/\?/g, (() => {
+        let i = 0
+        return () => `$${++i}`
+      })())
+      // Convert DATETIME to TIMESTAMP
+      .replace(/DATETIME/gi, 'TIMESTAMP')
+      // Convert INTEGER PRIMARY KEY AUTOINCREMENT to SERIAL PRIMARY KEY
+      .replace(/INTEGER PRIMARY KEY AUTOINCREMENT/gi, 'SERIAL PRIMARY KEY')
+      // Convert date('now') to CURRENT_DATE
+      .replace(/date\('now'\)/gi, 'CURRENT_DATE')
+      // Convert date('now', '-X days') to CURRENT_DATE - INTERVAL 'X days'
+      .replace(/date\('now',\s*'(-?\d+)\s*days?'\)/gi, "CURRENT_DATE + INTERVAL '$1 days'")
+      // Convert INSERT OR IGNORE to INSERT ... ON CONFLICT DO NOTHING
+      .replace(/INSERT OR IGNORE/gi, 'INSERT')
+
     return {
-      run: (...params: unknown[]) => {
+      run: async (...params: unknown[]) => {
+        await ensureDbInitialized()
         try {
-          // Extract table name from INSERT
-          const insertMatch = sql.match(/INSERT\s+(?:OR\s+IGNORE\s+)?INTO\s+(\w+)/i)
-          if (insertMatch) {
-            const tableName = insertMatch[1]
-            if (!tables[tableName]) tables[tableName] = []
-
-            // Simple insert - just store params as a row
-            const row: Row = { id: idCounter++, created_at: new Date().toISOString() }
-            const columns = sql.match(/\(([^)]+)\)\s*VALUES/i)?.[1]?.split(',').map(c => c.trim()) || []
-            columns.forEach((col, i) => {
-              if (params[i] !== undefined) row[col] = params[i]
-            })
-            tables[tableName].push(row)
-          }
-
-          // Handle UPDATE
-          const updateMatch = sql.match(/UPDATE\s+(\w+)/i)
-          if (updateMatch) {
-            // Just log, don't actually need to update for chat to work
-          }
-        } catch (error) {
-          console.error('DB run error (non-fatal):', error)
-        }
-        return { changes: 1, lastInsertRowid: idCounter - 1 }
-      },
-      get: (..._params: unknown[]): Row | undefined => {
-        try {
-          // Return empty for most queries - chat doesn't need reads
-          const selectMatch = sql.match(/FROM\s+(\w+)/i)
-          if (selectMatch) {
-            const tableName = selectMatch[1]
-            if (tables[tableName]?.length > 0) {
-              return tables[tableName][tables[tableName].length - 1]
+          // Handle INSERT OR IGNORE pattern
+          let finalSql = pgSql
+          if (sql.match(/INSERT OR IGNORE/i)) {
+            // Add ON CONFLICT DO NOTHING for unique constraint violations
+            if (finalSql.includes('achievements')) {
+              finalSql = finalSql.replace(/VALUES\s*\([^)]+\)/i, '$& ON CONFLICT (user_id, achievement_key) DO NOTHING')
+            } else {
+              finalSql = finalSql + ' ON CONFLICT DO NOTHING'
             }
           }
+          const result = await pool.query(finalSql, params)
+          return { changes: result.rowCount, lastInsertRowid: 0 }
         } catch (error) {
-          console.error('DB get error (non-fatal):', error)
+          console.error('DB run error:', error, 'SQL:', pgSql)
+          return { changes: 0, lastInsertRowid: 0 }
         }
-        return undefined
       },
-      all: (..._params: unknown[]): Row[] => {
+      get: async (...params: unknown[]) => {
+        await ensureDbInitialized()
         try {
-          const selectMatch = sql.match(/FROM\s+(\w+)/i)
-          if (selectMatch) {
-            const tableName = selectMatch[1]
-            return tables[tableName] || []
-          }
+          const result: QueryResult = await pool.query(pgSql, params)
+          return result.rows[0]
         } catch (error) {
-          console.error('DB all error (non-fatal):', error)
+          console.error('DB get error:', error, 'SQL:', pgSql)
+          return undefined
         }
-        return []
+      },
+      all: async (...params: unknown[]) => {
+        await ensureDbInitialized()
+        try {
+          const result: QueryResult = await pool.query(pgSql, params)
+          return result.rows
+        } catch (error) {
+          console.error('DB all error:', error, 'SQL:', pgSql)
+          return []
+        }
       }
     }
   },
-  exec: (_sql: string) => {
-    // Table creation - already handled by initialization
+  exec: async (sql: string) => {
+    await ensureDbInitialized()
+    try {
+      await pool.query(sql)
+    } catch (error) {
+      console.error('DB exec error:', error)
+    }
   }
 }
 

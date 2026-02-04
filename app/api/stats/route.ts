@@ -12,42 +12,42 @@ export async function GET(request: NextRequest) {
 
   try {
     // Get user info
-    const user = db.prepare('SELECT * FROM users WHERE id = ?').get(userId) as any
+    const user = await db.prepare('SELECT * FROM users WHERE id = ?').get(userId) as any
 
     if (!user) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 })
     }
 
     // Get chat count
-    const chatCount = db.prepare(`
+    const chatCount = await db.prepare(`
       SELECT COUNT(*) as count FROM activity_log
       WHERE user_id = ? AND activity_type = 'chat_message'
-    `).get(userId) as { count: number }
+    `).get(userId) as { count: number } | undefined
 
     // Get journal count
-    const journalCount = db.prepare(`
+    const journalCount = await db.prepare(`
       SELECT COUNT(*) as count FROM journal_entries WHERE user_id = ?
-    `).get(userId) as { count: number }
+    `).get(userId) as { count: number } | undefined
 
     // Get achievements
-    const achievements = db.prepare(`
+    const achievements = await db.prepare(`
       SELECT achievement_key, unlocked_at FROM achievements WHERE user_id = ?
     `).all(userId) as { achievement_key: string; unlocked_at: string }[]
 
     // Get milestones
-    const milestones = db.prepare(`
+    const milestones = await db.prepare(`
       SELECT * FROM milestones WHERE user_id = ? ORDER BY unlocked_at ASC
     `).all(userId)
 
     // Get goals
-    const goals = db.prepare(`
+    const goals = await db.prepare(`
       SELECT * FROM user_goals WHERE user_id = ?
     `).all(userId) as any[]
 
     const goalsCompleted = goals.filter(g => g.status === 'completed').length
 
     // Calculate streak (days with activity in a row)
-    const dailyActivity = db.prepare(`
+    const dailyActivity = await db.prepare(`
       SELECT activity_date FROM daily_activity
       WHERE user_id = ?
       ORDER BY activity_date DESC
@@ -77,11 +77,11 @@ export async function GET(request: NextRequest) {
     }
 
     // Calculate level based on total activities
-    const totalActivities = db.prepare(`
+    const totalActivities = await db.prepare(`
       SELECT COUNT(*) as count FROM activity_log WHERE user_id = ?
-    `).get(userId) as { count: number }
+    `).get(userId) as { count: number } | undefined
 
-    const xp = totalActivities.count * 10 + chatCount.count * 5 + journalCount.count * 20 + goalsCompleted * 100
+    const xp = (totalActivities?.count || 0) * 10 + (chatCount?.count || 0) * 5 + (journalCount?.count || 0) * 20 + goalsCompleted * 100
     const level = Math.floor(xp / 500) + 1
     const nextLevelXp = level * 500
 
@@ -96,8 +96,8 @@ export async function GET(request: NextRequest) {
       },
       stats: {
         streak,
-        totalReflections: chatCount.count,
-        journalEntries: journalCount.count,
+        totalReflections: chatCount?.count || 0,
+        journalEntries: journalCount?.count || 0,
         goalsCompleted,
         level,
         xp,

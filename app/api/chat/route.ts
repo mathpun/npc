@@ -17,9 +17,9 @@ function getAnthropicClient(): Anthropic {
 }
 
 // Save a chat message to the database
-function saveMessage(userId: string, role: string, content: string) {
+async function saveMessage(userId: string, role: string, content: string) {
   try {
-    db.prepare(`
+    await db.prepare(`
       INSERT INTO chat_messages (user_id, role, content)
       VALUES (?, ?, ?)
     `).run(userId, role, content)

@@ -9,14 +9,14 @@ export async function GET(request: NextRequest) {
 
   try {
     if (userId) {
-      const user = db.prepare('SELECT * FROM users WHERE id = ?').get(userId)
+      const user = await db.prepare('SELECT * FROM users WHERE id = ?').get(userId)
       if (!user) {
         return NextResponse.json({ error: 'User not found' }, { status: 404 })
       }
       return NextResponse.json(user)
     }
 
-    const users = db.prepare('SELECT * FROM users ORDER BY created_at DESC').all()
+    const users = await db.prepare('SELECT * FROM users ORDER BY created_at DESC').all()
     return NextResponse.json(users)
   } catch (error) {
     return NextResponse.json({ error: 'Database error' }, { status: 500 })
@@ -36,27 +36,28 @@ export async function POST(request: NextRequest) {
     const id = uuidv4()
     const interestsStr = Array.isArray(interests) ? interests.join(', ') : interests
 
-    db.prepare(`
+    await db.prepare(`
       INSERT INTO users (id, name, age, interests, goals)
       VALUES (?, ?, ?, ?, ?)
     `).run(id, name, age, interestsStr, goals || null)
 
     // Log the activity
-    db.prepare(`
+    await db.prepare(`
       INSERT INTO activity_log (user_id, activity_type, activity_data)
       VALUES (?, 'signup', ?)
     `).run(id, JSON.stringify({ name, age }))
 
     // Create first milestone
-    db.prepare(`
+    await db.prepare(`
       INSERT INTO milestones (user_id, milestone_type, title, description, color)
       VALUES (?, 'journey_start', 'Started Journey', 'Welcome to your growth journey!', '#90EE90')
     `).run(id)
 
     // Grant first achievement
-    db.prepare(`
-      INSERT OR IGNORE INTO achievements (user_id, achievement_key)
+    await db.prepare(`
+      INSERT INTO achievements (user_id, achievement_key)
       VALUES (?, 'first_steps')
+      ON CONFLICT (user_id, achievement_key) DO NOTHING
     `).run(id)
 
     return NextResponse.json({ id, name, age, interests: interestsStr, goals })
@@ -78,7 +79,7 @@ export async function PUT(request: NextRequest) {
 
     const interestsStr = Array.isArray(interests) ? interests.join(', ') : interests
 
-    db.prepare(`
+    await db.prepare(`
       UPDATE users
       SET name = COALESCE(?, name),
           age = COALESCE(?, age),

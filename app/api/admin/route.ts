@@ -20,21 +20,21 @@ export async function GET(request: NextRequest) {
 
   try {
     // Get overall stats
-    const totalUsers = db.prepare('SELECT COUNT(*) as count FROM users').get() as { count: number }
-    const activeToday = db.prepare(`
+    const totalUsers = await db.prepare('SELECT COUNT(*) as count FROM users').get() as { count: number } | undefined
+    const activeToday = await db.prepare(`
       SELECT COUNT(DISTINCT user_id) as count
       FROM activity_log
-      WHERE date(created_at) = date('now')
-    `).get() as { count: number }
-    const totalChats = db.prepare(`
+      WHERE created_at::date = CURRENT_DATE
+    `).get() as { count: number } | undefined
+    const totalChats = await db.prepare(`
       SELECT COUNT(*) as count FROM activity_log WHERE activity_type = 'chat_message'
-    `).get() as { count: number }
-    const totalJournals = db.prepare(`
+    `).get() as { count: number } | undefined
+    const totalJournals = await db.prepare(`
       SELECT COUNT(*) as count FROM journal_entries
-    `).get() as { count: number }
+    `).get() as { count: number } | undefined
 
     // Get all users with their stats
-    const users = db.prepare(`
+    const users = await db.prepare(`
       SELECT
         u.*,
         (SELECT COUNT(*) FROM activity_log WHERE user_id = u.id) as total_activities,
@@ -48,7 +48,7 @@ export async function GET(request: NextRequest) {
     `).all()
 
     // Get recent activity feed
-    const recentActivity = db.prepare(`
+    const recentActivity = await db.prepare(`
       SELECT
         al.*,
         u.name as user_name
@@ -59,19 +59,19 @@ export async function GET(request: NextRequest) {
     `).all()
 
     // Get activity by day (last 7 days)
-    const dailyActivity = db.prepare(`
+    const dailyActivity = await db.prepare(`
       SELECT
-        date(created_at) as date,
+        created_at::date as date,
         COUNT(*) as total,
         COUNT(DISTINCT user_id) as unique_users
       FROM activity_log
-      WHERE created_at >= date('now', '-7 days')
-      GROUP BY date(created_at)
+      WHERE created_at >= CURRENT_DATE - INTERVAL '7 days'
+      GROUP BY created_at::date
       ORDER BY date DESC
     `).all()
 
     // Get popular topics from chat
-    const topTopics = db.prepare(`
+    const topTopics = await db.prepare(`
       SELECT
         session_topic,
         COUNT(*) as count
@@ -83,7 +83,7 @@ export async function GET(request: NextRequest) {
     `).all()
 
     // Get recent chat messages
-    const chatMessages = db.prepare(`
+    const chatMessages = await db.prepare(`
       SELECT
         cm.*,
         u.name as user_name
@@ -95,10 +95,10 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({
       stats: {
-        totalUsers: totalUsers.count,
-        activeToday: activeToday.count,
-        totalChats: totalChats.count,
-        totalJournals: totalJournals.count,
+        totalUsers: totalUsers?.count || 0,
+        activeToday: activeToday?.count || 0,
+        totalChats: totalChats?.count || 0,
+        totalJournals: totalJournals?.count || 0,
       },
       users,
       recentActivity,
