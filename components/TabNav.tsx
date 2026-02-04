@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useTheme } from '@/lib/ThemeContext'
 
 export type TabId = 'chat' | 'growth' | 'parent'
 export type GrowthSubTab = 'insights' | 'progress' | 'challenges' | 'epistemic' | 'peers' | 'literacy' | 'anti-engagement' | 'co-design'
@@ -29,8 +30,6 @@ const GROWTH_SUBTABS = [
   { id: 'co-design' as GrowthSubTab, label: 'co-design', emoji: '🎨' },
 ]
 
-const TAB_COLORS = ['#FF69B4', '#90EE90', '#87CEEB', '#FFD700', '#DDA0DD', '#FFA500', '#98FB98', '#FF6B6B']
-
 export default function TabNav({
   activeTab,
   onTabChange,
@@ -38,6 +37,8 @@ export default function TabNav({
   onGrowthTabChange
 }: TabNavProps) {
   const [showGrowthMenu, setShowGrowthMenu] = useState(false)
+  const { theme } = useTheme()
+  const TAB_COLORS = theme.colors.primary
 
   return (
     <div className="flex flex-col items-center gap-2" style={{  }}>

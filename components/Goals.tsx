@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { useTheme } from '@/lib/ThemeContext'
 
 interface Goal {
   id: number
@@ -16,10 +17,11 @@ interface GoalsProps {
   onGoalChange?: () => void
 }
 
-const GOAL_COLORS = ['#DDA0DD', '#FF69B4', '#87CEEB', '#FFD700', '#90EE90']
 const GOAL_EMOJIS = ['🎯', '💪', '🚀', '⭐', '🌟', '💡', '🎨', '📚', '🎵', '💻']
 
 export default function Goals({ userId, onGoalChange }: GoalsProps) {
+  const { theme } = useTheme()
+  const GOAL_COLORS = [theme.colors.accent5, theme.colors.accent1, theme.colors.accent4, theme.colors.accent2, theme.colors.accent3]
   const [goals, setGoals] = useState<Goal[]>([])
   const [loading, setLoading] = useState(true)
   const [showAddForm, setShowAddForm] = useState(false)
@@ -134,7 +136,7 @@ export default function Goals({ userId, onGoalChange }: GoalsProps) {
         <div
           className="fixed top-20 left-1/2 -translate-x-1/2 z-50 px-6 py-3 text-center font-bold animate-bounce"
           style={{
-            backgroundColor: '#FFD700',
+            backgroundColor: theme.colors.accent2,
             border: '3px solid black',
             borderRadius: '12px',
             boxShadow: '4px 4px 0 black',
@@ -180,7 +182,7 @@ export default function Goals({ userId, onGoalChange }: GoalsProps) {
                     onClick={() => completeGoal(goal.id)}
                     className="px-2 py-1 text-xs font-bold hover:scale-110 transition-transform"
                     style={{
-                      backgroundColor: '#90EE90',
+                      backgroundColor: theme.colors.buttonSuccess,
                       border: '2px solid black',
                       borderRadius: '6px',
                     }}
@@ -192,7 +194,7 @@ export default function Goals({ userId, onGoalChange }: GoalsProps) {
                     onClick={() => deleteGoal(goal.id)}
                     className="px-2 py-1 text-xs font-bold hover:scale-110 transition-transform"
                     style={{
-                      backgroundColor: '#FFB6C1',
+                      backgroundColor: theme.colors.buttonDanger,
                       border: '2px solid black',
                       borderRadius: '6px',
                     }}
@@ -273,7 +275,7 @@ export default function Goals({ userId, onGoalChange }: GoalsProps) {
               disabled={adding || !newGoalTitle.trim()}
               className="flex-1 py-2 font-bold hover:scale-105 transition-transform disabled:opacity-50"
               style={{
-                backgroundColor: '#90EE90',
+                backgroundColor: theme.colors.buttonSuccess,
                 border: '3px solid black',
                 borderRadius: '8px',
                 boxShadow: '2px 2px 0 black',
@@ -319,7 +321,7 @@ export default function Goals({ userId, onGoalChange }: GoalsProps) {
                 key={goal.id}
                 className="p-2 flex items-center gap-2 opacity-70"
                 style={{
-                  backgroundColor: '#90EE90',
+                  backgroundColor: theme.colors.buttonSuccess,
                   border: '2px solid black',
                   borderRadius: '8px',
                 }}

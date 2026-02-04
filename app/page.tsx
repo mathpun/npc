@@ -2,10 +2,13 @@
 
 import Link from 'next/link'
 import NavBar from '@/components/NavBar'
+import { useTheme } from '@/lib/ThemeContext'
 
 export default function Home() {
+  const { theme } = useTheme()
+
   return (
-    <main className="min-h-screen font-hand" style={{ backgroundColor: '#FFB6C1' }}>
+    <main className="min-h-screen font-hand" style={{ backgroundColor: theme.colors.background }}>
       {/* Doodle decorations */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden">
         <div className="absolute top-10 left-10 text-6xl rotate-12 animate-bounce">⭐</div>
@@ -26,7 +29,7 @@ export default function Home() {
           <div
             className="inline-block px-6 py-3 mb-8 rotate-2"
             style={{
-              backgroundColor: '#87CEEB',
+              backgroundColor: theme.colors.accent4,
               border: '3px solid black',
               borderRadius: '9999px',
               boxShadow: '4px 4px 0 black',
@@ -42,7 +45,7 @@ export default function Home() {
             <span
               className="inline-block px-4 py-2 mt-2 -rotate-2"
               style={{
-                backgroundColor: '#FFD700',
+                backgroundColor: theme.colors.accent2,
                 border: '4px solid black',
                 boxShadow: '6px 6px 0 black',
               }}
@@ -54,7 +57,7 @@ export default function Home() {
           {/* Little blob character */}
           <div className="flex justify-center my-8">
             <svg width="120" height="140" viewBox="0 0 60 70">
-              <ellipse cx="30" cy="45" rx="20" ry="25" fill="#DDA0DD" stroke="black" strokeWidth="3"/>
+              <ellipse cx="30" cy="45" rx="20" ry="25" fill={theme.colors.accent5} stroke="black" strokeWidth="3"/>
               <circle cx="30" cy="20" r="18" fill="white" stroke="black" strokeWidth="3"/>
               <circle cx="24" cy="18" r="5" fill="black"/>
               <circle cx="36" cy="18" r="5" fill="black"/>
@@ -91,7 +94,7 @@ export default function Home() {
               href="/dashboard"
               className="flex items-center gap-3 px-10 py-5 text-xl font-bold hover:scale-110 hover:rotate-2 transition-all"
               style={{
-                backgroundColor: '#90EE90',
+                backgroundColor: theme.colors.buttonSuccess,
                 border: '4px solid black',
                 borderRadius: '20px',
                 boxShadow: '6px 6px 0 black',
@@ -128,7 +131,7 @@ export default function Home() {
                     key={i}
                     className="w-10 h-10 rounded-full flex items-center justify-center text-xl"
                     style={{
-                      backgroundColor: ['#FF69B4', '#FFD700', '#90EE90', '#87CEEB'][i],
+                      backgroundColor: theme.colors.primary[i % theme.colors.primary.length],
                       border: '2px solid black',
                     }}
                   >
@@ -143,13 +146,13 @@ export default function Home() {
       </div>
 
       {/* Features Section */}
-      <div className="relative z-10 px-4 py-16" style={{ backgroundColor: '#7FDBFF' }}>
+      <div className="relative z-10 px-4 py-16" style={{ backgroundColor: theme.colors.backgroundAlt }}>
         <div className="max-w-5xl mx-auto" style={{  }}>
           <div className="text-center mb-12">
             <h2
               className="text-3xl md:text-5xl font-bold inline-block px-6 py-3 -rotate-1"
               style={{
-                backgroundColor: '#FFD700',
+                backgroundColor: theme.colors.accent2,
                 border: '4px solid black',
                 boxShadow: '6px 6px 0 black',
               }}
@@ -166,7 +169,7 @@ export default function Home() {
             <div
               className="p-6 hover:scale-105 transition-transform rotate-1"
               style={{
-                backgroundColor: '#DDA0DD',
+                backgroundColor: theme.colors.accent5,
                 border: '3px solid black',
                 borderRadius: '12px',
                 boxShadow: '5px 5px 0 black',
@@ -183,7 +186,7 @@ export default function Home() {
             <div
               className="p-6 hover:scale-105 transition-transform -rotate-1"
               style={{
-                backgroundColor: '#98FB98',
+                backgroundColor: theme.colors.accent3,
                 border: '3px solid black',
                 borderRadius: '12px',
                 boxShadow: '5px 5px 0 black',
@@ -200,7 +203,7 @@ export default function Home() {
             <div
               className="p-6 hover:scale-105 transition-transform rotate-2"
               style={{
-                backgroundColor: '#87CEEB',
+                backgroundColor: theme.colors.accent4,
                 border: '3px solid black',
                 borderRadius: '12px',
                 boxShadow: '5px 5px 0 black',
@@ -217,7 +220,7 @@ export default function Home() {
       </div>
 
       {/* Use Cases */}
-      <div className="relative z-10 px-4 py-16" style={{ backgroundColor: '#FFFACD' }}>
+      <div className="relative z-10 px-4 py-16" style={{ backgroundColor: 'white' }}>
         <div className="max-w-5xl mx-auto">
           <h2 className="text-2xl md:text-4xl font-bold text-center mb-10 underline decoration-wavy decoration-black">
             what people use it for
@@ -225,16 +228,16 @@ export default function Home() {
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {[
-              { emoji: '🧠', title: 'hw help', desc: 'without just giving answers', color: '#FF69B4' },
-              { emoji: '💭', title: 'vent sesh', desc: 'process feelings safely', color: '#87CEEB' },
-              { emoji: '✨', title: 'creative stuff', desc: 'brainstorm & create', color: '#98FB98' },
-              { emoji: '🎯', title: 'decisions', desc: 'think through choices', color: '#FFD700' },
+              { emoji: '🧠', title: 'hw help', desc: 'without just giving answers' },
+              { emoji: '💭', title: 'vent sesh', desc: 'process feelings safely' },
+              { emoji: '✨', title: 'creative stuff', desc: 'brainstorm & create' },
+              { emoji: '🎯', title: 'decisions', desc: 'think through choices' },
             ].map((item, i) => (
               <div
                 key={i}
                 className="p-5 text-center hover:scale-110 transition-transform cursor-pointer"
                 style={{
-                  backgroundColor: item.color,
+                  backgroundColor: theme.colors.primary[i % theme.colors.primary.length],
                   border: '3px solid black',
                   borderRadius: '12px',
                   boxShadow: '4px 4px 0 black',
@@ -251,7 +254,7 @@ export default function Home() {
       </div>
 
       {/* CTA Section */}
-      <div className="relative z-10 px-4 py-16" style={{ backgroundColor: '#98FB98' }}>
+      <div className="relative z-10 px-4 py-16" style={{ backgroundColor: theme.colors.backgroundAccent }}>
         <div className="max-w-2xl mx-auto text-center">
           <div
             className="p-10 rotate-1"
@@ -265,7 +268,7 @@ export default function Home() {
             {/* Little excited blob */}
             <div className="flex justify-center mb-6">
               <svg width="80" height="90" viewBox="0 0 60 70">
-                <ellipse cx="30" cy="45" rx="20" ry="25" fill="#FFD700" stroke="black" strokeWidth="3"/>
+                <ellipse cx="30" cy="45" rx="20" ry="25" fill={theme.colors.accent2} stroke="black" strokeWidth="3"/>
                 <circle cx="30" cy="20" r="18" fill="white" stroke="black" strokeWidth="3"/>
                 <circle cx="22" cy="16" r="6" fill="black"/>
                 <circle cx="38" cy="16" r="6" fill="black"/>
@@ -288,7 +291,7 @@ export default function Home() {
               href="/dashboard"
               className="inline-block px-10 py-5 text-xl font-bold hover:scale-110 hover:-rotate-2 transition-all"
               style={{
-                backgroundColor: '#FF69B4',
+                backgroundColor: theme.colors.buttonPrimary,
                 border: '4px solid black',
                 borderRadius: '9999px',
                 boxShadow: '5px 5px 0 black',
@@ -303,7 +306,7 @@ export default function Home() {
       {/* Footer */}
       <footer
         className="relative z-10 px-4 py-8 border-t-4 border-black border-dashed"
-        style={{ backgroundColor: '#DDA0DD' }}
+        style={{ backgroundColor: theme.colors.accent5 }}
       >
         <div className="max-w-5xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-3">

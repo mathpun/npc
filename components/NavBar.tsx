@@ -3,6 +3,8 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
+import { useTheme } from '@/lib/ThemeContext'
+import ThemePicker, { ThemePickerButton } from './ThemePicker'
 
 interface NavBarProps {
   showBack?: boolean
@@ -14,6 +16,8 @@ export default function NavBar({ showBack = false, backHref = '/', backLabel = '
   const router = useRouter()
   const [isLoggedIn, setIsLoggedIn] = useState(false)
   const [userName, setUserName] = useState('')
+  const [showThemePicker, setShowThemePicker] = useState(false)
+  const { theme } = useTheme()
 
   useEffect(() => {
     const profile = localStorage.getItem('youthai_profile')
@@ -45,7 +49,7 @@ export default function NavBar({ showBack = false, backHref = '/', backLabel = '
           href="/"
           className="flex items-center gap-2 px-3 py-2 font-bold hover:scale-105 transition-transform"
           style={{
-            backgroundColor: '#FFB6C1',
+            backgroundColor: theme.colors.navHome,
             border: '3px solid black',
             borderRadius: '9999px',
             boxShadow: '3px 3px 0 black',
@@ -60,7 +64,7 @@ export default function NavBar({ showBack = false, backHref = '/', backLabel = '
           href="/dashboard"
           className="flex items-center gap-2 px-3 py-2 font-bold hover:scale-105 transition-transform"
           style={{
-            backgroundColor: '#87CEEB',
+            backgroundColor: theme.colors.navDashboard,
             border: '3px solid black',
             borderRadius: '9999px',
             boxShadow: '3px 3px 0 black',
@@ -75,7 +79,7 @@ export default function NavBar({ showBack = false, backHref = '/', backLabel = '
           href="/chat"
           className="flex items-center gap-2 px-3 py-2 font-bold hover:scale-105 transition-transform"
           style={{
-            backgroundColor: '#98FB98',
+            backgroundColor: theme.colors.navChat,
             border: '3px solid black',
             borderRadius: '9999px',
             boxShadow: '3px 3px 0 black',
@@ -90,7 +94,7 @@ export default function NavBar({ showBack = false, backHref = '/', backLabel = '
           href="/museum"
           className="flex items-center gap-2 px-3 py-2 font-bold hover:scale-105 transition-transform"
           style={{
-            backgroundColor: '#DDA0DD',
+            backgroundColor: theme.colors.navMuseum,
             border: '3px solid black',
             borderRadius: '9999px',
             boxShadow: '3px 3px 0 black',
@@ -105,7 +109,7 @@ export default function NavBar({ showBack = false, backHref = '/', backLabel = '
           href="/moltbook"
           className="flex items-center gap-2 px-3 py-2 font-bold hover:scale-105 transition-transform"
           style={{
-            backgroundColor: '#FFD700',
+            backgroundColor: theme.colors.navWorld,
             border: '3px solid black',
             borderRadius: '9999px',
             boxShadow: '3px 3px 0 black',
@@ -114,6 +118,9 @@ export default function NavBar({ showBack = false, backHref = '/', backLabel = '
           <span className="text-xl">🌍</span>
           <span className="hidden sm:inline">world</span>
         </Link>
+
+        {/* Theme picker button */}
+        <ThemePickerButton onClick={() => setShowThemePicker(true)} />
 
         {/* Optional back button */}
         {showBack && (
@@ -145,7 +152,7 @@ export default function NavBar({ showBack = false, backHref = '/', backLabel = '
             <span
               className="hidden sm:inline px-3 py-1 text-sm"
               style={{
-                backgroundColor: '#90EE90',
+                backgroundColor: theme.colors.buttonSuccess,
                 border: '2px solid black',
                 borderRadius: '9999px',
               }}
@@ -156,7 +163,7 @@ export default function NavBar({ showBack = false, backHref = '/', backLabel = '
               onClick={handleLogout}
               className="px-4 py-2 font-bold hover:scale-105 transition-transform"
               style={{
-                backgroundColor: '#FF69B4',
+                backgroundColor: theme.colors.buttonPrimary,
                 border: '3px solid black',
                 borderRadius: '9999px',
                 boxShadow: '3px 3px 0 black',
@@ -171,7 +178,7 @@ export default function NavBar({ showBack = false, backHref = '/', backLabel = '
             href="/login"
             className="px-4 py-2 font-bold hover:scale-105 transition-transform"
             style={{
-              backgroundColor: '#90EE90',
+              backgroundColor: theme.colors.buttonSuccess,
               border: '3px solid black',
               borderRadius: '9999px',
               boxShadow: '3px 3px 0 black',
@@ -182,6 +189,9 @@ export default function NavBar({ showBack = false, backHref = '/', backLabel = '
           </Link>
         )}
       </div>
+
+      {/* Theme Picker Modal */}
+      <ThemePicker isOpen={showThemePicker} onClose={() => setShowThemePicker(false)} />
     </nav>
   )
 }

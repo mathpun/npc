@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useTheme } from '@/lib/ThemeContext'
 
 interface ChatMessageProps {
   role: 'user' | 'assistant'
@@ -20,6 +21,7 @@ export default function ChatMessage({
   const [showSaveOptions, setShowSaveOptions] = useState(false)
   const [saved, setSaved] = useState(false)
   const [showTransparency, setShowTransparency] = useState(false)
+  const { theme } = useTheme()
 
   const handleSave = (type: 'insight' | 'reflection' | 'action') => {
     if (onSaveToJournal) {
@@ -44,7 +46,7 @@ export default function ChatMessage({
         <div
           className="flex-shrink-0 w-12 h-12 rounded-full flex items-center justify-center text-2xl"
           style={{
-            backgroundColor: '#DDA0DD',
+            backgroundColor: theme.colors.assistantAvatar,
             border: '3px solid black',
           }}
         >
@@ -57,7 +59,7 @@ export default function ChatMessage({
         <div
           className="px-4 py-3"
           style={{
-            backgroundColor: isAssistant ? 'white' : '#90EE90',
+            backgroundColor: isAssistant ? 'white' : theme.colors.userMessage,
             border: '3px solid black',
             borderRadius: isAssistant ? '16px 16px 16px 4px' : '16px 16px 4px 16px',
             boxShadow: '4px 4px 0 black',
@@ -79,7 +81,7 @@ export default function ChatMessage({
                   onClick={() => setShowSaveOptions(true)}
                   className="px-3 py-1 text-xs font-bold hover:scale-105 transition-transform"
                   style={{
-                    backgroundColor: '#FFD700',
+                    backgroundColor: theme.colors.accent2,
                     border: '2px solid black',
                     borderRadius: '9999px',
                   }}
@@ -93,7 +95,7 @@ export default function ChatMessage({
                 <div
                   className="px-3 py-1 text-xs font-bold"
                   style={{
-                    backgroundColor: '#90EE90',
+                    backgroundColor: theme.colors.buttonSuccess,
                     border: '2px solid black',
                     borderRadius: '9999px',
                   }}
@@ -109,7 +111,7 @@ export default function ChatMessage({
                     onClick={() => handleSave('insight')}
                     className="px-2 py-1 text-xs font-bold hover:scale-105 transition-transform"
                     style={{
-                      backgroundColor: '#DDA0DD',
+                      backgroundColor: theme.colors.accent5,
                       border: '2px solid black',
                       borderRadius: '9999px',
                     }}
@@ -120,7 +122,7 @@ export default function ChatMessage({
                     onClick={() => handleSave('reflection')}
                     className="px-2 py-1 text-xs font-bold hover:scale-105 transition-transform"
                     style={{
-                      backgroundColor: '#87CEEB',
+                      backgroundColor: theme.colors.accent4,
                       border: '2px solid black',
                       borderRadius: '9999px',
                     }}
@@ -131,7 +133,7 @@ export default function ChatMessage({
                     onClick={() => handleSave('action')}
                     className="px-2 py-1 text-xs font-bold hover:scale-105 transition-transform"
                     style={{
-                      backgroundColor: '#90EE90',
+                      backgroundColor: theme.colors.buttonSuccess,
                       border: '2px solid black',
                       borderRadius: '9999px',
                     }}
@@ -159,7 +161,7 @@ export default function ChatMessage({
                 onClick={() => setShowTransparency(!showTransparency)}
                 className="px-3 py-1 text-xs font-bold hover:scale-105 transition-transform"
                 style={{
-                  backgroundColor: showTransparency ? '#87CEEB' : 'white',
+                  backgroundColor: showTransparency ? theme.colors.accent4 : 'white',
                   border: '2px solid black',
                   borderRadius: '9999px',
                 }}
@@ -176,7 +178,7 @@ export default function ChatMessage({
           <div
             className="mt-2 p-3"
             style={{
-              backgroundColor: '#87CEEB',
+              backgroundColor: theme.colors.accent4,
               border: '3px solid black',
               borderRadius: '12px',
             }}
@@ -193,7 +195,7 @@ export default function ChatMessage({
         <div
           className="flex-shrink-0 w-12 h-12 rounded-full flex items-center justify-center text-2xl"
           style={{
-            backgroundColor: '#FF69B4',
+            backgroundColor: theme.colors.userAvatar,
             border: '3px solid black',
           }}
         >

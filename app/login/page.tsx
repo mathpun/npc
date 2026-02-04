@@ -4,12 +4,14 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import NavBar from '@/components/NavBar'
+import { useTheme } from '@/lib/ThemeContext'
 
 export default function LoginPage() {
   const router = useRouter()
   const [name, setName] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
+  const { theme } = useTheme()
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -48,7 +50,7 @@ export default function LoginPage() {
   }
 
   return (
-    <main className="min-h-screen flex flex-col" style={{ backgroundColor: '#FFB6C1' }}>
+    <main className="min-h-screen flex flex-col" style={{ backgroundColor: theme.colors.background }}>
       {/* Doodle decorations */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden">
         <div className="absolute top-10 right-10 text-5xl rotate-12 animate-bounce">⭐</div>
@@ -72,7 +74,7 @@ export default function LoginPage() {
           {/* Blob character */}
           <div className="flex justify-center mb-6">
             <svg width="100" height="120" viewBox="0 0 60 70">
-              <ellipse cx="30" cy="45" rx="20" ry="25" fill="#87CEEB" stroke="black" strokeWidth="3"/>
+              <ellipse cx="30" cy="45" rx="20" ry="25" fill={theme.colors.accent4} stroke="black" strokeWidth="3"/>
               <circle cx="30" cy="20" r="18" fill="white" stroke="black" strokeWidth="3"/>
               <circle cx="24" cy="18" r="4" fill="black"/>
               <circle cx="36" cy="18" r="4" fill="black"/>
@@ -85,7 +87,7 @@ export default function LoginPage() {
           <h1
             className="text-2xl font-bold text-center mb-2 inline-block w-full px-4 py-2"
             style={{
-              backgroundColor: '#FFD700',
+              backgroundColor: theme.colors.accent2,
               border: '3px solid black',
               boxShadow: '4px 4px 0 black',
             }}
@@ -113,7 +115,7 @@ export default function LoginPage() {
               <div
                 className="mb-4 p-3 text-center font-bold"
                 style={{
-                  backgroundColor: '#FFA500',
+                  backgroundColor: theme.colors.buttonDanger,
                   border: '2px solid black',
                   borderRadius: '8px',
                 }}
@@ -127,7 +129,7 @@ export default function LoginPage() {
               disabled={loading}
               className="w-full py-3 font-bold text-lg hover:scale-105 transition-transform"
               style={{
-                backgroundColor: '#90EE90',
+                backgroundColor: theme.colors.buttonSuccess,
                 border: '3px solid black',
                 borderRadius: '12px',
                 boxShadow: '4px 4px 0 black',
@@ -143,7 +145,7 @@ export default function LoginPage() {
               href="/onboarding"
               className="inline-block px-6 py-2 font-bold hover:scale-105 transition-transform"
               style={{
-                backgroundColor: '#FF69B4',
+                backgroundColor: theme.colors.buttonPrimary,
                 border: '3px solid black',
                 borderRadius: '9999px',
                 boxShadow: '3px 3px 0 black',

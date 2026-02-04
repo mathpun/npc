@@ -39,6 +39,14 @@ export async function POST(request: NextRequest) {
         ON CONFLICT(user_id, activity_date)
         DO UPDATE SET journal_count = journal_count + 1
       `).run(userId, today)
+    } else if (activityType === 'daily_checkin') {
+      // Daily check-in already updates daily_activity in the checkin API
+      // Just ensure the row exists
+      await db.prepare(`
+        INSERT INTO daily_activity (user_id, activity_date, journal_count)
+        VALUES (?, ?, 0)
+        ON CONFLICT(user_id, activity_date) DO NOTHING
+      `).run(userId, today)
     }
 
     // Check for achievements
@@ -84,6 +92,41 @@ export async function GET(request: NextRequest) {
 
 async function checkAndGrantAchievements(userId: string, activityType: string) {
   try {
+    // Check-in achievements
+    if (activityType === 'daily_checkin') {
+      const checkinCount = await db.prepare(`
+        SELECT COUNT(*) as count FROM daily_checkins WHERE user_id = ?
+      `).get(userId) as { count: number } | undefined
+
+      if (checkinCount?.count === 1) {
+        await db.prepare(`
+          INSERT INTO achievements (user_id, achievement_key)
+          VALUES (?, 'first_checkin')
+          ON CONFLICT (user_id, achievement_key) DO NOTHING
+        `).run(userId)
+
+        await db.prepare(`
+          INSERT INTO milestones (user_id, milestone_type, title, description, color)
+          VALUES (?, 'first_checkin', 'First Check-In', 'Started reflecting on your day!', '#98FB98')
+        `).run(userId)
+      }
+
+      // Check for 7-day check-in streak
+      const streakCount = await db.prepare(`
+        SELECT COUNT(*) as count FROM daily_checkins
+        WHERE user_id = ?
+        AND checkin_date >= CURRENT_DATE - INTERVAL '7 days'
+      `).get(userId) as { count: number } | undefined
+
+      if (streakCount && streakCount.count >= 7) {
+        await db.prepare(`
+          INSERT INTO achievements (user_id, achievement_key)
+          VALUES (?, 'checkin_streak_7')
+          ON CONFLICT (user_id, achievement_key) DO NOTHING
+        `).run(userId)
+      }
+    }
+
     // First chat achievement
     if (activityType === 'chat_message') {
       const chatCount = await db.prepare(`

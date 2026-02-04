@@ -1,56 +1,115 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import NavBar from '@/components/NavBar'
+import { MOOD_OPTIONS } from '@/lib/checkin-prompts'
+
+interface CheckinData {
+  date: string
+  questions: string[]
+  responses: string[]
+  mood: string | null
+  summary: string | null
+}
+
+interface ReportData {
+  user: {
+    name: string
+    age: number
+    interests: string
+  }
+  weekOf: string
+  summary: {
+    reflections: number
+    checkins: number
+    journalEntries: number
+    streakDays: number
+    moodTrend: string
+  }
+  checkins: CheckinData[]
+  moodTrend: { date: string; mood: string }[]
+  highlights: { text: string; date: string; emoji: string; category: string }[]
+  topTopics: { topic: string; count: number }[]
+}
 
 export default function WeeklyReport() {
+  const router = useRouter()
   const [showShareModal, setShowShareModal] = useState(false)
-  const [userName, setUserName] = useState('')
+  const [loading, setLoading] = useState(true)
+  const [reportData, setReportData] = useState<ReportData | null>(null)
+  const [expandedCheckin, setExpandedCheckin] = useState<number | null>(null)
 
   useEffect(() => {
-    const savedProfile = localStorage.getItem('youthai_profile')
-    if (savedProfile) {
-      const profile = JSON.parse(savedProfile)
-      setUserName(profile.name || 'User')
+    const userId = localStorage.getItem('npc_user_id')
+    if (!userId) {
+      router.push('/login')
+      return
     }
-  }, [])
 
-  // Mock weekly report data - uses dynamic userName
-  const reportData = {
-    weekOf: 'Jan 22 - Jan 28',
-    userName: userName || 'User',
-  summary: {
-    reflections: 12,
-    goalsProgress: 67,
-    moodTrend: 'improving',
-    streakDays: 12,
-    minutesReflecting: 45,
-  },
-  highlights: [
-    { text: 'Had a breakthrough about handling stress', emoji: '💡', category: 'insight' },
-    { text: 'Set a new goal for learning guitar', emoji: '🎸', category: 'goal' },
-    { text: 'Reflected on friendship dynamics', emoji: '👥', category: 'growth' },
-  ],
-  growthAreas: [
-    { area: 'Self-Awareness', score: 78, change: '+5', color: '#DDA0DD' },
-    { area: 'Goal Setting', score: 85, change: '+12', color: '#FF69B4' },
-    { area: 'Emotional Processing', score: 62, change: '+8', color: '#87CEEB' },
-    { area: 'Problem Solving', score: 71, change: '+3', color: '#FFD700' },
-  ],
-  topTopics: [
-    { topic: 'School & Learning', count: 5, emoji: '📚' },
-    { topic: 'Friendships', count: 4, emoji: '👋' },
-    { topic: 'Future Goals', count: 3, emoji: '🎯' },
-  ],
-  aiObservation: `${userName || 'This user'} showed great curiosity this week, especially when exploring questions about their future. They're getting better at sitting with uncertainty and considering multiple perspectives before jumping to conclusions. A standout moment was when they realized on their own that their stress about school was actually about something deeper.`,
-  goalsUpdate: [
-    { goal: 'Learn to code', status: 'on-track', progress: 45 },
-    { goal: 'Make new friends', status: 'ahead', progress: 70 },
-    { goal: 'Feel more confident', status: 'on-track', progress: 55 },
-  ],
-  parentNote: "This report is designed to spark conversation, not surveillance. Ask about the highlights - let them share what they're comfortable with.",
+    fetchReportData(userId)
+  }, [router])
+
+  const fetchReportData = async (userId: string) => {
+    try {
+      const res = await fetch(`/api/report?userId=${userId}`)
+      const data = await res.json()
+      if (data.error) {
+        console.error('Failed to fetch report:', data.error)
+      } else {
+        setReportData(data)
+      }
+    } catch (err) {
+      console.error('Failed to fetch report:', err)
+    }
+    setLoading(false)
   }
+
+  const getMoodEmoji = (mood: string | null) => {
+    const moodOption = MOOD_OPTIONS.find(m => m.value === mood)
+    return moodOption?.emoji || '😐'
+  }
+
+  const formatDate = (dateStr: string) => {
+    const date = new Date(dateStr)
+    return date.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })
+  }
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: '#FFB6C1' }}>
+        <div className="text-center">
+          <div className="text-6xl animate-bounce mb-4">📊</div>
+          <p className="text-xl font-bold">loading your report...</p>
+        </div>
+      </div>
+    )
+  }
+
+  if (!reportData) {
+    return (
+      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: '#FFB6C1' }}>
+        <div className="text-center">
+          <div className="text-6xl mb-4">😕</div>
+          <p className="text-xl font-bold">couldn&apos;t load report</p>
+          <button
+            onClick={() => router.push('/dashboard')}
+            className="mt-4 px-6 py-2 font-bold"
+            style={{
+              backgroundColor: 'white',
+              border: '3px solid black',
+              borderRadius: '12px',
+              boxShadow: '3px 3px 0 black',
+            }}
+          >
+            back to dashboard
+          </button>
+        </div>
+      </div>
+    )
+  }
+
+  const { user, weekOf, summary, checkins, moodTrend, highlights, topTopics } = reportData
 
   return (
     <div className="min-h-screen pb-8 text-black" style={{ backgroundColor: '#FFB6C1' }}>
@@ -106,7 +165,7 @@ export default function WeeklyReport() {
               boxShadow: '3px 3px 0 black',
             }}
           >
-            <span className="font-bold">📅 {reportData.weekOf}</span>
+            <span className="font-bold">📅 {weekOf}</span>
           </div>
           <h1
             className="text-3xl md:text-4xl font-bold inline-block px-6 py-3 -rotate-1"
@@ -119,17 +178,17 @@ export default function WeeklyReport() {
             weekly growth report!
           </h1>
           <p className="text-lg mt-4">
-            {reportData.userName}&apos;s reflection journey this week
+            {user.name}&apos;s reflection journey this week
           </p>
         </div>
 
         {/* Quick Stats */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-8">
           {[
-            { label: 'Reflections', value: reportData.summary.reflections, emoji: '🧠', color: '#DDA0DD' },
-            { label: 'Goals Progress', value: `${reportData.summary.goalsProgress}%`, emoji: '🎯', color: '#90EE90' },
-            { label: 'Day Streak', value: reportData.summary.streakDays, emoji: '🔥', color: '#FFA500' },
-            { label: 'Minutes', value: reportData.summary.minutesReflecting, emoji: '⏰', color: '#87CEEB' },
+            { label: 'Check-ins', value: summary.checkins, emoji: '📝', color: '#98FB98' },
+            { label: 'Chats', value: summary.reflections, emoji: '💬', color: '#DDA0DD' },
+            { label: 'Day Streak', value: summary.streakDays, emoji: '🔥', color: '#FFA500' },
+            { label: 'Mood', value: summary.moodTrend, emoji: summary.moodTrend === 'improving' ? '📈' : summary.moodTrend === 'declining' ? '📉' : '➡️', color: '#87CEEB' },
           ].map((stat, i) => (
             <div
               key={i}
@@ -149,203 +208,202 @@ export default function WeeklyReport() {
           ))}
         </div>
 
-        {/* Highlights */}
-        <div
-          className="mb-8 p-6 rotate-1"
-          style={{
-            backgroundColor: '#DDA0DD',
-            border: '4px solid black',
-            borderRadius: '20px',
-            boxShadow: '6px 6px 0 black',
-          }}
-        >
-          <div className="flex items-center gap-2 mb-4">
-            <span className="text-3xl">✨</span>
-            <h2 className="text-xl font-bold">week highlights!</h2>
-          </div>
-          <div className="space-y-3">
-            {reportData.highlights.map((highlight, i) => (
-              <div
-                key={i}
-                className="flex items-center gap-3 p-3"
-                style={{
-                  backgroundColor: 'white',
-                  border: '3px solid black',
-                  borderRadius: '12px',
-                  transform: `rotate(${(i % 2 === 0 ? -1 : 1)}deg)`,
-                }}
-              >
-                <span className="text-2xl">{highlight.emoji}</span>
-                <span className="font-bold">{highlight.text}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Growth Areas */}
-        <div
-          className="mb-8 p-6 -rotate-1"
-          style={{
-            backgroundColor: 'white',
-            border: '4px solid black',
-            borderRadius: '20px',
-            boxShadow: '6px 6px 0 black',
-          }}
-        >
-          <div className="flex items-center gap-2 mb-4">
-            <span className="text-3xl">📈</span>
-            <h2 className="text-xl font-bold">growth areas</h2>
-          </div>
-          <div className="space-y-4">
-            {reportData.growthAreas.map((area, i) => (
-              <div key={i}>
-                <div className="flex items-center justify-between mb-2">
-                  <span className="font-bold">{area.area}</span>
-                  <div className="flex items-center gap-2">
-                    <span>{area.score}%</span>
-                    <span
-                      className="text-xs px-2 py-1 font-bold"
-                      style={{
-                        backgroundColor: '#90EE90',
-                        border: '2px solid black',
-                        borderRadius: '9999px',
-                      }}
-                    >
-                      {area.change}
-                    </span>
-                  </div>
-                </div>
-                <div
-                  className="h-6 rounded-full overflow-hidden"
-                  style={{ backgroundColor: '#f0f0f0', border: '3px solid black' }}
-                >
-                  <div
-                    className="h-full rounded-full"
-                    style={{
-                      width: `${area.score}%`,
-                      backgroundColor: area.color,
-                    }}
-                  />
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* AI Observation */}
-        <div
-          className="mb-8 p-6 rotate-1"
-          style={{
-            backgroundColor: '#87CEEB',
-            border: '4px solid black',
-            borderRadius: '20px',
-            boxShadow: '6px 6px 0 black',
-          }}
-        >
-          <div className="flex items-center gap-2 mb-4">
-            <span className="text-3xl">👻</span>
-            <h2 className="text-xl font-bold">NPC&apos;s observation</h2>
-          </div>
-          <p
-            className="text-sm leading-relaxed p-4"
+        {/* Mood Trend */}
+        {moodTrend.length > 0 && (
+          <div
+            className="mb-8 p-6 rotate-1"
             style={{
-              backgroundColor: 'white',
-              border: '3px solid black',
-              borderRadius: '12px',
+              backgroundColor: '#DDA0DD',
+              border: '4px solid black',
+              borderRadius: '20px',
+              boxShadow: '6px 6px 0 black',
             }}
           >
-            {reportData.aiObservation}
-          </p>
-        </div>
+            <div className="flex items-center gap-2 mb-4">
+              <span className="text-3xl">😊</span>
+              <h2 className="text-xl font-bold">mood this week</h2>
+            </div>
+            <div className="flex justify-around items-end h-24 p-3" style={{ backgroundColor: 'white', border: '3px solid black', borderRadius: '12px' }}>
+              {moodTrend.map((m, i) => (
+                <div key={i} className="flex flex-col items-center gap-1">
+                  <span className="text-2xl">{getMoodEmoji(m.mood)}</span>
+                  <span className="text-xs">{new Date(m.date).toLocaleDateString('en-US', { weekday: 'short' })}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
 
-        {/* Goals Update */}
-        <div
-          className="mb-8 p-6 -rotate-1"
-          style={{
-            backgroundColor: '#FF69B4',
-            border: '4px solid black',
-            borderRadius: '20px',
-            boxShadow: '6px 6px 0 black',
-          }}
-        >
-          <div className="flex items-center gap-2 mb-4">
-            <span className="text-3xl">🎯</span>
-            <h2 className="text-xl font-bold">goals this week</h2>
-          </div>
-          <div className="space-y-3">
-            {reportData.goalsUpdate.map((goal, i) => (
-              <div
-                key={i}
-                className="flex items-center justify-between p-3"
-                style={{
-                  backgroundColor: 'white',
-                  border: '3px solid black',
-                  borderRadius: '12px',
-                }}
-              >
-                <div className="flex items-center gap-3">
-                  <span className="text-xl">{goal.status === 'ahead' ? '🌟' : '✅'}</span>
-                  <span className="font-bold">{goal.goal}</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <div
-                    className="w-20 h-3 rounded-full overflow-hidden"
-                    style={{ backgroundColor: '#f0f0f0', border: '2px solid black' }}
+        {/* Daily Check-ins */}
+        {checkins.length > 0 && (
+          <div
+            className="mb-8 p-6 -rotate-1"
+            style={{
+              backgroundColor: '#98FB98',
+              border: '4px solid black',
+              borderRadius: '20px',
+              boxShadow: '6px 6px 0 black',
+            }}
+          >
+            <div className="flex items-center gap-2 mb-4">
+              <span className="text-3xl">📝</span>
+              <h2 className="text-xl font-bold">daily check-ins</h2>
+            </div>
+            <div className="space-y-3">
+              {checkins.map((checkin, i) => (
+                <div key={i}>
+                  <button
+                    onClick={() => setExpandedCheckin(expandedCheckin === i ? null : i)}
+                    className="w-full p-3 text-left hover:scale-[1.02] transition-transform"
+                    style={{
+                      backgroundColor: 'white',
+                      border: '3px solid black',
+                      borderRadius: '12px',
+                    }}
                   >
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <span className="text-xl">{getMoodEmoji(checkin.mood)}</span>
+                        <span className="font-bold">{formatDate(checkin.date)}</span>
+                      </div>
+                      <span className="text-lg">{expandedCheckin === i ? '▼' : '▶'}</span>
+                    </div>
+                    {checkin.summary && (
+                      <p className="text-sm mt-2 opacity-70">{checkin.summary}</p>
+                    )}
+                  </button>
+                  {expandedCheckin === i && (
                     <div
-                      className="h-full rounded-full"
+                      className="mt-2 p-3 space-y-3"
                       style={{
-                        width: `${goal.progress}%`,
-                        backgroundColor: goal.status === 'ahead' ? '#90EE90' : '#FFD700',
+                        backgroundColor: '#f9f9f9',
+                        border: '2px dashed black',
+                        borderRadius: '12px',
                       }}
-                    />
-                  </div>
-                  <span className="text-xs font-bold">{goal.progress}%</span>
+                    >
+                      {checkin.questions.map((q, qi) => (
+                        <div key={qi}>
+                          <p className="font-bold text-sm">{q}</p>
+                          <p className="text-sm mt-1">{checkin.responses[qi] || '(no response)'}</p>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
-        </div>
+        )}
+
+        {/* Highlights */}
+        {highlights.length > 0 && (
+          <div
+            className="mb-8 p-6 rotate-1"
+            style={{
+              backgroundColor: '#FFD700',
+              border: '4px solid black',
+              borderRadius: '20px',
+              boxShadow: '6px 6px 0 black',
+            }}
+          >
+            <div className="flex items-center gap-2 mb-4">
+              <span className="text-3xl">✨</span>
+              <h2 className="text-xl font-bold">week highlights!</h2>
+            </div>
+            <div className="space-y-3">
+              {highlights.map((highlight, i) => (
+                <div
+                  key={i}
+                  className="flex items-start gap-3 p-3"
+                  style={{
+                    backgroundColor: 'white',
+                    border: '3px solid black',
+                    borderRadius: '12px',
+                    transform: `rotate(${(i % 2 === 0 ? -1 : 1)}deg)`,
+                  }}
+                >
+                  <span className="text-2xl">{highlight.emoji}</span>
+                  <div>
+                    <span className="font-bold">{highlight.text}</span>
+                    <p className="text-xs opacity-60">{formatDate(highlight.date)}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* Top Topics */}
-        <div
-          className="mb-8 p-6"
-          style={{
-            backgroundColor: '#FFFACD',
-            border: '4px solid black',
-            borderRadius: '20px',
-            boxShadow: '6px 6px 0 black',
-          }}
-        >
-          <div className="flex items-center gap-2 mb-4">
-            <span className="text-3xl">💬</span>
-            <h2 className="text-xl font-bold">most discussed</h2>
+        {topTopics.length > 0 && (
+          <div
+            className="mb-8 p-6"
+            style={{
+              backgroundColor: '#FFFACD',
+              border: '4px solid black',
+              borderRadius: '20px',
+              boxShadow: '6px 6px 0 black',
+            }}
+          >
+            <div className="flex items-center gap-2 mb-4">
+              <span className="text-3xl">💬</span>
+              <h2 className="text-xl font-bold">most discussed</h2>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              {topTopics.map((topic, i) => (
+                <div
+                  key={i}
+                  className="flex items-center gap-2 px-4 py-2"
+                  style={{
+                    backgroundColor: ['#FF69B4', '#90EE90', '#87CEEB', '#DDA0DD', '#FFD700'][i % 5],
+                    border: '3px solid black',
+                    borderRadius: '9999px',
+                    boxShadow: '3px 3px 0 black',
+                  }}
+                >
+                  <span className="font-bold">{topic.topic}</span>
+                  <span className="text-xs">({topic.count})</span>
+                </div>
+              ))}
+            </div>
           </div>
-          <div className="flex flex-wrap gap-2">
-            {reportData.topTopics.map((topic, i) => (
-              <div
-                key={i}
-                className="flex items-center gap-2 px-4 py-2"
-                style={{
-                  backgroundColor: ['#FF69B4', '#90EE90', '#87CEEB'][i],
-                  border: '3px solid black',
-                  borderRadius: '9999px',
-                  boxShadow: '3px 3px 0 black',
-                }}
-              >
-                <span>{topic.emoji}</span>
-                <span className="font-bold">{topic.topic}</span>
-                <span className="text-xs">({topic.count})</span>
-              </div>
-            ))}
+        )}
+
+        {/* Empty state */}
+        {checkins.length === 0 && highlights.length === 0 && (
+          <div
+            className="p-6 text-center"
+            style={{
+              backgroundColor: 'white',
+              border: '4px solid black',
+              borderRadius: '20px',
+              boxShadow: '6px 6px 0 black',
+            }}
+          >
+            <div className="text-5xl mb-4">🌱</div>
+            <h3 className="text-xl font-bold mb-2">your journey is just starting!</h3>
+            <p className="text-sm mb-4">
+              complete your daily check-ins and chat with NPC to see your growth here
+            </p>
+            <button
+              onClick={() => router.push('/dashboard')}
+              className="px-6 py-3 font-bold hover:scale-105 transition-transform"
+              style={{
+                backgroundColor: '#90EE90',
+                border: '3px solid black',
+                borderRadius: '12px',
+                boxShadow: '3px 3px 0 black',
+              }}
+            >
+              start reflecting
+            </button>
           </div>
-        </div>
+        )}
 
         {/* Note for Parents */}
         <div
           className="p-6 rotate-1"
           style={{
-            backgroundColor: '#FFD700',
+            backgroundColor: '#87CEEB',
             border: '4px solid black',
             borderRadius: '20px',
             boxShadow: '6px 6px 0 black',
@@ -363,7 +421,7 @@ export default function WeeklyReport() {
               borderRadius: '12px',
             }}
           >
-            {reportData.parentNote}
+            This report is designed to spark conversation, not surveillance. Ask about the highlights - let them share what they&apos;re comfortable with.
           </p>
           <div
             className="flex items-center gap-2 text-xs px-3 py-2"
@@ -374,7 +432,7 @@ export default function WeeklyReport() {
             }}
           >
             <span>🔒</span>
-            <span>detailed conversation content is private to {reportData.userName}</span>
+            <span>detailed conversation content is private to {user.name}</span>
           </div>
         </div>
       </main>
@@ -401,7 +459,7 @@ export default function WeeklyReport() {
               {[
                 { label: 'Full Report', desc: 'Everything shown above', color: '#90EE90' },
                 { label: 'Highlights Only', desc: 'Just the good stuff', color: '#FFD700' },
-                { label: 'Goals Progress', desc: 'Track record on goals', color: '#87CEEB' },
+                { label: 'Mood Trend', desc: 'Weekly mood overview', color: '#87CEEB' },
               ].map((option, i) => (
                 <label
                   key={i}

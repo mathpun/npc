@@ -12,7 +12,7 @@ export async function GET(request: NextRequest) {
 
   try {
     // Find user by name (case-insensitive)
-    const user = db.prepare(`
+    const user = await db.prepare(`
       SELECT * FROM users
       WHERE LOWER(name) = LOWER(?)
       ORDER BY last_active DESC
@@ -24,12 +24,12 @@ export async function GET(request: NextRequest) {
     }
 
     // Update last_active
-    db.prepare(`
+    await db.prepare(`
       UPDATE users SET last_active = CURRENT_TIMESTAMP WHERE id = ?
     `).run((user as any).id)
 
     // Log the login activity
-    db.prepare(`
+    await db.prepare(`
       INSERT INTO activity_log (user_id, activity_type, activity_data)
       VALUES (?, 'login', ?)
     `).run((user as any).id, JSON.stringify({ timestamp: new Date().toISOString() }))

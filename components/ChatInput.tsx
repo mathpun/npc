@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useRef, useEffect } from 'react'
+import { useTheme } from '@/lib/ThemeContext'
 
 interface ChatInputProps {
   onSend: (message: string) => void
@@ -15,6 +16,7 @@ export default function ChatInput({
 }: ChatInputProps) {
   const [message, setMessage] = useState('')
   const textareaRef = useRef<HTMLTextAreaElement>(null)
+  const { theme } = useTheme()
 
   // Auto-resize textarea
   useEffect(() => {
@@ -73,7 +75,7 @@ export default function ChatInput({
           disabled={!message.trim() || disabled}
           className="px-6 py-3 text-lg font-bold transition-all duration-200 hover:scale-105"
           style={{
-            backgroundColor: message.trim() && !disabled ? '#90EE90' : '#ccc',
+            backgroundColor: message.trim() && !disabled ? theme.colors.buttonSuccess : '#ccc',
             border: '3px solid black',
             borderRadius: '12px',
             boxShadow: message.trim() && !disabled ? '3px 3px 0 black' : 'none',

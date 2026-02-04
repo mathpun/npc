@@ -2,15 +2,32 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  /* Default theme colors (Bubblegum Pop) */
+  --theme-background: #FFB6C1;
+  --theme-background-alt: #7FDBFF;
+  --theme-background-accent: #98FB98;
+  --theme-glow: rgba(255, 105, 180, 0.3);
+  --theme-accent1: #FF69B4;
+  --theme-accent2: #FFD700;
+  --theme-accent3: #90EE90;
+  --theme-accent4: #87CEEB;
+  --theme-accent5: #DDA0DD;
+  --theme-button-primary: #FF69B4;
+  --theme-button-secondary: #87CEEB;
+  --theme-button-success: #90EE90;
+}
+
 * {
   box-sizing: border-box;
 }
 
 body {
-  background: #FFB6C1;
+  background: var(--theme-background);
   color: #000;
   min-height: 100vh;
   -webkit-font-smoothing: antialiased;
+  transition: background-color 0.3s ease;
 }
 
 /* Custom scrollbar */
@@ -23,22 +40,22 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(139, 92, 246, 0.3);
+  background: var(--theme-glow);
   border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(139, 92, 246, 0.5);
+  background: var(--theme-accent1);
 }
 
 /* Selection */
 ::selection {
-  background: rgba(139, 92, 246, 0.4);
+  background: var(--theme-glow);
 }
 
 /* Gradient text utility */
 .gradient-text {
-  background: linear-gradient(135deg, #8b5cf6 0%, #d946ef 50%, #06b6d4 100%);
+  background: linear-gradient(135deg, var(--theme-accent1) 0%, var(--theme-accent5) 50%, var(--theme-accent4) 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -53,16 +70,20 @@ body {
 
 /* Glow effects */
 .glow-violet {
-  box-shadow: 0 0 60px rgba(139, 92, 246, 0.3);
+  box-shadow: 0 0 60px var(--theme-glow);
 }
 
 .glow-fuchsia {
-  box-shadow: 0 0 60px rgba(217, 70, 239, 0.3);
+  box-shadow: 0 0 60px var(--theme-glow);
+}
+
+.glow-theme {
+  box-shadow: 0 0 60px var(--theme-glow);
 }
 
 /* Text glow */
 .text-glow {
-  text-shadow: 0 0 30px rgba(139, 92, 246, 0.5);
+  text-shadow: 0 0 30px var(--theme-glow);
 }
 
 /* Animations */
@@ -139,7 +160,7 @@ body {
   content: '|';
   animation: blink 1s infinite;
   margin-left: 2px;
-  color: #8b5cf6;
+  color: var(--theme-accent1);
 }
 
 @keyframes blink {
@@ -151,7 +172,7 @@ body {
 input:focus,
 textarea:focus {
   outline: none;
-  box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.3);
+  box-shadow: 0 0 0 2px var(--theme-glow);
 }
 
 /* Button hover glow */
@@ -166,7 +187,7 @@ button:hover {
 
 .card-hover:hover {
   transform: translateY(-4px);
-  box-shadow: 0 20px 40px rgba(139, 92, 246, 0.15);
+  box-shadow: 0 20px 40px var(--theme-glow);
 }
 
 /* Wave animation for emoji */

@@ -147,6 +147,19 @@ async function initDb() {
         content TEXT NOT NULL,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       );
+
+      -- Daily check-ins
+      CREATE TABLE IF NOT EXISTS daily_checkins (
+        id SERIAL PRIMARY KEY,
+        user_id TEXT NOT NULL REFERENCES users(id),
+        checkin_date DATE NOT NULL,
+        questions JSONB NOT NULL,
+        responses JSONB NOT NULL,
+        mood TEXT,
+        ai_summary TEXT,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        UNIQUE(user_id, checkin_date)
+      );
     `)
     console.log('Database tables initialized')
   } catch (error) {
@@ -252,6 +265,8 @@ export const ACHIEVEMENTS = {
   streak_30: { title: 'Monthly Master', desc: '30 day streak', icon: '👑', color: '#DDA0DD' },
   world_explorer: { title: 'World Explorer', desc: 'Visited the Moltbook', icon: '🌍', color: '#87CEEB' },
   insight_hunter: { title: 'Insight Hunter', desc: 'Saved 10 insights', icon: '💡', color: '#FFFACD' },
+  first_checkin: { title: 'First Check-In', desc: 'Completed your first daily check-in', icon: '📝', color: '#98FB98' },
+  checkin_streak_7: { title: 'Week of Reflection', desc: '7 day check-in streak', icon: '✨', color: '#FFB6C1' },
 }
 
 // Milestone type definitions

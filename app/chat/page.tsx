@@ -18,6 +18,7 @@ import CoDesignPortal from '@/components/CoDesignPortal'
 import RealWorldChallenges from '@/components/RealWorldChallenges'
 import PeerWisdom from '@/components/PeerWisdom'
 import AILiteracy from '@/components/AILiteracy'
+import DailyCheckIn from '@/components/DailyCheckIn'
 import { SessionGoal, SESSION_GOALS, buildReflectionPrompt } from '@/lib/prompts'
 
 interface Message {
@@ -53,6 +54,7 @@ function ChatPageContent() {
   const [reflectionPrompt, setReflectionPrompt] = useState<string | null>(null)
   const [activeTab, setActiveTab] = useState<TabId>('chat')
   const [activeGrowthTab, setActiveGrowthTab] = useState<GrowthSubTab>('insights')
+  const [showCheckIn, setShowCheckIn] = useState(false)
   const messagesEndRef = useRef<HTMLDivElement>(null)
 
   // Track activity helper
@@ -94,6 +96,12 @@ function ChatPageContent() {
 
     // Check for topic from URL (e.g., from moltbook friend chat)
     const topicFromUrl = searchParams.get('topic')
+
+    // Check for daily check-in (only if not coming from URL topic)
+    const userId = localStorage.getItem('npc_user_id')
+    if (userId && !topicFromUrl) {
+      checkForDailyCheckIn(userId)
+    }
     if (topicFromUrl && savedProfile) {
       // Auto-start a session with this topic
       setShowSessionPicker(false)
@@ -103,6 +111,26 @@ function ChatPageContent() {
       getInitialGreetingWithTopic(parsedProfile, topicFromUrl)
     }
   }, [router, searchParams])
+
+  const checkForDailyCheckIn = async (userId: string) => {
+    try {
+      const res = await fetch(`/api/checkin?userId=${userId}`)
+      const data = await res.json()
+      if (!data.hasCheckedInToday) {
+        setShowCheckIn(true)
+      }
+    } catch (err) {
+      console.error('Failed to check check-in status:', err)
+    }
+  }
+
+  const handleCheckInComplete = () => {
+    setShowCheckIn(false)
+  }
+
+  const handleCheckInSkip = () => {
+    setShowCheckIn(false)
+  }
 
   const getInitialGreetingWithTopic = async (userProfile: UserProfile, topic: string) => {
     setIsLoading(true)
@@ -398,6 +426,16 @@ function ChatPageContent() {
 
   return (
     <main className="min-h-screen flex flex-col text-black" style={{ backgroundColor: '#7FDBFF' }}>
+      {/* Daily Check-In Modal */}
+      {showCheckIn && (
+        <DailyCheckIn
+          userId={localStorage.getItem('npc_user_id') || ''}
+          userName={profile.name}
+          onComplete={handleCheckInComplete}
+          onSkip={handleCheckInSkip}
+        />
+      )}
+
       {/* Doodle decorations */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden">
         <div className="absolute top-20 right-10 text-3xl rotate-12">☀️</div>

@@ -6,7 +6,9 @@ import Link from 'next/link'
 import NavBar from '@/components/NavBar'
 import Goals from '@/components/Goals'
 import ParentPrompts from '@/components/ParentPrompts'
+import DailyCheckIn from '@/components/DailyCheckIn'
 import { ACHIEVEMENTS } from '@/lib/db'
+import { useTheme } from '@/lib/ThemeContext'
 
 interface UserStats {
   user: {
@@ -41,6 +43,8 @@ const ACHIEVEMENT_INFO: Record<string, { title: string; desc: string; icon: stri
   streak_3: { title: 'On Fire', desc: '3 day streak', icon: '🔥' },
   streak_7: { title: 'Week Warrior', desc: '7 day streak', icon: '⚡' },
   streak_30: { title: 'Monthly Master', desc: '30 day streak', icon: '👑' },
+  first_checkin: { title: 'First Check-In', desc: 'Completed your first daily check-in', icon: '📝' },
+  checkin_streak_7: { title: 'Week of Reflection', desc: '7 day check-in streak', icon: '✨' },
 }
 
 export default function Dashboard() {
@@ -48,6 +52,9 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true)
   const [data, setData] = useState<UserStats | null>(null)
   const [showPrompts, setShowPrompts] = useState(true)
+  const [showCheckIn, setShowCheckIn] = useState(false)
+  const [checkedInToday, setCheckedInToday] = useState(false)
+  const { theme } = useTheme()
 
   useEffect(() => {
     const userId = localStorage.getItem('npc_user_id')
@@ -66,6 +73,8 @@ export default function Dashboard() {
           router.push('/login')
         } else {
           setData(data)
+          // Check if user needs to do a check-in today
+          checkForDailyCheckIn(userId)
         }
         setLoading(false)
       })
@@ -74,9 +83,32 @@ export default function Dashboard() {
       })
   }, [router])
 
+  const checkForDailyCheckIn = async (userId: string) => {
+    try {
+      const res = await fetch(`/api/checkin?userId=${userId}`)
+      const data = await res.json()
+      if (!data.hasCheckedInToday) {
+        setShowCheckIn(true)
+      } else {
+        setCheckedInToday(true)
+      }
+    } catch (err) {
+      console.error('Failed to check check-in status:', err)
+    }
+  }
+
+  const handleCheckInComplete = () => {
+    setShowCheckIn(false)
+    setCheckedInToday(true)
+  }
+
+  const handleCheckInSkip = () => {
+    setShowCheckIn(false)
+  }
+
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: '#7FDBFF' }}>
+      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: theme.colors.backgroundAlt }}>
         <div className="text-center">
           <div className="text-6xl animate-bounce mb-4">👻</div>
           <p className="text-xl font-bold">loading your journey...</p>
@@ -98,23 +130,23 @@ export default function Dashboard() {
     date: new Date(m.unlocked_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
     type: m.milestone_type,
     completed: true,
-    color: m.color || ['#FF69B4', '#FFD700', '#90EE90', '#87CEEB', '#DDA0DD'][i % 5],
+    color: m.color || theme.colors.primary[i % theme.colors.primary.length],
   }))
 
   // Add placeholder future milestones if user has few
   if (lifeMapNodes.length < 3) {
     lifeMapNodes.push(
-      { id: 'future-1', title: 'First Deep Reflection', date: 'Coming soon', type: 'milestone', completed: false, color: '#FFD700' },
-      { id: 'future-2', title: 'Week 1 Check-in', date: 'Coming soon', type: 'checkpoint', completed: false, color: '#90EE90' },
+      { id: 'future-1', title: 'First Deep Reflection', date: 'Coming soon', type: 'milestone', completed: false, color: theme.colors.accent2 },
+      { id: 'future-2', title: 'Week 1 Check-in', date: 'Coming soon', type: 'checkpoint', completed: false, color: theme.colors.accent3 },
     )
   }
 
   // Weekly insights based on real stats
   const weeklyInsights = [
-    { label: 'Reflections', value: stats.totalReflections, change: stats.totalReflections > 0 ? `${stats.totalReflections} total` : 'start chatting!', emoji: '🧠', color: '#DDA0DD' },
-    { label: 'Journal', value: stats.journalEntries, change: stats.journalEntries > 0 ? `${stats.journalEntries} entries` : 'save insights!', emoji: '📔', color: '#90EE90' },
-    { label: 'Streak', value: stats.streak, change: stats.streak > 0 ? `${stats.streak} days` : 'start today!', emoji: '🔥', color: '#FF69B4' },
-    { label: 'Goals Done', value: stats.goalsCompleted, change: stats.goalsCompleted > 0 ? 'nice work!' : 'set a goal!', emoji: '🎯', color: '#FFD700' },
+    { label: 'Reflections', value: stats.totalReflections, change: stats.totalReflections > 0 ? `${stats.totalReflections} total` : 'start chatting!', emoji: '🧠', color: theme.colors.accent5 },
+    { label: 'Journal', value: stats.journalEntries, change: stats.journalEntries > 0 ? `${stats.journalEntries} entries` : 'save insights!', emoji: '📔', color: theme.colors.accent3 },
+    { label: 'Streak', value: stats.streak, change: stats.streak > 0 ? `${stats.streak} days` : 'start today!', emoji: '🔥', color: theme.colors.accent1 },
+    { label: 'Goals Done', value: stats.goalsCompleted, change: stats.goalsCompleted > 0 ? 'nice work!' : 'set a goal!', emoji: '🎯', color: theme.colors.accent2 },
   ]
 
   // Build achievements list
@@ -126,9 +158,19 @@ export default function Dashboard() {
   }))
 
   return (
-    <div className="min-h-screen font-hand text-black" style={{ backgroundColor: '#7FDBFF' }}>
+    <div className="min-h-screen font-hand text-black" style={{ backgroundColor: theme.colors.backgroundAlt }}>
+      {/* Daily Check-In Modal */}
+      {showCheckIn && (
+        <DailyCheckIn
+          userId={user.id}
+          userName={user.name}
+          onComplete={handleCheckInComplete}
+          onSkip={handleCheckInSkip}
+        />
+      )}
+
       {/* Parent Prompts Modal */}
-      {showPrompts && <ParentPrompts userId={user.id} />}
+      {showPrompts && !showCheckIn && <ParentPrompts userId={user.id} />}
 
       {/* Doodle decorations */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden">
@@ -142,13 +184,13 @@ export default function Dashboard() {
       <NavBar />
 
       {/* Stats bar */}
-      <div className="relative z-10 px-6 py-3 border-b-4 border-black border-dashed" style={{ backgroundColor: '#98FB98' }}>
+      <div className="relative z-10 px-6 py-3 border-b-4 border-black border-dashed" style={{ backgroundColor: theme.colors.backgroundAccent }}>
         <div className="max-w-6xl mx-auto flex items-center justify-center gap-4">
           {/* Level badge */}
           <div
             className="flex items-center gap-2 px-4 py-2 rotate-2"
             style={{
-              backgroundColor: '#FFD700',
+              backgroundColor: theme.colors.accent2,
               border: '3px solid black',
               borderRadius: '9999px',
               boxShadow: '3px 3px 0 black',
@@ -162,7 +204,7 @@ export default function Dashboard() {
           <div
             className="flex items-center gap-2 px-4 py-2 -rotate-1"
             style={{
-              backgroundColor: '#FFA500',
+              backgroundColor: theme.colors.accent1,
               border: '3px solid black',
               borderRadius: '9999px',
               boxShadow: '3px 3px 0 black',
@@ -200,7 +242,7 @@ export default function Dashboard() {
         <div
           className="mb-8 p-4 rotate-1"
           style={{
-            backgroundColor: '#DDA0DD',
+            backgroundColor: theme.colors.accent5,
             border: '4px solid black',
             borderRadius: '16px',
             boxShadow: '6px 6px 0 black',
@@ -221,7 +263,7 @@ export default function Dashboard() {
               className="h-full rounded-full"
               style={{
                 width: `${Math.min((stats.xp / stats.nextLevelXp) * 100, 100)}%`,
-                background: 'linear-gradient(90deg, #FF69B4, #FFD700, #90EE90, #87CEEB)',
+                background: `linear-gradient(90deg, ${theme.colors.accent1}, ${theme.colors.accent2}, ${theme.colors.accent3}, ${theme.colors.accent4})`,
               }}
             />
           </div>
@@ -260,7 +302,7 @@ export default function Dashboard() {
             <div
               className="p-6 -rotate-1"
               style={{
-                backgroundColor: '#98FB98',
+                backgroundColor: theme.colors.backgroundAccent,
                 border: '4px solid black',
                 borderRadius: '20px',
                 boxShadow: '8px 8px 0 black',
@@ -294,7 +336,7 @@ export default function Dashboard() {
                 <div
                   className="absolute left-8 top-0 bottom-0 w-4 rounded-full"
                   style={{
-                    background: 'repeating-linear-gradient(to bottom, #FF69B4 0px, #FF69B4 20px, #FFD700 20px, #FFD700 40px, #90EE90 40px, #90EE90 60px, #87CEEB 60px, #87CEEB 80px)',
+                    background: `repeating-linear-gradient(to bottom, ${theme.colors.accent1} 0px, ${theme.colors.accent1} 20px, ${theme.colors.accent2} 20px, ${theme.colors.accent2} 40px, ${theme.colors.accent3} 40px, ${theme.colors.accent3} 60px, ${theme.colors.accent4} 60px, ${theme.colors.accent4} 80px)`,
                     border: '2px solid black',
                   }}
                 />
@@ -316,7 +358,7 @@ export default function Dashboard() {
                         href="/chat"
                         className="inline-block mt-4 px-6 py-2 font-bold hover:scale-105 transition-transform"
                         style={{
-                          backgroundColor: '#90EE90',
+                          backgroundColor: theme.colors.buttonSuccess,
                           border: '3px solid black',
                           borderRadius: '9999px',
                           boxShadow: '3px 3px 0 black',
@@ -381,7 +423,7 @@ export default function Dashboard() {
             <div
               className="p-6 rotate-1"
               style={{
-                backgroundColor: '#FF69B4',
+                backgroundColor: theme.colors.accent1,
                 border: '4px solid black',
                 borderRadius: '20px',
                 boxShadow: '6px 6px 0 black',
@@ -399,7 +441,7 @@ export default function Dashboard() {
             <div
               className="p-6 -rotate-1"
               style={{
-                backgroundColor: '#FFD700',
+                backgroundColor: theme.colors.accent2,
                 border: '4px solid black',
                 borderRadius: '20px',
                 boxShadow: '6px 6px 0 black',
@@ -433,7 +475,7 @@ export default function Dashboard() {
             <div
               className="p-6 rotate-2"
               style={{
-                backgroundColor: '#87CEEB',
+                backgroundColor: theme.colors.accent4,
                 border: '4px solid black',
                 borderRadius: '20px',
                 boxShadow: '6px 6px 0 black',
@@ -483,7 +525,7 @@ export default function Dashboard() {
               href={item.href}
               className={`flex flex-col items-center px-4 py-2 rounded-xl`}
               style={{
-                backgroundColor: item.active ? '#FFD700' : 'transparent',
+                backgroundColor: item.active ? theme.colors.accent2 : 'transparent',
                 border: item.active ? '2px solid black' : 'none',
               }}
             >
