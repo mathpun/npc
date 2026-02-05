@@ -19,7 +19,7 @@ import RealWorldChallenges from '@/components/RealWorldChallenges'
 import PeerWisdom from '@/components/PeerWisdom'
 import AILiteracy from '@/components/AILiteracy'
 import DailyCheckIn from '@/components/DailyCheckIn'
-import { SessionGoal, SESSION_GOALS, buildReflectionPrompt } from '@/lib/prompts'
+import { SessionGoal, PersonaType, SESSION_GOALS, buildReflectionPrompt } from '@/lib/prompts'
 
 interface Message {
   id: string
@@ -37,6 +37,7 @@ interface UserProfile {
 interface Session {
   goal: SessionGoal
   topic: string
+  persona?: PersonaType
 }
 
 function ChatPageContent() {
@@ -216,19 +217,19 @@ function ChatPageContent() {
     }
   }, [messages, reflectionPrompt])
 
-  const handleSessionSelect = async (goal: SessionGoal, topic: string) => {
-    setSession({ goal, topic })
+  const handleSessionSelect = async (goal: SessionGoal, topic: string, persona: PersonaType) => {
+    setSession({ goal, topic, persona })
     setShowSessionPicker(false)
 
     // Track session start
-    trackActivity('session_start', { goal, topic })
+    trackActivity('session_start', { goal, topic, persona })
 
     if (profile) {
-      await getInitialGreeting(goal, topic)
+      await getInitialGreeting(goal, topic, persona)
     }
   }
 
-  const getInitialGreeting = async (goal: SessionGoal, topic: string) => {
+  const getInitialGreeting = async (goal: SessionGoal, topic: string, persona?: PersonaType) => {
     if (!profile) return
 
     setIsLoading(true)
@@ -241,7 +242,7 @@ function ChatPageContent() {
         body: JSON.stringify({
           messages: [{ role: 'user', content: topic || `I want to ${SESSION_GOALS[goal].label.toLowerCase()}` }],
           profile,
-          session: { goal, topic },
+          session: { goal, topic, persona },
           userId: localStorage.getItem('npc_user_id'),
         }),
       })
