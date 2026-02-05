@@ -132,13 +132,23 @@ export async function GET(request: NextRequest) {
         streakDays: streakDays?.days || 0,
         moodTrend: moodTrendDirection,
       },
-      checkins: checkins.map(c => ({
-        date: c.checkin_date,
-        questions: JSON.parse(c.questions),
-        responses: JSON.parse(c.responses),
-        mood: c.mood,
-        summary: c.ai_summary,
-      })),
+      checkins: checkins.map(c => {
+        let questions: string[] = []
+        let responses: string[] = []
+        try {
+          questions = c.questions ? JSON.parse(c.questions) : []
+          responses = c.responses ? JSON.parse(c.responses) : []
+        } catch {
+          // Invalid JSON, use empty arrays
+        }
+        return {
+          date: c.checkin_date,
+          questions,
+          responses,
+          mood: c.mood,
+          summary: c.ai_summary,
+        }
+      }),
       moodTrend,
       highlights,
       topTopics,

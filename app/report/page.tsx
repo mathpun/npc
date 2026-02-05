@@ -39,6 +39,7 @@ export default function WeeklyReport() {
   const [loading, setLoading] = useState(true)
   const [reportData, setReportData] = useState<ReportData | null>(null)
   const [expandedCheckin, setExpandedCheckin] = useState<number | null>(null)
+  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
     const userId = localStorage.getItem('npc_user_id')
@@ -56,11 +57,13 @@ export default function WeeklyReport() {
       const data = await res.json()
       if (data.error) {
         console.error('Failed to fetch report:', data.error)
+        setError(data.error)
       } else {
         setReportData(data)
       }
     } catch (err) {
       console.error('Failed to fetch report:', err)
+      setError('Network error - please try again')
     }
     setLoading(false)
   }
@@ -92,6 +95,7 @@ export default function WeeklyReport() {
         <div className="text-center">
           <div className="text-6xl mb-4">😕</div>
           <p className="text-xl font-bold">couldn&apos;t load report</p>
+          {error && <p className="text-sm mt-2 opacity-70">{error}</p>}
           <button
             onClick={() => router.push('/dashboard')}
             className="mt-4 px-6 py-2 font-bold"
