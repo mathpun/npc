@@ -7,6 +7,7 @@ import NavBar from '@/components/NavBar'
 import Goals from '@/components/Goals'
 import ParentPrompts from '@/components/ParentPrompts'
 import DailyCheckIn from '@/components/DailyCheckIn'
+import InstallPrompt from '@/components/InstallPrompt'
 import { ACHIEVEMENTS } from '@/lib/db'
 import { useTheme } from '@/lib/ThemeContext'
 
@@ -543,6 +544,9 @@ export default function Dashboard() {
           ))}
         </div>
       </nav>
+
+      {/* PWA Install Prompt */}
+      <InstallPrompt />
     </div>
   )
 }

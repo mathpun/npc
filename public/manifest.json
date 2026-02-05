@@ -1,0 +1,44 @@
+{
+  "name": "NPC - Your Thinking Partner",
+  "short_name": "NPC",
+  "description": "An AI that helps you think, not one that thinks for you",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#FFB6C1",
+  "theme_color": "#FF69B4",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/icons/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon.svg",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/icons/icon.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    }
+  ],
+  "categories": ["education", "lifestyle"],
+  "screenshots": [],
+  "shortcuts": [
+    {
+      "name": "Start Chat",
+      "url": "/chat",
+      "description": "Start a new thinking session"
+    },
+    {
+      "name": "Dashboard",
+      "url": "/dashboard",
+      "description": "View your progress"
+    }
+  ]
+}
