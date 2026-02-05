@@ -21,16 +21,66 @@ export async function GET(request: NextRequest) {
   try {
     // Get overall stats
     const totalUsers = await db.prepare('SELECT COUNT(*) as count FROM users').get() as { count: number } | undefined
+
+    // DAU - Daily Active Users
     const activeToday = await db.prepare(`
       SELECT COUNT(DISTINCT user_id) as count
       FROM activity_log
       WHERE created_at::date = CURRENT_DATE
     `).get() as { count: number } | undefined
-    const totalChats = await db.prepare(`
-      SELECT COUNT(*) as count FROM activity_log WHERE activity_type = 'chat_message'
+
+    // WAU - Weekly Active Users
+    const activeThisWeek = await db.prepare(`
+      SELECT COUNT(DISTINCT user_id) as count
+      FROM activity_log
+      WHERE created_at >= CURRENT_DATE - INTERVAL '7 days'
     `).get() as { count: number } | undefined
+
+    // MAU - Monthly Active Users
+    const activeThisMonth = await db.prepare(`
+      SELECT COUNT(DISTINCT user_id) as count
+      FROM activity_log
+      WHERE created_at >= CURRENT_DATE - INTERVAL '30 days'
+    `).get() as { count: number } | undefined
+
+    const totalChats = await db.prepare(`
+      SELECT COUNT(*) as count FROM chat_messages WHERE role = 'user'
+    `).get() as { count: number } | undefined
+
     const totalJournals = await db.prepare(`
       SELECT COUNT(*) as count FROM journal_entries
+    `).get() as { count: number } | undefined
+
+    // New users this week
+    const newUsersThisWeek = await db.prepare(`
+      SELECT COUNT(*) as count FROM users
+      WHERE created_at >= CURRENT_DATE - INTERVAL '7 days'
+    `).get() as { count: number } | undefined
+
+    // New users today
+    const newUsersToday = await db.prepare(`
+      SELECT COUNT(*) as count FROM users
+      WHERE created_at::date = CURRENT_DATE
+    `).get() as { count: number } | undefined
+
+    // Total check-ins
+    const totalCheckins = await db.prepare(`
+      SELECT COUNT(*) as count FROM daily_checkins
+    `).get() as { count: number } | undefined
+
+    // Average messages per user
+    const avgMessagesPerUser = await db.prepare(`
+      SELECT ROUND(AVG(msg_count)::numeric, 1) as avg
+      FROM (SELECT COUNT(*) as msg_count FROM chat_messages WHERE role = 'user' GROUP BY user_id) sub
+    `).get() as { avg: number } | undefined
+
+    // Returning users (users active more than once)
+    const returningUsers = await db.prepare(`
+      SELECT COUNT(*) as count FROM (
+        SELECT user_id FROM activity_log
+        GROUP BY user_id
+        HAVING COUNT(DISTINCT created_at::date) > 1
+      ) sub
     `).get() as { count: number } | undefined
 
     // Get all users with their stats
@@ -58,15 +108,48 @@ export async function GET(request: NextRequest) {
       LIMIT 100
     `).all()
 
-    // Get activity by day (last 7 days)
+    // Get activity by day (last 14 days)
     const dailyActivity = await db.prepare(`
       SELECT
         created_at::date as date,
         COUNT(*) as total,
         COUNT(DISTINCT user_id) as unique_users
       FROM activity_log
-      WHERE created_at >= CURRENT_DATE - INTERVAL '7 days'
+      WHERE created_at >= CURRENT_DATE - INTERVAL '14 days'
       GROUP BY created_at::date
+      ORDER BY date DESC
+    `).all()
+
+    // Get chats per day (last 14 days)
+    const chatsPerDay = await db.prepare(`
+      SELECT
+        created_at::date as date,
+        COUNT(*) as total
+      FROM chat_messages
+      WHERE role = 'user' AND created_at >= CURRENT_DATE - INTERVAL '14 days'
+      GROUP BY created_at::date
+      ORDER BY date DESC
+    `).all()
+
+    // Get signups per day (last 14 days)
+    const signupsPerDay = await db.prepare(`
+      SELECT
+        created_at::date as date,
+        COUNT(*) as total
+      FROM users
+      WHERE created_at >= CURRENT_DATE - INTERVAL '14 days'
+      GROUP BY created_at::date
+      ORDER BY date DESC
+    `).all()
+
+    // Get check-ins per day (last 14 days)
+    const checkinsPerDay = await db.prepare(`
+      SELECT
+        checkin_date as date,
+        COUNT(*) as total
+      FROM daily_checkins
+      WHERE checkin_date >= CURRENT_DATE - INTERVAL '14 days'
+      GROUP BY checkin_date
       ORDER BY date DESC
     `).all()
 
@@ -93,16 +176,32 @@ export async function GET(request: NextRequest) {
       LIMIT 200
     `).all()
 
+    // Retention rate (returning users / total users)
+    const retentionRate = totalUsers?.count
+      ? Math.round(((returningUsers?.count || 0) / totalUsers.count) * 100)
+      : 0
+
     return NextResponse.json({
       stats: {
         totalUsers: totalUsers?.count || 0,
         activeToday: activeToday?.count || 0,
+        activeThisWeek: activeThisWeek?.count || 0,
+        activeThisMonth: activeThisMonth?.count || 0,
         totalChats: totalChats?.count || 0,
         totalJournals: totalJournals?.count || 0,
+        totalCheckins: totalCheckins?.count || 0,
+        newUsersToday: newUsersToday?.count || 0,
+        newUsersThisWeek: newUsersThisWeek?.count || 0,
+        avgMessagesPerUser: avgMessagesPerUser?.avg || 0,
+        returningUsers: returningUsers?.count || 0,
+        retentionRate,
       },
       users,
       recentActivity,
       dailyActivity,
+      chatsPerDay,
+      signupsPerDay,
+      checkinsPerDay,
       topTopics,
       chatMessages,
     })

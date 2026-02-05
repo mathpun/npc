@@ -59,16 +59,32 @@ interface Prompt {
   response_count: number
 }
 
+interface TimeSeriesData {
+  date: string
+  total: number
+}
+
 interface AdminData {
   stats: {
     totalUsers: number
     activeToday: number
+    activeThisWeek: number
+    activeThisMonth: number
     totalChats: number
     totalJournals: number
+    totalCheckins: number
+    newUsersToday: number
+    newUsersThisWeek: number
+    avgMessagesPerUser: number
+    returningUsers: number
+    retentionRate: number
   }
   users: User[]
   recentActivity: Activity[]
   dailyActivity: DailyActivity[]
+  chatsPerDay: TimeSeriesData[]
+  signupsPerDay: TimeSeriesData[]
+  checkinsPerDay: TimeSeriesData[]
   topTopics: { session_topic: string; count: number }[]
   chatMessages: ChatMessage[]
 }
@@ -362,28 +378,67 @@ export default function AdminDashboard() {
           <div className="text-center text-2xl animate-pulse">loading the data...</div>
         ) : data ? (
           <>
+            {/* Key Metrics - DAU/WAU/MAU */}
+            <div
+              className="mb-6 p-6"
+              style={{
+                backgroundColor: 'white',
+                border: '3px solid black',
+                borderRadius: '12px',
+                boxShadow: '6px 6px 0 black',
+              }}
+            >
+              <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
+                <span>📈</span> Key Metrics
+              </h2>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                {[
+                  { label: 'DAU (today)', value: data.stats.activeToday, color: '#FF69B4', emoji: '📊' },
+                  { label: 'WAU (7 days)', value: data.stats.activeThisWeek, color: '#87CEEB', emoji: '📈' },
+                  { label: 'MAU (30 days)', value: data.stats.activeThisMonth, color: '#90EE90', emoji: '🚀' },
+                  { label: 'Retention', value: `${data.stats.retentionRate}%`, color: '#FFD700', emoji: '🔄' },
+                ].map((stat, i) => (
+                  <div
+                    key={stat.label}
+                    className="p-4 text-center"
+                    style={{
+                      backgroundColor: stat.color,
+                      border: '3px solid black',
+                      borderRadius: '8px',
+                      boxShadow: '4px 4px 0 black',
+                    }}
+                  >
+                    <div className="text-2xl mb-1">{stat.emoji}</div>
+                    <div className="text-3xl font-bold">{stat.value}</div>
+                    <div className="text-xs font-bold">{stat.label}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
             {/* Stats Cards */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3 mb-8">
               {[
                 { label: 'total users', value: data.stats.totalUsers, color: '#90EE90', emoji: '👥' },
-                { label: 'active today', value: data.stats.activeToday, color: '#87CEEB', emoji: '🔥' },
+                { label: 'new today', value: data.stats.newUsersToday, color: '#FFB6C1', emoji: '🌱' },
+                { label: 'new this week', value: data.stats.newUsersThisWeek, color: '#DDA0DD', emoji: '📅' },
                 { label: 'total chats', value: data.stats.totalChats, color: '#FFD700', emoji: '💬' },
-                { label: 'journal entries', value: data.stats.totalJournals, color: '#DDA0DD', emoji: '📔' },
+                { label: 'check-ins', value: data.stats.totalCheckins, color: '#87CEEB', emoji: '📝' },
+                { label: 'avg msgs/user', value: data.stats.avgMessagesPerUser, color: '#FFA07A', emoji: '📊' },
               ].map((stat, i) => (
                 <div
                   key={stat.label}
-                  className="p-4 text-center"
+                  className="p-3 text-center"
                   style={{
                     backgroundColor: stat.color,
-                    border: '3px solid black',
+                    border: '2px solid black',
                     borderRadius: '8px',
-                    boxShadow: '4px 4px 0 black',
-                    transform: `rotate(${i % 2 === 0 ? -1 : 1}deg)`,
+                    boxShadow: '3px 3px 0 black',
                   }}
                 >
-                  <div className="text-3xl mb-2">{stat.emoji}</div>
-                  <div className="text-3xl font-bold">{stat.value}</div>
-                  <div className="text-sm">{stat.label}</div>
+                  <div className="text-2xl mb-1">{stat.emoji}</div>
+                  <div className="text-2xl font-bold">{stat.value}</div>
+                  <div className="text-xs">{stat.label}</div>
                 </div>
               ))}
             </div>
@@ -526,44 +581,170 @@ export default function AdminDashboard() {
               </div>
             </div>
 
-            {/* Daily Activity Chart (simple text version) */}
-            <div
-              className="mt-6 p-6"
-              style={{
-                backgroundColor: 'white',
-                border: '3px solid black',
-                borderRadius: '8px',
-                boxShadow: '6px 6px 0 black',
-              }}
-            >
-              <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
-                <span>📊</span> last 7 days activity
-              </h2>
-              <div className="flex gap-2 items-end justify-around h-32">
-                {data.dailyActivity.length === 0 ? (
-                  <p className="text-gray-500 text-center w-full">no data yet!</p>
-                ) : (
-                  data.dailyActivity.slice(0, 7).reverse().map((day) => {
-                    const maxTotal = Math.max(...data.dailyActivity.map(d => d.total), 1)
-                    const height = Math.max((day.total / maxTotal) * 100, 10)
-                    return (
-                      <div key={day.date} className="flex flex-col items-center">
-                        <div className="text-xs font-bold mb-1">{day.total}</div>
-                        <div
-                          className="w-8 rounded-t"
-                          style={{
-                            height: `${height}px`,
-                            backgroundColor: '#90EE90',
-                            border: '2px solid black',
-                          }}
-                        />
-                        <div className="text-xs mt-1">
-                          {new Date(day.date).toLocaleDateString(undefined, { weekday: 'short' })}
+            {/* Charts Grid */}
+            <div className="grid md:grid-cols-2 gap-6 mt-6">
+              {/* Chats Per Day Chart */}
+              <div
+                className="p-6"
+                style={{
+                  backgroundColor: 'white',
+                  border: '3px solid black',
+                  borderRadius: '8px',
+                  boxShadow: '6px 6px 0 black',
+                }}
+              >
+                <h2 className="text-lg font-bold mb-4 flex items-center gap-2">
+                  <span>💬</span> Chats Per Day (14 days)
+                </h2>
+                <div className="flex gap-1 items-end justify-around h-28">
+                  {!data.chatsPerDay || data.chatsPerDay.length === 0 ? (
+                    <p className="text-gray-500 text-center w-full">no data yet!</p>
+                  ) : (
+                    data.chatsPerDay.slice(0, 14).reverse().map((day) => {
+                      const maxTotal = Math.max(...data.chatsPerDay.map(d => d.total), 1)
+                      const height = Math.max((day.total / maxTotal) * 100, 8)
+                      return (
+                        <div key={day.date} className="flex flex-col items-center flex-1">
+                          <div className="text-xs font-bold mb-1">{day.total}</div>
+                          <div
+                            className="w-full max-w-6 rounded-t"
+                            style={{
+                              height: `${height}px`,
+                              backgroundColor: '#FFD700',
+                              border: '1px solid black',
+                            }}
+                          />
+                          <div className="text-xs mt-1 truncate w-full text-center">
+                            {new Date(day.date).getDate()}
+                          </div>
                         </div>
-                      </div>
-                    )
-                  })
-                )}
+                      )
+                    })
+                  )}
+                </div>
+              </div>
+
+              {/* DAU Chart */}
+              <div
+                className="p-6"
+                style={{
+                  backgroundColor: 'white',
+                  border: '3px solid black',
+                  borderRadius: '8px',
+                  boxShadow: '6px 6px 0 black',
+                }}
+              >
+                <h2 className="text-lg font-bold mb-4 flex items-center gap-2">
+                  <span>👥</span> Daily Active Users (14 days)
+                </h2>
+                <div className="flex gap-1 items-end justify-around h-28">
+                  {data.dailyActivity.length === 0 ? (
+                    <p className="text-gray-500 text-center w-full">no data yet!</p>
+                  ) : (
+                    data.dailyActivity.slice(0, 14).reverse().map((day) => {
+                      const maxTotal = Math.max(...data.dailyActivity.map(d => d.unique_users), 1)
+                      const height = Math.max((day.unique_users / maxTotal) * 100, 8)
+                      return (
+                        <div key={day.date} className="flex flex-col items-center flex-1">
+                          <div className="text-xs font-bold mb-1">{day.unique_users}</div>
+                          <div
+                            className="w-full max-w-6 rounded-t"
+                            style={{
+                              height: `${height}px`,
+                              backgroundColor: '#87CEEB',
+                              border: '1px solid black',
+                            }}
+                          />
+                          <div className="text-xs mt-1 truncate w-full text-center">
+                            {new Date(day.date).getDate()}
+                          </div>
+                        </div>
+                      )
+                    })
+                  )}
+                </div>
+              </div>
+
+              {/* Signups Per Day Chart */}
+              <div
+                className="p-6"
+                style={{
+                  backgroundColor: 'white',
+                  border: '3px solid black',
+                  borderRadius: '8px',
+                  boxShadow: '6px 6px 0 black',
+                }}
+              >
+                <h2 className="text-lg font-bold mb-4 flex items-center gap-2">
+                  <span>🌱</span> New Signups (14 days)
+                </h2>
+                <div className="flex gap-1 items-end justify-around h-28">
+                  {!data.signupsPerDay || data.signupsPerDay.length === 0 ? (
+                    <p className="text-gray-500 text-center w-full">no signups yet!</p>
+                  ) : (
+                    data.signupsPerDay.slice(0, 14).reverse().map((day) => {
+                      const maxTotal = Math.max(...data.signupsPerDay.map(d => d.total), 1)
+                      const height = Math.max((day.total / maxTotal) * 100, 8)
+                      return (
+                        <div key={day.date} className="flex flex-col items-center flex-1">
+                          <div className="text-xs font-bold mb-1">{day.total}</div>
+                          <div
+                            className="w-full max-w-6 rounded-t"
+                            style={{
+                              height: `${height}px`,
+                              backgroundColor: '#90EE90',
+                              border: '1px solid black',
+                            }}
+                          />
+                          <div className="text-xs mt-1 truncate w-full text-center">
+                            {new Date(day.date).getDate()}
+                          </div>
+                        </div>
+                      )
+                    })
+                  )}
+                </div>
+              </div>
+
+              {/* Check-ins Per Day Chart */}
+              <div
+                className="p-6"
+                style={{
+                  backgroundColor: 'white',
+                  border: '3px solid black',
+                  borderRadius: '8px',
+                  boxShadow: '6px 6px 0 black',
+                }}
+              >
+                <h2 className="text-lg font-bold mb-4 flex items-center gap-2">
+                  <span>📝</span> Check-ins (14 days)
+                </h2>
+                <div className="flex gap-1 items-end justify-around h-28">
+                  {!data.checkinsPerDay || data.checkinsPerDay.length === 0 ? (
+                    <p className="text-gray-500 text-center w-full">no check-ins yet!</p>
+                  ) : (
+                    data.checkinsPerDay.slice(0, 14).reverse().map((day) => {
+                      const maxTotal = Math.max(...data.checkinsPerDay.map(d => d.total), 1)
+                      const height = Math.max((day.total / maxTotal) * 100, 8)
+                      return (
+                        <div key={day.date} className="flex flex-col items-center flex-1">
+                          <div className="text-xs font-bold mb-1">{day.total}</div>
+                          <div
+                            className="w-full max-w-6 rounded-t"
+                            style={{
+                              height: `${height}px`,
+                              backgroundColor: '#DDA0DD',
+                              border: '1px solid black',
+                            }}
+                          />
+                          <div className="text-xs mt-1 truncate w-full text-center">
+                            {new Date(day.date).getDate()}
+                          </div>
+                        </div>
+                      )
+                    })
+                  )}
+                </div>
               </div>
             </div>
 
