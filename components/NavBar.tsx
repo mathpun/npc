@@ -70,7 +70,7 @@ export default function NavBar({ showBack = false, backHref = '/', backLabel = '
           </button>
           <Link href="/" className="flex items-center gap-1">
             <span className="text-2xl">👻</span>
-            <span className="text-lg font-bold">NPC</span>
+            <span className="text-lg font-bold">npc</span>
           </Link>
         </div>
 
@@ -114,7 +114,7 @@ export default function NavBar({ showBack = false, backHref = '/', backLabel = '
         {/* Desktop: Center logo */}
         <Link href="/" className="hidden sm:flex items-center gap-2">
           <span className="text-3xl">👻</span>
-          <span className="text-xl font-bold hidden md:inline">NPC</span>
+          <span className="text-xl font-bold hidden md:inline">npc</span>
         </Link>
 
         {/* Login/Logout - shown on both mobile and desktop */}

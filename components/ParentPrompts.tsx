@@ -193,7 +193,7 @@ export default function ParentPrompts({ userId }: ParentPromptsProps) {
                   boxShadow: '3px 3px 0 black',
                 }}
               >
-                talk to NPC about this 💬
+                talk to npc about this 💬
               </button>
             </>
           ) : (

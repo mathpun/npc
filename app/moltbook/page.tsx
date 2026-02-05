@@ -25,7 +25,7 @@ const groupThoughts = [
   { user: 'jordan', text: 'does anyone else feel like theyre just pretending to know things', color: '#FFD700' },
   { user: 'alex', text: 'YES constantly', color: '#FF69B4' },
   { user: 'sam', text: 'wait we\'re supposed to know things??', color: '#90EE90' },
-  { user: 'NPC', text: 'sounds like you\'re all experiencing imposter feelings - thats actually super common. what makes it feel like pretending?', color: '#E0E0E0', isAI: true },
+  { user: 'npc', text: 'sounds like you\'re all experiencing imposter feelings - thats actually super common. what makes it feel like pretending?', color: '#E0E0E0', isAI: true },
 ]
 
 export default function Moltbook() {

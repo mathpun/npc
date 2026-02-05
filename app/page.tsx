@@ -311,7 +311,7 @@ export default function Home() {
         <div className="max-w-5xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <span className="text-3xl">👻</span>
-            <span className="text-xl font-bold">NPC</span>
+            <span className="text-xl font-bold">npc</span>
             <span>|</span>
             <span className="text-sm">AI that gets it</span>
           </div>

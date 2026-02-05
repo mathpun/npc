@@ -9,13 +9,13 @@ const dmSans = DM_Sans({
 })
 
 export const metadata: Metadata = {
-  title: 'NPC - not like other AIs',
+  title: 'npc - not like other AIs',
   description: 'an AI that helps you think, not one that thinks for you. no cap.',
   manifest: '/manifest.json',
   appleWebApp: {
     capable: true,
     statusBarStyle: 'default',
-    title: 'NPC',
+    title: 'npc',
   },
   formatDetection: {
     telephone: false,

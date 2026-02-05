@@ -270,7 +270,7 @@ export default function AdminDashboard() {
           </Link>
           <div className="flex items-center gap-2">
             <span className="text-3xl">👻</span>
-            <span className="text-xl font-bold">NPC Admin</span>
+            <span className="text-xl font-bold">npc admin</span>
           </div>
           <div style={{ width: '100px' }} />
         </nav>
@@ -356,7 +356,7 @@ export default function AdminDashboard() {
               boxShadow: '4px 4px 0 black',
             }}
           >
-            NPC Admin Dashboard
+            npc admin Dashboard
           </h1>
         </div>
         <button

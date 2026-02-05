@@ -103,7 +103,7 @@ export default function InstallPrompt() {
       <div className="flex items-start gap-3">
         <div className="text-3xl">📱</div>
         <div className="flex-1">
-          <h3 className="font-bold text-sm mb-1">Add NPC to your phone!</h3>
+          <h3 className="font-bold text-sm mb-1">Add npc to your phone!</h3>
           {isIOS ? (
             <p className="text-xs opacity-80">
               Tap <span className="inline-block px-1 bg-gray-200 rounded">⎙</span> then "Add to Home Screen" for the best experience

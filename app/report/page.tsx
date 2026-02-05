@@ -386,7 +386,7 @@ export default function WeeklyReport() {
             <div className="text-5xl mb-4">🌱</div>
             <h3 className="text-xl font-bold mb-2">your journey is just starting!</h3>
             <p className="text-sm mb-4">
-              complete your daily check-ins and chat with NPC to see your growth here
+              complete your daily check-ins and chat with npc to see your growth here
             </p>
             <button
               onClick={() => router.push('/dashboard')}

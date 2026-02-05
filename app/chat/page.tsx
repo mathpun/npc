@@ -515,7 +515,7 @@ function ChatPageContent() {
                     <div className="flex items-center gap-3">
                       <div className="text-3xl">👻</div>
                       <div>
-                        <h1 className="font-bold text-lg">NPC</h1>
+                        <h1 className="font-bold text-lg">npc</h1>
                         {session && (
                           <p className="text-sm">{SESSION_GOALS[session.goal].label}</p>
                         )}

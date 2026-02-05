@@ -1,6 +1,6 @@
 {
-  "name": "NPC - Your Thinking Partner",
-  "short_name": "NPC",
+  "name": "npc - Your Thinking Partner",
+  "short_name": "npc",
   "description": "An AI that helps you think, not one that thinks for you",
   "start_url": "/",
   "display": "standalone",

@@ -731,7 +731,7 @@ export default function ParentDashboard({
           🤝 This dashboard is designed to build trust, not surveillance.
         </p>
         <p className="text-xs mt-1">
-          NPC respects your teen's privacy while keeping you informed.
+          npc respects your teen's privacy while keeping you informed.
         </p>
       </div>
     </div>

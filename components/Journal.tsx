@@ -41,7 +41,7 @@ function getPersonalizedPrompt(profile?: UserProfile): string {
     `If you could tell your future self one thing, what would it be?`,
     `What's challenging you right now, and how are you handling it?`,
     `What's something you want to remember about today?`,
-    `How have you grown since you started using NPC?`,
+    `How have you grown since you started using npc?`,
     `What's one small win you had recently?`,
     `What would make tomorrow amazing?`,
   ]
