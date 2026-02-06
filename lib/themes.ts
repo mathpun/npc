@@ -266,6 +266,80 @@ export const themes: Record<string, Theme> = {
       glow: 'rgba(255, 20, 147, 0.3)',
     },
   },
+
+  minimal: {
+    id: 'minimal',
+    name: 'Minimal',
+    emoji: '◻️',
+    description: 'clean black & white',
+    colors: {
+      background: '#FFFFFF',
+      backgroundAlt: '#F5F5F5',
+      backgroundAccent: '#E0E0E0',
+
+      primary: ['#000000', '#333333', '#666666', '#999999', '#CCCCCC', '#E0E0E0', '#F5F5F5', '#FFFFFF'],
+
+      navHome: '#F5F5F5',
+      navDashboard: '#E0E0E0',
+      navChat: '#F5F5F5',
+      navMuseum: '#E0E0E0',
+      navWorld: '#F5F5F5',
+
+      userMessage: '#F0F0F0',
+      userAvatar: '#333333',
+      assistantAvatar: '#666666',
+
+      accent1: '#000000',
+      accent2: '#333333',
+      accent3: '#666666',
+      accent4: '#999999',
+      accent5: '#CCCCCC',
+
+      buttonPrimary: '#000000',
+      buttonSecondary: '#666666',
+      buttonSuccess: '#E0E0E0',
+      buttonDanger: '#333333',
+
+      glow: 'rgba(0, 0, 0, 0.1)',
+    },
+  },
+
+  dark: {
+    id: 'dark',
+    name: 'Dark Mode',
+    emoji: '🌙',
+    description: 'easy on the eyes',
+    colors: {
+      background: '#1A1A1A',
+      backgroundAlt: '#2D2D2D',
+      backgroundAccent: '#404040',
+
+      primary: ['#FFFFFF', '#E0E0E0', '#CCCCCC', '#999999', '#666666', '#404040', '#2D2D2D', '#1A1A1A'],
+
+      navHome: '#2D2D2D',
+      navDashboard: '#404040',
+      navChat: '#2D2D2D',
+      navMuseum: '#404040',
+      navWorld: '#2D2D2D',
+
+      userMessage: '#404040',
+      userAvatar: '#E0E0E0',
+      assistantAvatar: '#999999',
+
+      accent1: '#FFFFFF',
+      accent2: '#E0E0E0',
+      accent3: '#CCCCCC',
+      accent4: '#999999',
+      accent5: '#666666',
+
+      buttonPrimary: '#FFFFFF',
+      buttonSecondary: '#999999',
+      buttonSuccess: '#404040',
+      buttonDanger: '#666666',
+
+      glow: 'rgba(255, 255, 255, 0.1)',
+    },
+  },
 }
 
 export const themeList = Object.values(themes)

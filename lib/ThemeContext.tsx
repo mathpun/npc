@@ -49,6 +49,13 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
 
     // Update body background
     document.body.style.backgroundColor = theme.colors.background
+
+    // Handle dark theme class for text colors
+    if (themeId === 'dark') {
+      document.body.classList.add('dark-theme')
+    } else {
+      document.body.classList.remove('dark-theme')
+    }
   }, [themeId, mounted])
 
   const setTheme = (newThemeId: string) => {

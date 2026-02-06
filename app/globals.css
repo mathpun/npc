@@ -24,10 +24,28 @@
 
 body {
   background: var(--theme-background);
-  color: #000;
+  color: var(--theme-text, #000);
   min-height: 100vh;
   -webkit-font-smoothing: antialiased;
-  transition: background-color 0.3s ease;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Dark theme text color */
+body.dark-theme {
+  color: #FFFFFF;
+}
+
+body.dark-theme input,
+body.dark-theme textarea,
+body.dark-theme select {
+  background-color: #2D2D2D;
+  color: #FFFFFF;
+  border-color: #404040;
+}
+
+body.dark-theme input::placeholder,
+body.dark-theme textarea::placeholder {
+  color: #999999;
 }
 
 /* Custom scrollbar */
