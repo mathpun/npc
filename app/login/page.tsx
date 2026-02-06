@@ -10,8 +10,10 @@ export default function LoginPage() {
   const router = useRouter()
   const [name, setName] = useState('')
   const [password, setPassword] = useState('')
+  const [confirmPassword, setConfirmPassword] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
+  const [needsPassword, setNeedsPassword] = useState(false)
   const { theme } = useTheme()
 
   const handleLogin = async (e: React.FormEvent) => {
@@ -20,21 +22,69 @@ export default function LoginPage() {
       setError('please enter your name')
       return
     }
-    if (!password) {
-      setError('please enter your password')
-      return
-    }
 
     setLoading(true)
     setError('')
 
     try {
+      // If we're in password creation mode
+      if (needsPassword) {
+        if (!password) {
+          setError('please create a password')
+          setLoading(false)
+          return
+        }
+        if (password.length < 4) {
+          setError('password must be at least 4 characters')
+          setLoading(false)
+          return
+        }
+        if (password !== confirmPassword) {
+          setError('passwords don\'t match')
+          setLoading(false)
+          return
+        }
+
+        // Set the password
+        const res = await fetch('/api/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name: name.trim(), password, setPassword: true }),
+        })
+        const data = await res.json()
+
+        if (res.ok && data.user) {
+          const profile = {
+            name: data.user.name,
+            currentAge: data.user.age,
+            interests: data.user.interests?.split(', ') || [],
+            currentGoals: data.user.goals || '',
+          }
+          localStorage.setItem('youthai_profile', JSON.stringify(profile))
+          localStorage.setItem('npc_user_id', data.user.id)
+          router.push('/dashboard')
+        } else {
+          setError(data.error || 'something went wrong')
+        }
+        setLoading(false)
+        return
+      }
+
+      // Normal login - first check if user exists and needs password
       const res = await fetch('/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name: name.trim(), password }),
       })
       const data = await res.json()
+
+      if (data.needsPassword) {
+        // User exists but needs to create a password
+        setNeedsPassword(true)
+        setPassword('')
+        setLoading(false)
+        return
+      }
 
       if (res.ok && data.user) {
         // Save to localStorage
@@ -96,42 +146,77 @@ export default function LoginPage() {
           <h1
             className="text-2xl font-bold text-center mb-2 inline-block w-full px-4 py-2"
             style={{
-              backgroundColor: theme.colors.accent2,
+              backgroundColor: needsPassword ? theme.colors.accent1 : theme.colors.accent2,
               border: '3px solid black',
               boxShadow: '4px 4px 0 black',
             }}
           >
-            welcome back!
+            {needsPassword ? `hey ${name}!` : 'welcome back!'}
           </h1>
-          <p className="text-center text-gray-600 mb-6 mt-4">enter your name and password to log in</p>
+          <p className="text-center text-gray-600 mb-6 mt-4">
+            {needsPassword
+              ? 'we added passwords! create one to keep your account secure'
+              : 'enter your name and password to log in'}
+          </p>
 
           <form onSubmit={handleLogin}>
-            <input
-              type="text"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="your name..."
-              className="w-full px-4 py-3 text-lg mb-4"
-              style={{
-                backgroundColor: '#FFFACD',
-                border: '3px solid black',
-                borderRadius: '12px',
-              }}
-              autoFocus
-            />
+            {!needsPassword && (
+              <input
+                type="text"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="your name..."
+                className="w-full px-4 py-3 text-lg mb-4"
+                style={{
+                  backgroundColor: '#FFFACD',
+                  border: '3px solid black',
+                  borderRadius: '12px',
+                }}
+                autoFocus
+              />
+            )}
 
             <input
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              placeholder="your password..."
+              placeholder={needsPassword ? 'create a password...' : 'your password...'}
               className="w-full px-4 py-3 text-lg mb-4"
               style={{
                 backgroundColor: '#FFFACD',
                 border: '3px solid black',
                 borderRadius: '12px',
               }}
+              autoFocus={needsPassword}
             />
+
+            {needsPassword && (
+              <input
+                type="password"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                placeholder="confirm password..."
+                className="w-full px-4 py-3 text-lg mb-4"
+                style={{
+                  backgroundColor: '#FFFACD',
+                  border: '3px solid black',
+                  borderRadius: '12px',
+                }}
+              />
+            )}
+
+            {needsPassword && (
+              <p
+                className="text-sm text-center mb-4 px-3 py-2"
+                style={{
+                  backgroundColor: theme.colors.accent3,
+                  border: '2px dashed black',
+                  borderRadius: '8px',
+                }}
+              >
+                password must be at least 4 characters
+              </p>
+            )}
 
             {error && (
               <div
@@ -157,8 +242,25 @@ export default function LoginPage() {
                 boxShadow: '4px 4px 0 black',
               }}
             >
-              {loading ? 'logging in...' : 'log in →'}
+              {loading
+                ? (needsPassword ? 'saving...' : 'logging in...')
+                : (needsPassword ? 'save password & log in →' : 'log in →')}
             </button>
+
+            {needsPassword && (
+              <button
+                type="button"
+                onClick={() => {
+                  setNeedsPassword(false)
+                  setPassword('')
+                  setConfirmPassword('')
+                  setError('')
+                }}
+                className="w-full mt-3 py-2 font-bold text-sm hover:underline"
+              >
+                ← back to login
+              </button>
+            )}
           </form>
 
           <div className="mt-6 text-center">

@@ -2,14 +2,14 @@ import { NextRequest, NextResponse } from 'next/server'
 import db from '@/lib/db'
 import bcrypt from 'bcryptjs'
 
-// POST - login with name and password
+// POST - login with name and password, or set password for existing users
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
-    const { name, password } = body
+    const { name, password, setPassword } = body
 
-    if (!name || !password) {
-      return NextResponse.json({ error: 'Name and password are required' }, { status: 400 })
+    if (!name) {
+      return NextResponse.json({ error: 'Name is required' }, { status: 400 })
     }
 
     // Find user by name (case-insensitive)
@@ -24,12 +24,52 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 })
     }
 
-    // If user has a password, verify it
-    if (user.password_hash) {
-      const isValid = await bcrypt.compare(password, user.password_hash)
-      if (!isValid) {
-        return NextResponse.json({ error: 'Incorrect password' }, { status: 401 })
+    // If user doesn't have a password yet
+    if (!user.password_hash) {
+      // If they're trying to set a password
+      if (setPassword && password) {
+        if (password.length < 4) {
+          return NextResponse.json({ error: 'Password must be at least 4 characters' }, { status: 400 })
+        }
+
+        // Hash and save the new password
+        const passwordHash = await bcrypt.hash(password, 10)
+        await db.prepare(`
+          UPDATE users SET password_hash = ? WHERE id = ?
+        `).run(passwordHash, user.id)
+
+        // Update last_active
+        await db.prepare(`
+          UPDATE users SET last_active = CURRENT_TIMESTAMP WHERE id = ?
+        `).run(user.id)
+
+        // Log the activity
+        await db.prepare(`
+          INSERT INTO activity_log (user_id, activity_type, activity_data)
+          VALUES (?, 'password_set', ?)
+        `).run(user.id, JSON.stringify({ timestamp: new Date().toISOString() }))
+
+        // Don't return password_hash to client
+        const { password_hash, ...safeUser } = user
+        return NextResponse.json({ user: safeUser })
       }
+
+      // Otherwise, tell the client they need to create a password
+      return NextResponse.json({
+        needsPassword: true,
+        userName: user.name,
+        message: 'Please create a password for your account'
+      }, { status: 200 })
+    }
+
+    // User has a password - verify it
+    if (!password) {
+      return NextResponse.json({ error: 'Password is required' }, { status: 400 })
+    }
+
+    const isValid = await bcrypt.compare(password, user.password_hash)
+    if (!isValid) {
+      return NextResponse.json({ error: 'Incorrect password' }, { status: 401 })
     }
 
     // Update last_active
