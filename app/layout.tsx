@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from 'next'
 import { DM_Sans } from 'next/font/google'
 import './globals.css'
 import { ThemeProvider } from '@/lib/ThemeContext'
+import ServiceWorkerRegistration from '@/components/ServiceWorkerRegistration'
 
 const dmSans = DM_Sans({
   subsets: ['latin'],
@@ -38,12 +39,14 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
-        <link rel="apple-touch-icon" href="/icons/icon.svg" />
-        <link rel="icon" type="image/svg+xml" href="/icons/icon.svg" />
+        <link rel="apple-touch-icon" href="/api/icon?size=180" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/api/icon?size=32" />
+        <link rel="icon" type="image/png" sizes="16x16" href="/api/icon?size=16" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="mobile-web-app-capable" content="yes" />
       </head>
       <body className={dmSans.className}>
+        <ServiceWorkerRegistration />
         <ThemeProvider>{children}</ThemeProvider>
       </body>
     </html>
