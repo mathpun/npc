@@ -17,12 +17,24 @@ function getAnthropicClient(): Anthropic {
 }
 
 // Save a chat message to the database
-async function saveMessage(userId: string, role: string, content: string) {
+async function saveMessage(userId: string, role: string, content: string, sessionId?: number) {
   try {
-    await db.prepare(`
-      INSERT INTO chat_messages (user_id, role, content)
-      VALUES (?, ?, ?)
-    `).run(userId, role, content)
+    if (sessionId) {
+      await db.prepare(`
+        INSERT INTO chat_messages (user_id, session_id, role, content)
+        VALUES (?, ?, ?, ?)
+      `).run(userId, sessionId, role, content)
+
+      // Update message count on session
+      await db.prepare(`
+        UPDATE chat_sessions SET message_count = message_count + 1 WHERE id = ?
+      `).run(sessionId)
+    } else {
+      await db.prepare(`
+        INSERT INTO chat_messages (user_id, role, content)
+        VALUES (?, ?, ?)
+      `).run(userId, role, content)
+    }
   } catch (error) {
     console.error('Failed to save message:', error)
   }
@@ -30,7 +42,7 @@ async function saveMessage(userId: string, role: string, content: string) {
 
 export async function POST(request: NextRequest) {
   try {
-    const { messages, profile, session, userId } = await request.json()
+    const { messages, profile, session, userId, sessionId } = await request.json()
 
     if (!profile || !profile.name || !profile.currentAge) {
       return new Response(JSON.stringify({ error: 'Missing profile data' }), {
@@ -58,7 +70,7 @@ export async function POST(request: NextRequest) {
     if (userId && messages.length > 0) {
       const lastMessage = messages[messages.length - 1]
       if (lastMessage.role === 'user') {
-        saveMessage(userId, 'user', lastMessage.content)
+        saveMessage(userId, 'user', lastMessage.content, sessionId)
       }
     }
 
@@ -93,7 +105,7 @@ export async function POST(request: NextRequest) {
 
           // Save assistant response to database
           if (userId && fullResponse) {
-            saveMessage(userId, 'assistant', fullResponse)
+            saveMessage(userId, 'assistant', fullResponse, sessionId)
           }
 
           controller.enqueue(encoder.encode('data: [DONE]\n\n'))

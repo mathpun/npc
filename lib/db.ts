@@ -55,12 +55,32 @@ async function initDb() {
       CREATE TABLE IF NOT EXISTS chat_sessions (
         id SERIAL PRIMARY KEY,
         user_id TEXT NOT NULL REFERENCES users(id),
+        title TEXT,
+        category TEXT DEFAULT 'general',
         session_goal TEXT,
         session_topic TEXT,
+        persona TEXT,
         message_count INTEGER DEFAULT 0,
         started_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         ended_at TIMESTAMP
       );
+
+      -- Add new columns to chat_sessions if they don't exist
+      DO $$
+      BEGIN
+        IF NOT EXISTS (SELECT 1 FROM information_schema.columns
+                       WHERE table_name = 'chat_sessions' AND column_name = 'title') THEN
+          ALTER TABLE chat_sessions ADD COLUMN title TEXT;
+        END IF;
+        IF NOT EXISTS (SELECT 1 FROM information_schema.columns
+                       WHERE table_name = 'chat_sessions' AND column_name = 'category') THEN
+          ALTER TABLE chat_sessions ADD COLUMN category TEXT DEFAULT 'general';
+        END IF;
+        IF NOT EXISTS (SELECT 1 FROM information_schema.columns
+                       WHERE table_name = 'chat_sessions' AND column_name = 'persona') THEN
+          ALTER TABLE chat_sessions ADD COLUMN persona TEXT;
+        END IF;
+      END $$;
 
       -- Journal entries
       CREATE TABLE IF NOT EXISTS journal_entries (
@@ -163,10 +183,20 @@ async function initDb() {
       CREATE TABLE IF NOT EXISTS chat_messages (
         id SERIAL PRIMARY KEY,
         user_id TEXT NOT NULL REFERENCES users(id),
+        session_id INTEGER REFERENCES chat_sessions(id),
         role TEXT NOT NULL,
         content TEXT NOT NULL,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       );
+
+      -- Add session_id to chat_messages if it doesn't exist
+      DO $$
+      BEGIN
+        IF NOT EXISTS (SELECT 1 FROM information_schema.columns
+                       WHERE table_name = 'chat_messages' AND column_name = 'session_id') THEN
+          ALTER TABLE chat_messages ADD COLUMN session_id INTEGER REFERENCES chat_sessions(id);
+        END IF;
+      END $$;
 
       -- Daily check-ins
       CREATE TABLE IF NOT EXISTS daily_checkins (

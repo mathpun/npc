@@ -20,6 +20,7 @@ import PeerWisdom from '@/components/PeerWisdom'
 import AILiteracy from '@/components/AILiteracy'
 import DailyCheckIn from '@/components/DailyCheckIn'
 import { SessionGoal, PersonaType, SESSION_GOALS, buildReflectionPrompt } from '@/lib/prompts'
+import ChatHistory from '@/components/ChatHistory'
 
 interface Message {
   id: string
@@ -56,6 +57,8 @@ function ChatPageContent() {
   const [activeTab, setActiveTab] = useState<TabId>('chat')
   const [activeGrowthTab, setActiveGrowthTab] = useState<GrowthSubTab>('insights')
   const [showCheckIn, setShowCheckIn] = useState(false)
+  const [showChatHistory, setShowChatHistory] = useState(false)
+  const [currentSessionId, setCurrentSessionId] = useState<number | undefined>(undefined)
   const messagesEndRef = useRef<HTMLDivElement>(null)
 
   // Track activity helper
@@ -224,8 +227,63 @@ function ChatPageContent() {
     // Track session start
     trackActivity('session_start', { goal, topic, persona })
 
+    // Create a new session in the database
+    const userId = localStorage.getItem('npc_user_id')
+    if (userId) {
+      try {
+        const res = await fetch('/api/chat-sessions', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            userId,
+            category: goal === 'feeling' ? 'feelings' : goal === 'creating' ? 'creative' : 'general',
+            sessionGoal: goal,
+            sessionTopic: topic,
+            persona,
+          }),
+        })
+        const data = await res.json()
+        if (data.session?.id) {
+          setCurrentSessionId(data.session.id)
+        }
+      } catch (err) {
+        console.error('Failed to create session:', err)
+      }
+    }
+
     if (profile) {
       await getInitialGreeting(goal, topic, persona)
+    }
+  }
+
+  const handleLoadSession = async (sessionId: number) => {
+    const userId = localStorage.getItem('npc_user_id')
+    if (!userId) return
+
+    try {
+      const res = await fetch(`/api/chat-sessions?userId=${userId}&sessionId=${sessionId}`)
+      const data = await res.json()
+
+      if (data.session && data.messages) {
+        // Set the session context
+        setSession({
+          goal: data.session.session_goal || 'thinking',
+          topic: data.session.session_topic || '',
+          persona: data.session.persona,
+        })
+        setCurrentSessionId(sessionId)
+        setShowSessionPicker(false)
+
+        // Load messages
+        const loadedMessages: Message[] = data.messages.map((m: { id: number; role: string; content: string }) => ({
+          id: m.id.toString(),
+          role: m.role as 'user' | 'assistant',
+          content: m.content,
+        }))
+        setMessages(loadedMessages)
+      }
+    } catch (err) {
+      console.error('Failed to load session:', err)
     }
   }
 
@@ -322,6 +380,7 @@ function ChatPageContent() {
           profile,
           session,
           userId: localStorage.getItem('npc_user_id'),
+          sessionId: currentSessionId,
         }),
       })
 
@@ -410,6 +469,7 @@ function ChatPageContent() {
     setSession(null)
     setShowSessionPicker(true)
     setReflectionPrompt(null)
+    setCurrentSessionId(undefined)
   }
 
   const handleTabChange = (tab: TabId) => {
@@ -513,6 +573,19 @@ function ChatPageContent() {
                 >
                   <div className="max-w-3xl mx-auto flex items-center justify-between">
                     <div className="flex items-center gap-3">
+                      <button
+                        onClick={() => setShowChatHistory(true)}
+                        className="w-10 h-10 flex items-center justify-center font-bold hover:scale-105 transition-transform"
+                        style={{
+                          backgroundColor: '#FFD700',
+                          border: '3px solid black',
+                          borderRadius: '10px',
+                          boxShadow: '2px 2px 0 black',
+                        }}
+                        title="Chat history"
+                      >
+                        📋
+                      </button>
                       <div className="text-3xl">👻</div>
                       <div>
                         <h1 className="font-bold text-lg">npc</h1>
@@ -678,6 +751,15 @@ function ChatPageContent() {
         onAddEntry={addJournalEntry}
         onDeleteEntry={deleteJournalEntry}
         profile={profile || undefined}
+      />
+
+      {/* Chat History Sidebar */}
+      <ChatHistory
+        isOpen={showChatHistory}
+        onClose={() => setShowChatHistory(false)}
+        onSelectSession={handleLoadSession}
+        onNewChat={startNewSession}
+        currentSessionId={currentSessionId}
       />
     </main>
   )
