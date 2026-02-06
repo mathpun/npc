@@ -28,7 +28,7 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
-    const { name, age, interests, goals, password } = body
+    const { name, nickname, age, interests, goals, password } = body
 
     if (!name || !age || !interests) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
@@ -49,20 +49,21 @@ export async function POST(request: NextRequest) {
 
     const id = uuidv4()
     const interestsStr = Array.isArray(interests) ? interests.join(', ') : interests
+    const displayName = nickname || name // default to username if no nickname
 
     // Hash the password
     const passwordHash = await bcrypt.hash(password, 10)
 
     await db.prepare(`
-      INSERT INTO users (id, name, age, interests, goals, password_hash)
-      VALUES (?, ?, ?, ?, ?, ?)
-    `).run(id, name, age, interestsStr, goals || null, passwordHash)
+      INSERT INTO users (id, name, nickname, age, interests, goals, password_hash)
+      VALUES (?, ?, ?, ?, ?, ?, ?)
+    `).run(id, name, displayName, age, interestsStr, goals || null, passwordHash)
 
     // Log the activity
     await db.prepare(`
       INSERT INTO activity_log (user_id, activity_type, activity_data)
       VALUES (?, 'signup', ?)
-    `).run(id, JSON.stringify({ name, age }))
+    `).run(id, JSON.stringify({ name, nickname: displayName, age }))
 
     // Create first milestone
     await db.prepare(`
@@ -77,7 +78,7 @@ export async function POST(request: NextRequest) {
       ON CONFLICT (user_id, achievement_key) DO NOTHING
     `).run(id)
 
-    return NextResponse.json({ id, name, age, interests: interestsStr, goals })
+    return NextResponse.json({ id, name, nickname: displayName, age, interests: interestsStr, goals })
   } catch (error) {
     console.error('Error creating user:', error)
     return NextResponse.json({ error: 'Failed to create user' }, { status: 500 })

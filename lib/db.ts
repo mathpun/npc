@@ -15,6 +15,7 @@ async function initDb() {
       CREATE TABLE IF NOT EXISTS users (
         id TEXT PRIMARY KEY,
         name TEXT NOT NULL,
+        nickname TEXT,
         age INTEGER NOT NULL,
         interests TEXT NOT NULL,
         goals TEXT,
@@ -29,6 +30,15 @@ async function initDb() {
         IF NOT EXISTS (SELECT 1 FROM information_schema.columns
                        WHERE table_name = 'users' AND column_name = 'password_hash') THEN
           ALTER TABLE users ADD COLUMN password_hash TEXT;
+        END IF;
+      END $$;
+
+      -- Add nickname column if it doesn't exist (for existing databases)
+      DO $$
+      BEGIN
+        IF NOT EXISTS (SELECT 1 FROM information_schema.columns
+                       WHERE table_name = 'users' AND column_name = 'nickname') THEN
+          ALTER TABLE users ADD COLUMN nickname TEXT;
         END IF;
       END $$;
 

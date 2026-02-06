@@ -55,7 +55,7 @@ export default function LoginPage() {
 
         if (res.ok && data.user) {
           const profile = {
-            name: data.user.name,
+            name: data.user.nickname || data.user.name, // use nickname for AI
             currentAge: data.user.age,
             interests: data.user.interests?.split(', ') || [],
             currentGoals: data.user.goals || '',
@@ -89,7 +89,7 @@ export default function LoginPage() {
       if (res.ok && data.user) {
         // Save to localStorage
         const profile = {
-          name: data.user.name,
+          name: data.user.nickname || data.user.name, // use nickname for AI
           currentAge: data.user.age,
           interests: data.user.interests?.split(', ') || [],
           currentGoals: data.user.goals || '',

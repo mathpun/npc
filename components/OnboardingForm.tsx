@@ -30,6 +30,7 @@ const STEP_COLORS = ['#FF69B4', '#FFD700', '#90EE90']
 
 interface FormData {
   name: string
+  nickname: string
   currentAge: string
   password: string
   interests: string[]
@@ -41,6 +42,7 @@ export default function OnboardingForm() {
   const [step, setStep] = useState(1)
   const [formData, setFormData] = useState<FormData>({
     name: '',
+    nickname: '',
     currentAge: '',
     password: '',
     interests: [],
@@ -63,6 +65,7 @@ export default function OnboardingForm() {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             name: formData.name,
+            nickname: formData.nickname || formData.name, // default to username if no nickname
             age: parseInt(formData.currentAge),
             interests: formData.interests,
             goals: formData.currentGoals,
@@ -79,7 +82,7 @@ export default function OnboardingForm() {
 
         // Success - save profile locally
         const profile = {
-          name: formData.name,
+          name: formData.nickname || formData.name, // use nickname for AI interactions
           currentAge: parseInt(formData.currentAge),
           interests: formData.interests,
           currentGoals: formData.currentGoals,
@@ -200,12 +203,12 @@ export default function OnboardingForm() {
             </div>
 
             <div>
-              <label className="block text-lg font-bold mb-2">what should i call you?</label>
+              <label className="block text-lg font-bold mb-2">pick a username</label>
               <input
                 type="text"
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                placeholder="your first name"
+                placeholder="for logging in"
                 className="w-full px-4 py-3 text-lg"
                 style={{
                   backgroundColor: '#FFFACD',
@@ -214,6 +217,27 @@ export default function OnboardingForm() {
                 }}
                 autoFocus
               />
+            </div>
+
+            <div>
+              <label className="block text-lg font-bold mb-2">what should the AI call you?</label>
+              <input
+                type="text"
+                value={formData.nickname}
+                onChange={(e) => setFormData({ ...formData, nickname: e.target.value })}
+                placeholder="a nickname, your name, whatever feels right"
+                className="w-full px-4 py-3 text-lg"
+                style={{
+                  backgroundColor: '#FFFACD',
+                  border: '3px solid black',
+                  borderRadius: '12px',
+                }}
+              />
+              <p
+                className="text-xs mt-2 text-gray-600"
+              >
+                this is how npc will address you in chats
+              </p>
             </div>
 
             <div>
