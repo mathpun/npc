@@ -31,6 +31,7 @@ const STEP_COLORS = ['#FF69B4', '#FFD700', '#90EE90']
 interface FormData {
   name: string
   currentAge: string
+  password: string
   interests: string[]
   currentGoals: string
 }
@@ -41,9 +42,11 @@ export default function OnboardingForm() {
   const [formData, setFormData] = useState<FormData>({
     name: '',
     currentAge: '',
+    password: '',
     interests: [],
     currentGoals: '',
   })
+  const [signupError, setSignupError] = useState('')
 
   const totalSteps = 3
 
@@ -51,15 +54,9 @@ export default function OnboardingForm() {
     if (step < totalSteps) {
       setStep(step + 1)
     } else {
-      const profile = {
-        name: formData.name,
-        currentAge: parseInt(formData.currentAge),
-        interests: formData.interests,
-        currentGoals: formData.currentGoals,
-      }
-      localStorage.setItem('youthai_profile', JSON.stringify(profile))
+      setSignupError('')
 
-      // Create user in database
+      // Create user in database first
       try {
         const res = await fetch('/api/users', {
           method: 'POST',
@@ -69,17 +66,32 @@ export default function OnboardingForm() {
             age: parseInt(formData.currentAge),
             interests: formData.interests,
             goals: formData.currentGoals,
+            password: formData.password,
           }),
         })
-        if (res.ok) {
-          const user = await res.json()
-          localStorage.setItem('npc_user_id', user.id)
+
+        const data = await res.json()
+
+        if (!res.ok) {
+          setSignupError(data.error || 'Failed to create account')
+          return
         }
+
+        // Success - save profile locally
+        const profile = {
+          name: formData.name,
+          currentAge: parseInt(formData.currentAge),
+          interests: formData.interests,
+          currentGoals: formData.currentGoals,
+        }
+        localStorage.setItem('youthai_profile', JSON.stringify(profile))
+        localStorage.setItem('npc_user_id', data.id)
+
+        router.push('/chat')
       } catch (err) {
         console.error('Failed to create user:', err)
+        setSignupError('Something went wrong, please try again')
       }
-
-      router.push('/chat')
     }
   }
 
@@ -104,7 +116,8 @@ export default function OnboardingForm() {
         return formData.name.trim().length > 0 &&
                formData.currentAge.trim().length > 0 &&
                parseInt(formData.currentAge) >= 13 &&
-               parseInt(formData.currentAge) <= 18
+               parseInt(formData.currentAge) <= 18 &&
+               formData.password.length >= 4
       case 2:
         return formData.interests.length >= 1
       case 3:
@@ -232,6 +245,34 @@ export default function OnboardingForm() {
                 </p>
               )}
             </div>
+
+            <div>
+              <label className="block text-lg font-bold mb-2">create a password</label>
+              <input
+                type="password"
+                value={formData.password}
+                onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                placeholder="at least 4 characters"
+                className="w-full px-4 py-3 text-lg"
+                style={{
+                  backgroundColor: '#FFFACD',
+                  border: '3px solid black',
+                  borderRadius: '12px',
+                }}
+              />
+              {formData.password && formData.password.length < 4 && (
+                <p
+                  className="text-sm mt-2 px-3 py-2 inline-block"
+                  style={{
+                    backgroundColor: '#FFA500',
+                    border: '2px solid black',
+                    borderRadius: '8px',
+                  }}
+                >
+                  password needs to be at least 4 characters
+                </p>
+              )}
+            </div>
           </div>
         )}
 
@@ -334,6 +375,19 @@ export default function OnboardingForm() {
             >
               this helps personalize conversations, but you can skip it!
             </p>
+
+            {signupError && (
+              <div
+                className="mt-4 p-3 text-center font-bold"
+                style={{
+                  backgroundColor: '#FFA500',
+                  border: '2px solid black',
+                  borderRadius: '8px',
+                }}
+              >
+                {signupError}
+              </div>
+            )}
           </div>
         )}
 

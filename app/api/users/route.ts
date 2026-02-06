@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import db from '@/lib/db'
 import { v4 as uuidv4 } from 'uuid'
+import bcrypt from 'bcryptjs'
 
 // GET all users or single user by id
 export async function GET(request: NextRequest) {
@@ -27,19 +28,35 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
-    const { name, age, interests, goals } = body
+    const { name, age, interests, goals, password } = body
 
     if (!name || !age || !interests) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
     }
 
+    if (!password || password.length < 4) {
+      return NextResponse.json({ error: 'Password must be at least 4 characters' }, { status: 400 })
+    }
+
+    // Check if username already exists
+    const existingUser = await db.prepare(`
+      SELECT id FROM users WHERE LOWER(name) = LOWER(?)
+    `).get(name.trim())
+
+    if (existingUser) {
+      return NextResponse.json({ error: 'This name is already taken' }, { status: 400 })
+    }
+
     const id = uuidv4()
     const interestsStr = Array.isArray(interests) ? interests.join(', ') : interests
 
+    // Hash the password
+    const passwordHash = await bcrypt.hash(password, 10)
+
     await db.prepare(`
-      INSERT INTO users (id, name, age, interests, goals)
-      VALUES (?, ?, ?, ?, ?)
-    `).run(id, name, age, interestsStr, goals || null)
+      INSERT INTO users (id, name, age, interests, goals, password_hash)
+      VALUES (?, ?, ?, ?, ?, ?)
+    `).run(id, name, age, interestsStr, goals || null, passwordHash)
 
     // Log the activity
     await db.prepare(`

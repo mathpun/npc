@@ -9,6 +9,7 @@ import { useTheme } from '@/lib/ThemeContext'
 export default function LoginPage() {
   const router = useRouter()
   const [name, setName] = useState('')
+  const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
   const { theme } = useTheme()
@@ -19,12 +20,20 @@ export default function LoginPage() {
       setError('please enter your name')
       return
     }
+    if (!password) {
+      setError('please enter your password')
+      return
+    }
 
     setLoading(true)
     setError('')
 
     try {
-      const res = await fetch(`/api/auth/login?name=${encodeURIComponent(name.trim())}`)
+      const res = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: name.trim(), password }),
+      })
       const data = await res.json()
 
       if (res.ok && data.user) {
@@ -94,7 +103,7 @@ export default function LoginPage() {
           >
             welcome back!
           </h1>
-          <p className="text-center text-gray-600 mb-6 mt-4">enter your name to log in</p>
+          <p className="text-center text-gray-600 mb-6 mt-4">enter your name and password to log in</p>
 
           <form onSubmit={handleLogin}>
             <input
@@ -109,6 +118,19 @@ export default function LoginPage() {
                 borderRadius: '12px',
               }}
               autoFocus
+            />
+
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="your password..."
+              className="w-full px-4 py-3 text-lg mb-4"
+              style={{
+                backgroundColor: '#FFFACD',
+                border: '3px solid black',
+                borderRadius: '12px',
+              }}
             />
 
             {error && (

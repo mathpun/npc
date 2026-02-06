@@ -18,9 +18,19 @@ async function initDb() {
         age INTEGER NOT NULL,
         interests TEXT NOT NULL,
         goals TEXT,
+        password_hash TEXT,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         last_active TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       );
+
+      -- Add password_hash column if it doesn't exist (for existing databases)
+      DO $$
+      BEGIN
+        IF NOT EXISTS (SELECT 1 FROM information_schema.columns
+                       WHERE table_name = 'users' AND column_name = 'password_hash') THEN
+          ALTER TABLE users ADD COLUMN password_hash TEXT;
+        END IF;
+      END $$;
 
       -- Activity log
       CREATE TABLE IF NOT EXISTS activity_log (
