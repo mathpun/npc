@@ -133,7 +133,7 @@ export default function NavBar({ showBack = false, backHref = '/', backLabel = '
               </span>
               <button
                 onClick={handleLogout}
-                className="px-3 sm:px-4 py-2 font-bold hover:scale-105 transition-transform"
+                className="px-3 sm:px-4 py-2 font-bold hover:scale-105 transition-transform text-sm sm:text-base"
                 style={{
                   backgroundColor: theme.colors.buttonPrimary,
                   border: '3px solid black',
@@ -141,14 +141,13 @@ export default function NavBar({ showBack = false, backHref = '/', backLabel = '
                   boxShadow: '3px 3px 0 black',
                 }}
               >
-                <span className="sm:hidden">👋</span>
-                <span className="hidden sm:inline">logout</span>
+                logout
               </button>
             </>
           ) : (
             <Link
               href="/login"
-              className="px-3 sm:px-4 py-2 font-bold hover:scale-105 transition-transform"
+              className="px-3 sm:px-4 py-2 font-bold hover:scale-105 transition-transform text-sm sm:text-base"
               style={{
                 backgroundColor: theme.colors.buttonSuccess,
                 border: '3px solid black',
@@ -156,8 +155,7 @@ export default function NavBar({ showBack = false, backHref = '/', backLabel = '
                 boxShadow: '3px 3px 0 black',
               }}
             >
-              <span className="sm:hidden">✨</span>
-              <span className="hidden sm:inline">sign in</span>
+              log in
             </Link>
           )}
         </div>
