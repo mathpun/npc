@@ -49,6 +49,7 @@ export async function POST(request: NextRequest) {
     const sessionContext: SessionContext | undefined = session ? {
       goal: session.goal,
       topic: session.topic,
+      persona: session.persona,
     } : undefined
 
     const systemPrompt = buildSystemPrompt(userProfile, sessionContext)
