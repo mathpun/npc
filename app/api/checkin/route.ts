@@ -86,16 +86,17 @@ export async function GET(request: NextRequest) {
       lastMood: lastCheckin?.mood || null,
     }
 
-    // Fallback questions in case AI fails
+    // Fallback questions - always have these ready
     const fallbackQuestions = [
       `Hey ${user.name}! What's one thing that happened today that you want to remember?`,
       `How are you feeling about ${dayOfWeek} so far?`,
       `Anything on your mind you'd like to think through?`,
     ]
 
-    let questions: string[] = []
+    // Start with fallback questions - they'll be replaced if AI succeeds
+    let questions: string[] = [...fallbackQuestions]
 
-    // Generate personalized questions using Claude
+    // Try to generate personalized questions using Claude
     try {
       const prompt = buildCheckinPrompt(context)
       const response = await getAnthropicClient().messages.create({
@@ -107,19 +108,23 @@ export async function GET(request: NextRequest) {
       const textContent = response.content.find(block => block.type === 'text')
       if (textContent && textContent.type === 'text') {
         try {
-          questions = JSON.parse(textContent.text)
+          const parsed = JSON.parse(textContent.text)
+          // Only use AI questions if we got a valid array with content
+          if (Array.isArray(parsed) && parsed.length > 0 && typeof parsed[0] === 'string') {
+            questions = parsed
+          }
         } catch {
-          // Fallback questions if parsing fails
-          questions = fallbackQuestions
+          // JSON parsing failed - keep using fallback
+          console.log('Failed to parse AI questions, using fallback')
         }
       }
     } catch (err) {
+      // AI call failed - keep using fallback
       console.error('Failed to generate questions with AI:', err)
-      questions = fallbackQuestions
     }
 
-    // Use fallback if questions is empty
-    if (!questions || questions.length === 0) {
+    // Final safety check - ensure we always have questions
+    if (!Array.isArray(questions) || questions.length === 0) {
       questions = fallbackQuestions
     }
 

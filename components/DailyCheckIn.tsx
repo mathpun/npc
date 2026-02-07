@@ -22,6 +22,13 @@ export default function DailyCheckIn({ userId, userName, onComplete, onSkip }: D
   const [showSkipConfirm, setShowSkipConfirm] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
+  // Local fallback questions in case API fails completely
+  const localFallbackQuestions = [
+    "What's one thing that happened today that you want to remember?",
+    "How are you feeling right now?",
+    "Anything on your mind you'd like to think through?",
+  ]
+
   const fetchQuestions = useCallback(async () => {
     try {
       const res = await fetch(`/api/checkin?userId=${userId}`)
@@ -32,13 +39,18 @@ export default function DailyCheckIn({ userId, userName, onComplete, onSkip }: D
         return
       }
 
-      if (data.questions) {
-        setQuestions(data.questions)
-        setResponses(new Array(data.questions.length).fill(''))
-      }
+      // Use API questions if available and valid, otherwise use local fallback
+      const questionsToUse = (data.questions && Array.isArray(data.questions) && data.questions.length > 0)
+        ? data.questions
+        : localFallbackQuestions
+
+      setQuestions(questionsToUse)
+      setResponses(new Array(questionsToUse.length).fill(''))
     } catch (err) {
-      setError('Failed to load questions')
       console.error('Failed to fetch questions:', err)
+      // Use local fallback on error
+      setQuestions(localFallbackQuestions)
+      setResponses(new Array(localFallbackQuestions.length).fill(''))
     }
     setLoading(false)
   }, [userId, onComplete])
@@ -121,7 +133,9 @@ export default function DailyCheckIn({ userId, userName, onComplete, onSkip }: D
     )
   }
 
-  if (error && questions.length === 0) {
+  // This shouldn't happen now since we always have fallback questions,
+  // but keep it as a safety net
+  if (questions.length === 0) {
     return (
       <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
         <div className="absolute inset-0 bg-black/50" onClick={onSkip} />
@@ -134,7 +148,7 @@ export default function DailyCheckIn({ userId, userName, onComplete, onSkip }: D
             boxShadow: '8px 8px 0 black',
           }}
         >
-          <p className="text-center font-bold mb-4">{error}</p>
+          <p className="text-center font-bold mb-4">couldn&apos;t load check-in questions</p>
           <button
             onClick={onSkip}
             className="w-full py-3 font-bold"
