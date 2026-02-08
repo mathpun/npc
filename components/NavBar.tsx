@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useTheme } from '@/lib/ThemeContext'
 import ThemePicker, { ThemePickerButton } from './ThemePicker'
+import ChangePassword from './ChangePassword'
 
 interface NavBarProps {
   showBack?: boolean
@@ -17,6 +18,7 @@ export default function NavBar({ showBack = false, backHref = '/', backLabel = '
   const [isLoggedIn, setIsLoggedIn] = useState(false)
   const [userName, setUserName] = useState('')
   const [showThemePicker, setShowThemePicker] = useState(false)
+  const [showChangePassword, setShowChangePassword] = useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const { theme } = useTheme()
 
@@ -202,6 +204,25 @@ export default function NavBar({ showBack = false, backHref = '/', backLabel = '
               <span className="text-2xl">🎨</span>
               <span className="text-xs">theme</span>
             </button>
+
+            {isLoggedIn && (
+              <button
+                onClick={() => {
+                  setMobileMenuOpen(false)
+                  setShowChangePassword(true)
+                }}
+                className="flex flex-col items-center gap-1 p-3 font-bold hover:scale-105 transition-transform"
+                style={{
+                  backgroundColor: theme.colors.accent5,
+                  border: '3px solid black',
+                  borderRadius: '16px',
+                  boxShadow: '3px 3px 0 black',
+                }}
+              >
+                <span className="text-2xl">🔐</span>
+                <span className="text-xs">password</span>
+              </button>
+            )}
           </div>
 
           {isLoggedIn && (
@@ -229,6 +250,9 @@ export default function NavBar({ showBack = false, backHref = '/', backLabel = '
 
       {/* Theme Picker Modal */}
       <ThemePicker isOpen={showThemePicker} onClose={() => setShowThemePicker(false)} />
+
+      {/* Change Password Modal */}
+      <ChangePassword isOpen={showChangePassword} onClose={() => setShowChangePassword(false)} />
     </>
   )
 }

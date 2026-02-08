@@ -38,7 +38,6 @@ const ACHIEVEMENT_INFO: Record<string, { title: string; desc: string; icon: stri
   first_steps: { title: 'First Steps', desc: 'Started your journey', icon: '🌱' },
   first_chat: { title: 'First Chat', desc: 'Had your first conversation', icon: '💬' },
   deep_thinker: { title: 'Deep Thinker', desc: 'Completed 10 reflections', icon: '🧠' },
-  journal_keeper: { title: 'Journal Keeper', desc: 'Saved 5 journal entries', icon: '📔' },
   goal_setter: { title: 'Goal Setter', desc: 'Set your first goal', icon: '🎯' },
   goal_getter: { title: 'Goal Getter', desc: 'Completed a goal', icon: '🏆' },
   streak_3: { title: 'On Fire', desc: '3 day streak', icon: '🔥' },
@@ -46,6 +45,7 @@ const ACHIEVEMENT_INFO: Record<string, { title: string; desc: string; icon: stri
   streak_30: { title: 'Monthly Master', desc: '30 day streak', icon: '👑' },
   first_checkin: { title: 'First Check-In', desc: 'Completed your first daily check-in', icon: '📝' },
   checkin_streak_7: { title: 'Week of Reflection', desc: '7 day check-in streak', icon: '✨' },
+  museum_collector: { title: 'Curator', desc: 'Added items to your museum', icon: '🏛️' },
 }
 
 export default function Dashboard() {
@@ -153,9 +153,9 @@ export default function Dashboard() {
   // Weekly insights based on real stats
   const weeklyInsights = [
     { label: 'Reflections', value: stats.totalReflections, change: stats.totalReflections > 0 ? `${stats.totalReflections} total` : 'start chatting!', emoji: '🧠', color: theme.colors.accent5 },
-    { label: 'Journal', value: stats.journalEntries, change: stats.journalEntries > 0 ? `${stats.journalEntries} entries` : 'save insights!', emoji: '📔', color: theme.colors.accent3 },
     { label: 'Streak', value: stats.streak, change: stats.streak > 0 ? `${stats.streak} days` : 'start today!', emoji: '🔥', color: theme.colors.accent1 },
     { label: 'Goals Done', value: stats.goalsCompleted, change: stats.goalsCompleted > 0 ? 'nice work!' : 'set a goal!', emoji: '🎯', color: theme.colors.accent2 },
+    { label: 'Check-ins', value: stats.journalEntries, change: stats.journalEntries > 0 ? `${stats.journalEntries} done` : 'check in!', emoji: '📝', color: theme.colors.accent3 },
   ]
 
   // Build achievements list

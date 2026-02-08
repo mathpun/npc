@@ -119,7 +119,7 @@ export default function OnboardingForm() {
         return formData.name.trim().length > 0 &&
                formData.currentAge.trim().length > 0 &&
                parseInt(formData.currentAge) >= 13 &&
-               parseInt(formData.currentAge) <= 18 &&
+               parseInt(formData.currentAge) <= 24 &&
                formData.password.length >= 4
       case 2:
         return formData.interests.length >= 1
@@ -246,9 +246,9 @@ export default function OnboardingForm() {
                 type="number"
                 value={formData.currentAge}
                 onChange={(e) => setFormData({ ...formData, currentAge: e.target.value })}
-                placeholder="13-18"
+                placeholder="13-24"
                 min={13}
-                max={18}
+                max={24}
                 className="w-full px-4 py-3 text-lg"
                 style={{
                   backgroundColor: '#FFFACD',
@@ -256,7 +256,7 @@ export default function OnboardingForm() {
                   borderRadius: '12px',
                 }}
               />
-              {formData.currentAge && (parseInt(formData.currentAge) < 13 || parseInt(formData.currentAge) > 18) && (
+              {formData.currentAge && (parseInt(formData.currentAge) < 13 || parseInt(formData.currentAge) > 24) && (
                 <p
                   className="text-sm mt-2 px-3 py-2 inline-block"
                   style={{
@@ -265,7 +265,7 @@ export default function OnboardingForm() {
                     borderRadius: '8px',
                   }}
                 >
-                  this app is for teens aged 13-18
+                  this app is for ages 13-24
                 </p>
               )}
             </div>

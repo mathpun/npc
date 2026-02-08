@@ -1,7 +1,6 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { JournalEntry } from './Journal'
 
 interface UserProfile {
   name: string
@@ -12,8 +11,6 @@ interface UserProfile {
 
 interface ParentDashboardProps {
   profile: UserProfile
-  journalEntries: JournalEntry[]
-  sharedInsights: JournalEntry[]
 }
 
 interface SuggestedTheme {
@@ -23,7 +20,7 @@ interface SuggestedTheme {
 }
 
 // Generate parent-appropriate summaries
-function generateParentSummary(profile: UserProfile, entries: JournalEntry[]) {
+function generateParentSummary(profile: UserProfile) {
   const usageHealth = {
     status: 'healthy' as 'healthy' | 'moderate' | 'concerning',
     avgSessionsPerWeek: 5,
@@ -64,14 +61,12 @@ function generateParentSummary(profile: UserProfile, entries: JournalEntry[]) {
 
 export default function ParentDashboard({
   profile,
-  journalEntries,
-  sharedInsights
 }: ParentDashboardProps) {
   const [expandedSection, setExpandedSection] = useState<string | null>('overview')
   const [showPrivacyInfo, setShowPrivacyInfo] = useState(false)
   const [suggestedThemes, setSuggestedThemes] = useState<SuggestedTheme[]>([])
   const [newTheme, setNewTheme] = useState('')
-  const summary = generateParentSummary(profile, journalEntries)
+  const summary = generateParentSummary(profile)
 
   // Load saved themes from localStorage
   useEffect(() => {
@@ -497,87 +492,6 @@ export default function ParentDashboard({
             <p className="text-xs text-center mt-2">
               These metrics indicate healthy, reflective AI use—not just engagement time.
             </p>
-          </div>
-        )}
-      </div>
-
-      {/* Shared Insights */}
-      <div
-        className="p-5 rotate-1"
-        style={{
-          backgroundColor: '#FFB6C1',
-          border: '4px solid black',
-          borderRadius: '16px',
-          boxShadow: '6px 6px 0 black',
-        }}
-      >
-        <button
-          onClick={() => toggleSection('shared')}
-          className="w-full flex items-center justify-between mb-3"
-        >
-          <div className="flex items-center gap-3">
-            <span className="text-2xl">🎁</span>
-            <div className="text-left">
-              <h2 className="text-xl font-bold">Shared by {profile.name}</h2>
-              <p className="text-sm">Insights they chose to share with you</p>
-            </div>
-          </div>
-          <div className="flex items-center gap-2">
-            {sharedInsights.length > 0 && (
-              <span
-                className="px-2 py-1 font-bold text-sm"
-                style={{
-                  backgroundColor: '#FFD700',
-                  border: '2px solid black',
-                  borderRadius: '8px',
-                }}
-              >
-                {sharedInsights.length}
-              </span>
-            )}
-            <span className="text-2xl">{expandedSection === 'shared' ? '⬆️' : '⬇️'}</span>
-          </div>
-        </button>
-
-        {expandedSection === 'shared' && (
-          <div>
-            {sharedInsights.length === 0 ? (
-              <div
-                className="text-center py-6"
-                style={{
-                  backgroundColor: 'white',
-                  border: '2px dashed black',
-                  borderRadius: '12px',
-                }}
-              >
-                <span className="text-4xl">🔒</span>
-                <p className="font-bold mt-2">No shared insights yet</p>
-                <p className="text-sm mt-1">
-                  {profile.name} can choose to share specific insights from their journal
-                </p>
-              </div>
-            ) : (
-              <div className="space-y-2">
-                {sharedInsights.map((insight, index) => (
-                  <div
-                    key={insight.id}
-                    className="p-3"
-                    style={{
-                      backgroundColor: 'white',
-                      border: '3px solid black',
-                      borderRadius: '12px',
-                      boxShadow: '2px 2px 0 black',
-                      transform: `rotate(${index % 2 === 0 ? 1 : -1}deg)`,
-                    }}
-                  >
-                    <p className="text-sm mb-2">"{insight.content}"</p>
-                    <p className="text-xs">
-                      📅 {new Date(insight.timestamp).toLocaleDateString()}
-                    </p>
-                  </div>
-                ))}
-              </div>
-            )}
           </div>
         )}
       </div>

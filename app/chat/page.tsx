@@ -7,7 +7,6 @@ import NavBar from '@/components/NavBar'
 import ChatMessage, { ReflectionPrompt } from '@/components/ChatMessage'
 import ChatInput from '@/components/ChatInput'
 import SessionPicker from '@/components/SessionPicker'
-import Journal, { JournalEntry } from '@/components/Journal'
 import TabNav, { TabId, GrowthSubTab } from '@/components/TabNav'
 import TeenInsights from '@/components/TeenInsights'
 import ParentDashboard from '@/components/ParentDashboard'
@@ -49,9 +48,6 @@ function ChatPageContent() {
   const [messages, setMessages] = useState<Message[]>([])
   const [isLoading, setIsLoading] = useState(false)
   const [streamingContent, setStreamingContent] = useState('')
-  const [journalEntries, setJournalEntries] = useState<JournalEntry[]>([])
-  const [sharedInsights, setSharedInsights] = useState<JournalEntry[]>([])
-  const [showJournal, setShowJournal] = useState(false)
   const [showSessionPicker, setShowSessionPicker] = useState(true)
   const [reflectionPrompt, setReflectionPrompt] = useState<string | null>(null)
   const [activeTab, setActiveTab] = useState<TabId>('chat')
@@ -83,16 +79,6 @@ function ChatPageContent() {
       setProfile(JSON.parse(savedProfile))
     } else {
       router.push('/onboarding')
-    }
-
-    const savedJournal = localStorage.getItem('youthai_journal')
-    if (savedJournal) {
-      setJournalEntries(JSON.parse(savedJournal))
-    }
-
-    const savedShared = localStorage.getItem('youthai_shared')
-    if (savedShared) {
-      setSharedInsights(JSON.parse(savedShared))
     }
 
     // Track page view
@@ -438,32 +424,6 @@ function ChatPageContent() {
     }
   }
 
-  const saveToJournal = (type: 'insight' | 'reflection' | 'action', content: string) => {
-    const newEntry: JournalEntry = {
-      id: Date.now().toString(),
-      type,
-      content,
-      context: session ? SESSION_GOALS[session.goal].label : undefined,
-      timestamp: new Date(),
-    }
-    const updatedEntries = [newEntry, ...journalEntries]
-    setJournalEntries(updatedEntries)
-    localStorage.setItem('youthai_journal', JSON.stringify(updatedEntries))
-
-    // Track journal entry
-    trackActivity('journal_entry', { type, context: session?.goal })
-  }
-
-  const deleteJournalEntry = (id: string) => {
-    const updatedEntries = journalEntries.filter((e) => e.id !== id)
-    setJournalEntries(updatedEntries)
-    localStorage.setItem('youthai_journal', JSON.stringify(updatedEntries))
-  }
-
-  const addJournalEntry = (entry: Omit<JournalEntry, 'id' | 'timestamp'>) => {
-    saveToJournal(entry.type, entry.content)
-  }
-
   const startNewSession = () => {
     setMessages([])
     setSession(null)
@@ -515,12 +475,12 @@ function ChatPageContent() {
       {/* Nav */}
       <NavBar />
 
-      {/* Sub header with tabs and journal */}
+      {/* Sub header with tabs */}
       <header
         className="relative z-10 px-4 py-3 border-b-4 border-black border-dashed"
         style={{ backgroundColor: '#98FB98' }}
       >
-        <div className="max-w-5xl mx-auto flex items-center justify-between">
+        <div className="max-w-5xl mx-auto">
           {/* Tab Navigation */}
           <TabNav
             activeTab={activeTab}
@@ -528,30 +488,6 @@ function ChatPageContent() {
             activeGrowthTab={activeGrowthTab}
             onGrowthTabChange={setActiveGrowthTab}
           />
-
-          <button
-            onClick={() => setShowJournal(true)}
-            className="px-4 py-2 font-bold hover:scale-105 transition-transform relative"
-            style={{
-              backgroundColor: '#FFD700',
-              border: '3px solid black',
-              borderRadius: '9999px',
-              boxShadow: '3px 3px 0 black',
-            }}
-          >
-            📔 journal
-            {journalEntries.length > 0 && (
-              <span
-                className="absolute -top-2 -right-2 w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold"
-                style={{
-                  backgroundColor: '#FF69B4',
-                  border: '2px solid black',
-                }}
-              >
-                {journalEntries.length}
-              </span>
-            )}
-          </button>
         </div>
       </header>
 
@@ -617,7 +553,6 @@ function ChatPageContent() {
                         <ChatMessage
                           role={message.role}
                           content={message.content}
-                          onSaveToJournal={message.role === 'assistant' ? saveToJournal : undefined}
                         />
 
                         {index === messages.length - 1 && reflectionPrompt && message.role === 'assistant' && (
@@ -692,7 +627,7 @@ function ChatPageContent() {
           <div className="h-full overflow-y-auto px-4 py-6">
             <div className="max-w-3xl mx-auto">
               {activeGrowthTab === 'insights' && (
-                <TeenInsights profile={profile} journalEntries={journalEntries} />
+                <TeenInsights profile={profile} />
               )}
               {activeGrowthTab === 'progress' && (
                 <DevelopmentalProgress
@@ -736,22 +671,10 @@ function ChatPageContent() {
           <div className="h-full overflow-y-auto">
             <ParentDashboard
               profile={profile}
-              journalEntries={journalEntries}
-              sharedInsights={sharedInsights}
             />
           </div>
         )}
       </div>
-
-      {/* Journal Sidebar */}
-      <Journal
-        entries={journalEntries}
-        isOpen={showJournal}
-        onClose={() => setShowJournal(false)}
-        onAddEntry={addJournalEntry}
-        onDeleteEntry={deleteJournalEntry}
-        profile={profile || undefined}
-      />
 
       {/* Chat History Sidebar */}
       <ChatHistory

@@ -1,7 +1,6 @@
 'use client'
 
 import { useState } from 'react'
-import { JournalEntry } from './Journal'
 
 interface UserProfile {
   name: string
@@ -12,11 +11,10 @@ interface UserProfile {
 
 interface TeenInsightsProps {
   profile: UserProfile
-  journalEntries: JournalEntry[]
 }
 
 // Mock data for demo - in production this would be derived from actual usage
-function generateInsights(profile: UserProfile, entries: JournalEntry[]) {
+function generateInsights(profile: UserProfile) {
   const themes = [
     { name: 'Self-Discovery', count: 12, trend: 'up', emoji: '🔍' },
     { name: 'School & Learning', count: 8, trend: 'stable', emoji: '📚' },
@@ -46,9 +44,6 @@ function generateInsights(profile: UserProfile, entries: JournalEntry[]) {
     sessionsCount: 7,
     topTopics: ['career exploration', 'friendship dynamics', 'creative writing'],
     questionsAsked: 23,
-    insightsSaved: entries.filter(e => e.type === 'insight').length,
-    actionItems: entries.filter(e => e.type === 'action').length,
-    reflections: entries.filter(e => e.type === 'reflection').length,
   }
 
   const growthAreas = [
@@ -60,9 +55,9 @@ function generateInsights(profile: UserProfile, entries: JournalEntry[]) {
   return { themes, thinkingPatterns, weeklyDigest, growthAreas }
 }
 
-export default function TeenInsights({ profile, journalEntries }: TeenInsightsProps) {
+export default function TeenInsights({ profile }: TeenInsightsProps) {
   const [expandedSection, setExpandedSection] = useState<string | null>('digest')
-  const insights = generateInsights(profile, journalEntries)
+  const insights = generateInsights(profile)
 
   const toggleSection = (section: string) => {
     setExpandedSection(expandedSection === section ? null : section)
@@ -99,12 +94,11 @@ export default function TeenInsights({ profile, journalEntries }: TeenInsightsPr
         <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
           📅 This Week's Stats
         </h2>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
           {[
             { label: 'Sessions', value: insights.weeklyDigest.sessionsCount, color: '#FF69B4', emoji: '💬' },
             { label: 'Questions', value: insights.weeklyDigest.questionsAsked, color: '#87CEEB', emoji: '❓' },
-            { label: 'Insights', value: insights.weeklyDigest.insightsSaved, color: '#90EE90', emoji: '💡' },
-            { label: 'Actions', value: insights.weeklyDigest.actionItems, color: '#FFD700', emoji: '⚡' },
+            { label: 'Topics', value: insights.weeklyDigest.topTopics.length, color: '#90EE90', emoji: '💡' },
           ].map((stat, i) => (
             <div
               key={stat.label}

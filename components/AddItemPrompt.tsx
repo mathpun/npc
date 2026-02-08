@@ -151,20 +151,71 @@ export default function AddItemPrompt({ item, onAdd, onDismiss }: AddItemPromptP
 
 // Helper function to parse gift shop items from AI response
 export function parseGiftShopItem(text: string): { emoji: string; name: string; description: string } | null {
-  // Look for pattern: emoji **Name** followed by *description* or italic description
+  // Try multiple patterns to catch different AI output formats
+  // Use a broad emoji pattern that works without /u flag
+  const emojiPattern = '([^\\s\\*a-zA-Z0-9]+)'
+
+  // Pattern 1: emoji **Name** followed by *description*
   // Example: "🎪 **Circus of Contradictions Snow Globe**\n*A snow globe where...*"
+  const pattern1 = text.match(new RegExp(emojiPattern + '\\s*\\*\\*([^*]+)\\*\\*'))
+  if (pattern1) {
+    const emoji = pattern1[1].trim()
+    const name = pattern1[2].trim()
+    const descMatch = text.match(/\*\*[^*]+\*\*\s*\n?\*([^*]+)\*/)
+    const description = descMatch ? descMatch[1].trim() : ''
+    if (emoji && name && isLikelyEmoji(emoji)) return { emoji, name, description }
+  }
 
-  const emojiMatch = text.match(/([^\s\*]+)\s+\*\*([^*]+)\*\*/)
-  if (!emojiMatch) return null
+  // Pattern 2: emoji Name: description or emoji "Name" - description
+  // Example: "🎨 The Creativity Spark: A tiny flame that never goes out"
+  const pattern2 = text.match(new RegExp(emojiPattern + '\\s+(?:"([^"]+)"|([^:\\n]+)):\\s*(.+)'))
+  if (pattern2) {
+    const emoji = pattern2[1].trim()
+    const name = (pattern2[2] || pattern2[3]).trim()
+    const description = pattern2[4].trim()
+    if (emoji && name && isLikelyEmoji(emoji)) return { emoji, name, description }
+  }
 
-  const emoji = emojiMatch[1].trim()
-  const name = emojiMatch[2].trim()
+  // Pattern 3: "Item: emoji Name - description" format
+  // Example: "Item: 🌟 Starlight Memory Jar - A jar that captures..."
+  const pattern3 = text.match(new RegExp('item:\\s*' + emojiPattern + '\\s+([^-–\\n]+)[-–]\\s*(.+)', 'i'))
+  if (pattern3) {
+    const emoji = pattern3[1].trim()
+    const name = pattern3[2].trim()
+    const description = pattern3[3].trim()
+    if (emoji && name && isLikelyEmoji(emoji)) return { emoji, name, description }
+  }
 
-  // Look for italic description after the name
-  const descMatch = text.match(/\*\*[^*]+\*\*\s*\n?\*([^*]+)\*/)
-  const description = descMatch ? descMatch[1].trim() : ''
+  // Pattern 4: Just emoji followed by bolded or quoted name
+  // Example: "🌈 **Rainbow Collection Box**" or "🌈 'Rainbow Collection Box'"
+  const pattern4 = text.match(new RegExp(emojiPattern + '\\s+(?:\\*\\*|"|[\'])([^*"\']+)(?:\\*\\*|"|[\'])'))
+  if (pattern4) {
+    const emoji = pattern4[1].trim()
+    const name = pattern4[2].trim()
+    // Look for any description after the name
+    const afterName = text.slice(text.indexOf(name) + name.length)
+    const descMatch = afterName.match(/[-–:]\s*(.+?)(?:\n|$)/)
+    const description = descMatch ? descMatch[1].trim() : ''
+    if (emoji && name && isLikelyEmoji(emoji)) return { emoji, name, description }
+  }
 
-  if (!emoji || !name) return null
+  // Fallback: original simple pattern
+  const simpleFallback = text.match(/([^\s\*]+)\s+\*\*([^*]+)\*\*/)
+  if (simpleFallback) {
+    const emoji = simpleFallback[1].trim()
+    const name = simpleFallback[2].trim()
+    const descMatch = text.match(/\*\*[^*]+\*\*\s*\n?\*([^*]+)\*/)
+    const description = descMatch ? descMatch[1].trim() : ''
+    if (emoji && name && isLikelyEmoji(emoji)) return { emoji, name, description }
+  }
 
-  return { emoji, name, description }
+  return null
+}
+
+// Helper to check if a string is likely an emoji (not just punctuation or symbols)
+function isLikelyEmoji(str: string): boolean {
+  // Check if string is 1-4 chars and contains at least one character above ASCII
+  if (str.length === 0 || str.length > 8) return false
+  // Must contain non-ASCII characters (emojis are typically above U+00FF)
+  return /[^\x00-\x7F]/.test(str)
 }
