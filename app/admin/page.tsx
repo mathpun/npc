@@ -44,6 +44,19 @@ interface ChatMessage {
   user_name: string
 }
 
+interface DailyCheckin {
+  id: number
+  user_id: string
+  checkin_date: string
+  questions: string
+  responses: string
+  mood: string | null
+  ai_summary: string | null
+  created_at: string
+  user_name: string
+  user_age: number
+}
+
 interface Prompt {
   id: number
   user_id: string | null
@@ -87,6 +100,7 @@ interface AdminData {
   checkinsPerDay: TimeSeriesData[]
   topTopics: { session_topic: string; count: number }[]
   chatMessages: ChatMessage[]
+  dailyCheckins: DailyCheckin[]
 }
 
 export default function AdminDashboard() {
@@ -576,6 +590,111 @@ export default function AdminDashboard() {
                         </div>
                       </div>
                     ))
+                  )}
+                </div>
+              </div>
+
+              {/* Daily Check-ins */}
+              <div
+                className="p-6"
+                style={{
+                  backgroundColor: 'white',
+                  border: '3px solid black',
+                  borderRadius: '8px',
+                  boxShadow: '6px 6px 0 black',
+                }}
+              >
+                <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
+                  <span>📝</span> daily check-ins
+                </h2>
+                <div className="space-y-4 max-h-[600px] overflow-y-auto">
+                  {!data.dailyCheckins || data.dailyCheckins.length === 0 ? (
+                    <p className="text-gray-500 text-center py-8">no check-ins yet!</p>
+                  ) : (
+                    data.dailyCheckins.map((checkin) => {
+                      let questions: string[] = []
+                      let responses: string[] = []
+                      try {
+                        questions = typeof checkin.questions === 'string'
+                          ? JSON.parse(checkin.questions)
+                          : checkin.questions
+                        responses = typeof checkin.responses === 'string'
+                          ? JSON.parse(checkin.responses)
+                          : checkin.responses
+                      } catch {
+                        // parsing failed
+                      }
+
+                      const moodEmojis: Record<string, string> = {
+                        great: '😊',
+                        good: '🙂',
+                        okay: '😐',
+                        bad: '😔',
+                        rough: '😢',
+                      }
+
+                      return (
+                        <div
+                          key={checkin.id}
+                          className="p-4"
+                          style={{
+                            backgroundColor: '#F0FFF0',
+                            border: '2px solid black',
+                            borderRadius: '12px',
+                          }}
+                        >
+                          <div className="flex items-center justify-between mb-3">
+                            <div className="flex items-center gap-2">
+                              <span className="font-bold">{checkin.user_name}</span>
+                              <span className="text-sm text-gray-600">({checkin.user_age}yo)</span>
+                              {checkin.mood && (
+                                <span
+                                  className="px-2 py-0.5 text-sm rounded-full"
+                                  style={{ backgroundColor: '#FFD700', border: '1px solid black' }}
+                                >
+                                  {moodEmojis[checkin.mood] || '😐'} {checkin.mood}
+                                </span>
+                              )}
+                            </div>
+                            <span className="text-xs text-gray-500">
+                              {formatDate(checkin.created_at)}
+                            </span>
+                          </div>
+
+                          <div className="space-y-3">
+                            {questions.map((q, i) => (
+                              <div key={i} className="space-y-1">
+                                <div
+                                  className="text-sm font-bold p-2 rounded"
+                                  style={{ backgroundColor: '#E6E6FA' }}
+                                >
+                                  Q: {q}
+                                </div>
+                                <div
+                                  className="text-sm p-2 rounded"
+                                  style={{ backgroundColor: 'white', border: '1px solid #ddd' }}
+                                >
+                                  A: {responses[i] || '(no response)'}
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+
+                          {checkin.ai_summary && (
+                            <div
+                              className="mt-3 p-2 text-sm"
+                              style={{
+                                backgroundColor: '#FFFACD',
+                                border: '1px dashed black',
+                                borderRadius: '8px',
+                              }}
+                            >
+                              <span className="font-bold">AI Summary:</span> {checkin.ai_summary}
+                            </div>
+                          )}
+                        </div>
+                      )
+                    })
                   )}
                 </div>
               </div>

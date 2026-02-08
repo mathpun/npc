@@ -176,6 +176,18 @@ export async function GET(request: NextRequest) {
       LIMIT 200
     `).all()
 
+    // Get daily check-ins with user info
+    const dailyCheckins = await db.prepare(`
+      SELECT
+        dc.*,
+        u.name as user_name,
+        u.age as user_age
+      FROM daily_checkins dc
+      JOIN users u ON dc.user_id = u.id
+      ORDER BY dc.created_at DESC
+      LIMIT 100
+    `).all()
+
     // Retention rate (returning users / total users)
     const retentionRate = totalUsers?.count
       ? Math.round(((returningUsers?.count || 0) / totalUsers.count) * 100)
@@ -204,6 +216,7 @@ export async function GET(request: NextRequest) {
       checkinsPerDay,
       topTopics,
       chatMessages,
+      dailyCheckins,
     })
   } catch (error) {
     console.error('Admin data error:', error)
