@@ -28,11 +28,20 @@ const INTERESTS = [
 
 const STEP_COLORS = ['#FF69B4', '#FFD700', '#90EE90']
 
+const PRONOUNS = [
+  { value: 'she/her', label: 'she/her' },
+  { value: 'he/him', label: 'he/him' },
+  { value: 'they/them', label: 'they/them' },
+  { value: 'other', label: 'other' },
+  { value: 'prefer not to say', label: 'prefer not to say' },
+]
+
 interface FormData {
   name: string
   nickname: string
   currentAge: string
   password: string
+  pronouns: string
   interests: string[]
   currentGoals: string
 }
@@ -45,6 +54,7 @@ export default function OnboardingForm() {
     nickname: '',
     currentAge: '',
     password: '',
+    pronouns: '',
     interests: [],
     currentGoals: '',
   })
@@ -67,6 +77,7 @@ export default function OnboardingForm() {
             name: formData.name,
             nickname: formData.nickname || formData.name, // default to username if no nickname
             age: parseInt(formData.currentAge),
+            pronouns: formData.pronouns,
             interests: formData.interests,
             goals: formData.currentGoals,
             password: formData.password,
@@ -266,6 +277,31 @@ export default function OnboardingForm() {
                   you must be at least 13 to use this app
                 </p>
               )}
+            </div>
+
+            <div>
+              <label className="block text-lg font-bold mb-2">your pronouns</label>
+              <div className="flex flex-wrap gap-2">
+                {PRONOUNS.map((p) => (
+                  <button
+                    key={p.value}
+                    type="button"
+                    onClick={() => setFormData({ ...formData, pronouns: p.value })}
+                    className="px-4 py-2 font-bold transition-all duration-200 hover:scale-105"
+                    style={{
+                      backgroundColor: formData.pronouns === p.value ? '#DDA0DD' : 'white',
+                      border: '3px solid black',
+                      borderRadius: '9999px',
+                      boxShadow: formData.pronouns === p.value ? '3px 3px 0 black' : 'none',
+                    }}
+                  >
+                    {p.label}
+                  </button>
+                ))}
+              </div>
+              <p className="text-xs mt-2 text-gray-600">
+                helps npc use the right language when talking about you
+              </p>
             </div>
 
             <div>

@@ -42,6 +42,15 @@ async function initDb() {
         END IF;
       END $$;
 
+      -- Add pronouns column if it doesn't exist (for existing databases)
+      DO $$
+      BEGIN
+        IF NOT EXISTS (SELECT 1 FROM information_schema.columns
+                       WHERE table_name = 'users' AND column_name = 'pronouns') THEN
+          ALTER TABLE users ADD COLUMN pronouns TEXT;
+        END IF;
+      END $$;
+
       -- Activity log
       CREATE TABLE IF NOT EXISTS activity_log (
         id SERIAL PRIMARY KEY,

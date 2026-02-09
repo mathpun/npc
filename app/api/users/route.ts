@@ -28,7 +28,7 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
-    const { name, nickname, age, interests, goals, password } = body
+    const { name, nickname, age, pronouns, interests, goals, password } = body
 
     if (!name || !age || !interests) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
@@ -55,9 +55,9 @@ export async function POST(request: NextRequest) {
     const passwordHash = await bcrypt.hash(password, 10)
 
     await db.prepare(`
-      INSERT INTO users (id, name, nickname, age, interests, goals, password_hash)
-      VALUES (?, ?, ?, ?, ?, ?, ?)
-    `).run(id, name, displayName, age, interestsStr, goals || null, passwordHash)
+      INSERT INTO users (id, name, nickname, age, pronouns, interests, goals, password_hash)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+    `).run(id, name, displayName, age, pronouns || null, interestsStr, goals || null, passwordHash)
 
     // Log the activity
     await db.prepare(`
