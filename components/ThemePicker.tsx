@@ -176,7 +176,7 @@ export function ThemePickerButton({ onClick }: { onClick: () => void }) {
       onClick={onClick}
       className="flex items-center gap-2 px-3 py-2 font-bold hover:scale-105 transition-transform"
       style={{
-        backgroundColor: theme.colors.accent2,
+        backgroundColor: '#FF69B4', // hot pink - distinct from other nav colors
         border: '3px solid black',
         borderRadius: '9999px',
         boxShadow: '3px 3px 0 black',
