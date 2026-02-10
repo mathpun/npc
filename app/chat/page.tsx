@@ -55,6 +55,18 @@ function ChatPageContent() {
   const [showCheckIn, setShowCheckIn] = useState(false)
   const [showChatHistory, setShowChatHistory] = useState(false)
   const [currentSessionId, setCurrentSessionId] = useState<number | undefined>(undefined)
+  const [userStats, setUserStats] = useState({
+    sessionsCompleted: 0,
+    messagesCount: 0,
+    checkinsCompleted: 0,
+    goalsCompleted: 0,
+    achievementsCount: 0,
+    challengesCompleted: 0,
+    sessionsThisWeek: 0,
+    avgSessionLength: 0,
+    reflectiveThinkingScore: 0,
+    completedChallengeIds: [] as string[],
+  })
   const messagesEndRef = useRef<HTMLDivElement>(null)
 
   // Track activity helper
@@ -73,6 +85,22 @@ function ChatPageContent() {
     }
   }
 
+  // Fetch user stats for growth tab
+  const fetchUserStats = async () => {
+    const userId = localStorage.getItem('npc_user_id')
+    if (!userId) return
+
+    try {
+      const res = await fetch(`/api/user-stats?userId=${userId}`)
+      if (res.ok) {
+        const data = await res.json()
+        setUserStats(data)
+      }
+    } catch (err) {
+      console.error('Failed to fetch user stats:', err)
+    }
+  }
+
   useEffect(() => {
     const savedProfile = localStorage.getItem('youthai_profile')
     if (savedProfile) {
@@ -87,11 +115,21 @@ function ChatPageContent() {
     // Check for topic from URL (e.g., from moltbook friend chat)
     const topicFromUrl = searchParams.get('topic')
 
+    // Check for tab from URL (e.g., from nav bar growth link)
+    const tabFromUrl = searchParams.get('tab')
+    if (tabFromUrl === 'growth') {
+      setActiveTab('growth')
+      setShowSessionPicker(false)
+    }
+
     // Check for daily check-in (only if not coming from URL topic)
     const userId = localStorage.getItem('npc_user_id')
     if (userId && !topicFromUrl) {
       checkForDailyCheckIn(userId)
     }
+
+    // Fetch user stats
+    fetchUserStats()
     if (topicFromUrl && savedProfile) {
       // Auto-start a session with this topic
       setShowSessionPicker(false)
@@ -439,6 +477,8 @@ function ChatPageContent() {
     }
     if (tab === 'growth') {
       setActiveGrowthTab('insights')
+      // Refresh user stats when viewing growth tab
+      fetchUserStats()
     }
   }
 
@@ -633,16 +673,24 @@ function ChatPageContent() {
                 <DevelopmentalProgress
                   userName={profile.name}
                   age={profile.currentAge}
-                  reflectiveThinkingScore={0}
-                  sessionsCompleted={0}
-                  challengesCompleted={0}
+                  reflectiveThinkingScore={userStats.reflectiveThinkingScore}
+                  sessionsCompleted={userStats.sessionsCompleted}
+                  challengesCompleted={userStats.challengesCompleted}
                 />
               )}
               {activeGrowthTab === 'challenges' && (
-                <RealWorldChallenges />
+                <RealWorldChallenges
+                  completedChallengeIds={userStats.completedChallengeIds}
+                  onChallengeToggle={fetchUserStats}
+                />
               )}
               {activeGrowthTab === 'epistemic' && (
-                <EpistemicHealth userName={profile.name} />
+                <EpistemicHealth
+                  userName={profile.name}
+                  sessionsCompleted={userStats.sessionsCompleted}
+                  checkinsCompleted={userStats.checkinsCompleted}
+                  challengesCompleted={userStats.challengesCompleted}
+                />
               )}
               {activeGrowthTab === 'peers' && (
                 <PeerWisdom />
@@ -653,10 +701,10 @@ function ChatPageContent() {
               {activeGrowthTab === 'anti-engagement' && (
                 <AntiEngagement
                   userName={profile.name}
-                  sessionsThisWeek={0}
-                  avgSessionLength={0}
-                  independentDecisions={0}
-                  irlActionsReported={0}
+                  sessionsThisWeek={userStats.sessionsThisWeek}
+                  avgSessionLength={userStats.avgSessionLength}
+                  independentDecisions={userStats.goalsCompleted}
+                  irlActionsReported={userStats.challengesCompleted}
                 />
               )}
               {activeGrowthTab === 'co-design' && (

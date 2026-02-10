@@ -1,38 +1,63 @@
 'use client'
 
-import { useState } from 'react'
-
 interface EpistemicHealthProps {
   userName: string
+  sessionsCompleted?: number
+  checkinsCompleted?: number
+  challengesCompleted?: number
 }
 
-export default function EpistemicHealth({ userName }: EpistemicHealthProps) {
+export default function EpistemicHealth({
+  userName,
+  sessionsCompleted = 0,
+  checkinsCompleted = 0,
+  challengesCompleted = 0,
+}: EpistemicHealthProps) {
+  // Calculate scores based on user activity
+  // Each metric has a base score of 30, and can grow to 100 based on activity
+
+  // Uncertainty Calibration: Based on check-ins (reflects self-awareness)
+  // Each check-in adds 10 points, max 100
+  const uncertaintyScore = Math.min(100, 30 + checkinsCompleted * 10)
+
+  // Perspective Seeking: Based on sessions (diverse conversations)
+  // Each session adds 7 points, max 100
+  const perspectiveScore = Math.min(100, 30 + sessionsCompleted * 7)
+
+  // Source Questioning: Based on challenges completed (critical thinking in action)
+  // Each challenge adds 14 points, max 100
+  const sourceScore = Math.min(100, 30 + challengesCompleted * 14)
+
+  // Complexity Tolerance: Based on overall engagement
+  // Average of all activities
+  const complexityScore = Math.min(100, 30 + Math.round((sessionsCompleted * 5 + checkinsCompleted * 8 + challengesCompleted * 12) / 3))
+
   const metrics = [
     {
       name: 'Uncertainty Calibration',
       emoji: '⚖️',
-      score: 72,
+      score: uncertaintyScore,
       description: "Knowing what you know vs. don't know",
       color: '#FF69B4',
     },
     {
       name: 'Perspective Seeking',
       emoji: '🔀',
-      score: 85,
+      score: perspectiveScore,
       description: 'Actively seeking different viewpoints',
       color: '#90EE90',
     },
     {
       name: 'Source Questioning',
       emoji: '🔍',
-      score: 68,
+      score: sourceScore,
       description: 'Questioning where info comes from',
       color: '#87CEEB',
     },
     {
       name: 'Complexity Tolerance',
       emoji: '🧩',
-      score: 78,
+      score: complexityScore,
       description: 'Sitting with ambiguity without rushing',
       color: '#FFD700',
     },
@@ -152,6 +177,33 @@ export default function EpistemicHealth({ userName }: EpistemicHealthProps) {
               </div>
             </div>
           ))}
+        </div>
+      </div>
+
+      {/* Activity Summary */}
+      <div
+        className="p-4"
+        style={{
+          backgroundColor: '#87CEEB',
+          border: '3px solid black',
+          borderRadius: '12px',
+          boxShadow: '3px 3px 0 black',
+        }}
+      >
+        <h3 className="font-bold mb-2">📈 Your Activity</h3>
+        <div className="grid grid-cols-3 gap-2 text-center text-sm">
+          <div className="p-2 bg-white rounded-lg border-2 border-black">
+            <div className="font-bold text-lg">{sessionsCompleted}</div>
+            <div className="text-xs">Sessions</div>
+          </div>
+          <div className="p-2 bg-white rounded-lg border-2 border-black">
+            <div className="font-bold text-lg">{checkinsCompleted}</div>
+            <div className="text-xs">Check-ins</div>
+          </div>
+          <div className="p-2 bg-white rounded-lg border-2 border-black">
+            <div className="font-bold text-lg">{challengesCompleted}</div>
+            <div className="text-xs">Challenges</div>
+          </div>
         </div>
       </div>
 

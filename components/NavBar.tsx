@@ -46,6 +46,7 @@ export default function NavBar({ showBack = false, backHref = '/', backLabel = '
     { href: '/', icon: '🏠', label: 'home', color: theme.colors.navHome },
     { href: '/dashboard', icon: '🗺️', label: 'journey', color: theme.colors.navDashboard },
     { href: '/chat', icon: '💬', label: 'chat', color: theme.colors.navChat },
+    { href: '/chat?tab=growth', icon: '🌱', label: 'growth', color: theme.colors.accent3 },
     { href: '/museum', icon: '🏛️', label: 'museum', color: theme.colors.navMuseum },
     { href: '/moltbook', icon: '🌍', label: 'world', color: theme.colors.navWorld },
   ]

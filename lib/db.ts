@@ -219,6 +219,16 @@ async function initDb() {
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         UNIQUE(user_id, checkin_date)
       );
+
+      -- User challenges (real-world challenges completed)
+      CREATE TABLE IF NOT EXISTS user_challenges (
+        id SERIAL PRIMARY KEY,
+        user_id TEXT NOT NULL REFERENCES users(id),
+        challenge_id TEXT NOT NULL,
+        completed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        notes TEXT,
+        UNIQUE(user_id, challenge_id)
+      );
     `)
     console.log('Database tables initialized')
   } catch (error) {

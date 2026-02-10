@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
 interface Challenge {
   id: string
@@ -14,11 +14,20 @@ interface Challenge {
   color: string
 }
 
-export default function RealWorldChallenges() {
+interface Props {
+  completedChallengeIds?: string[]
+  onChallengeToggle?: () => void
+}
+
+export default function RealWorldChallenges({ completedChallengeIds = [], onChallengeToggle }: Props) {
   const [activeChallenge, setActiveChallenge] = useState<Challenge | null>(null)
   const [showReflection, setShowReflection] = useState(false)
   const [reflection, setReflection] = useState('')
-  const [completedCount, setCompletedCount] = useState(3)
+  const [completedIds, setCompletedIds] = useState<Set<string>>(new Set(completedChallengeIds))
+
+  useEffect(() => {
+    setCompletedIds(new Set(completedChallengeIds))
+  }, [completedChallengeIds])
 
   const challenges: Challenge[] = [
     {
@@ -78,14 +87,38 @@ export default function RealWorldChallenges() {
     },
   ]
 
+  const completedCount = completedIds.size
+  const totalXP = challenges.filter(c => completedIds.has(c.id)).reduce((sum, c) => sum + c.xp, 0)
+
   const startChallenge = (challenge: Challenge) => {
     setActiveChallenge(challenge)
     setShowReflection(false)
     setReflection('')
   }
 
-  const submitReflection = () => {
-    setCompletedCount(prev => prev + 1)
+  const submitReflection = async () => {
+    if (!activeChallenge) return
+
+    const userId = localStorage.getItem('npc_user_id')
+    if (userId) {
+      try {
+        await fetch('/api/challenges', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            userId,
+            challengeId: activeChallenge.id,
+            notes: reflection,
+          }),
+        })
+
+        setCompletedIds(prev => new Set([...Array.from(prev), activeChallenge.id]))
+        onChallengeToggle?.()
+      } catch (err) {
+        console.error('Failed to save challenge:', err)
+      }
+    }
+
     setActiveChallenge(null)
     setShowReflection(false)
     setReflection('')
@@ -113,8 +146,8 @@ export default function RealWorldChallenges() {
       <div className="grid grid-cols-3 gap-3">
         {[
           { label: 'Completed', value: completedCount, emoji: '✅', color: '#90EE90' },
-          { label: 'XP Earned', value: completedCount * 30, emoji: '⭐', color: '#FFD700' },
-          { label: 'Streak', value: completedCount >= 5 ? '🔥' : '🌱', emoji: '', color: '#FF69B4' },
+          { label: 'XP Earned', value: totalXP, emoji: '⭐', color: '#FFD700' },
+          { label: 'Streak', value: completedCount >= 5 ? '🔥' : completedCount >= 3 ? '⚡' : '🌱', emoji: '', color: '#FF69B4' },
         ].map((stat) => (
           <div
             key={stat.label}
@@ -126,7 +159,7 @@ export default function RealWorldChallenges() {
               boxShadow: '3px 3px 0 black',
             }}
           >
-            <div className="text-2xl font-bold">{stat.emoji || stat.value}</div>
+            <div className="text-2xl font-bold">{stat.label === 'Streak' ? stat.value : (stat.emoji || stat.value)}</div>
             <div className="text-xs font-bold">{stat.label}</div>
           </div>
         ))}
@@ -234,44 +267,47 @@ export default function RealWorldChallenges() {
         >
           <h2 className="text-xl font-bold mb-4">🎮 Pick a Challenge</h2>
           <div className="space-y-3">
-            {challenges.map((challenge, index) => (
-              <div
-                key={challenge.id}
-                className="p-3 cursor-pointer hover:scale-[1.02] transition-transform"
-                onClick={() => startChallenge(challenge)}
-                style={{
-                  backgroundColor: challenge.color,
-                  border: '3px solid black',
-                  borderRadius: '12px',
-                  boxShadow: '3px 3px 0 black',
-                  transform: `rotate(${index % 2 === 0 ? 1 : -1}deg)`,
-                }}
-              >
-                <div className="flex items-center gap-3">
-                  <span className="text-3xl">{challenge.emoji}</span>
-                  <div className="flex-1">
-                    <div className="flex items-center justify-between">
-                      <h3 className="font-bold">{challenge.title}</h3>
-                      <span
-                        className="px-2 py-1 text-xs font-bold"
-                        style={{
-                          backgroundColor: 'white',
-                          border: '2px solid black',
-                          borderRadius: '8px',
-                        }}
-                      >
-                        +{challenge.xp} XP
-                      </span>
-                    </div>
-                    <p className="text-sm">{challenge.description}</p>
-                    <div className="flex gap-2 mt-2">
-                      <span className="text-xs">⏱️ {challenge.duration}</span>
-                      <span className="text-xs">• {challenge.difficulty}</span>
+            {challenges.map((challenge, index) => {
+              const isCompleted = completedIds.has(challenge.id)
+              return (
+                <div
+                  key={challenge.id}
+                  className={`p-3 ${isCompleted ? 'opacity-75' : 'cursor-pointer hover:scale-[1.02]'} transition-transform`}
+                  onClick={() => !isCompleted && startChallenge(challenge)}
+                  style={{
+                    backgroundColor: challenge.color,
+                    border: '3px solid black',
+                    borderRadius: '12px',
+                    boxShadow: '3px 3px 0 black',
+                    transform: `rotate(${index % 2 === 0 ? 1 : -1}deg)`,
+                  }}
+                >
+                  <div className="flex items-center gap-3">
+                    <span className="text-3xl">{isCompleted ? '✅' : challenge.emoji}</span>
+                    <div className="flex-1">
+                      <div className="flex items-center justify-between">
+                        <h3 className={`font-bold ${isCompleted ? 'line-through' : ''}`}>{challenge.title}</h3>
+                        <span
+                          className="px-2 py-1 text-xs font-bold"
+                          style={{
+                            backgroundColor: isCompleted ? '#90EE90' : 'white',
+                            border: '2px solid black',
+                            borderRadius: '8px',
+                          }}
+                        >
+                          {isCompleted ? 'Done!' : `+${challenge.xp} XP`}
+                        </span>
+                      </div>
+                      <p className="text-sm">{challenge.description}</p>
+                      <div className="flex gap-2 mt-2">
+                        <span className="text-xs">⏱️ {challenge.duration}</span>
+                        <span className="text-xs">• {challenge.difficulty}</span>
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              )
+            })}
           </div>
         </div>
       )}

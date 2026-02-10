@@ -14,8 +14,8 @@ interface TabNavProps {
 }
 
 const MAIN_TABS = [
-  { id: 'chat' as TabId, label: 'chat', emoji: '💬' },
   { id: 'growth' as TabId, label: 'growth', emoji: '🌱' },
+  { id: 'chat' as TabId, label: 'chat', emoji: '💬' },
   { id: 'parent' as TabId, label: 'parent', emoji: '👨‍👩‍👧' },
 ]
 
