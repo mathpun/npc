@@ -524,7 +524,6 @@ function ChatPageContent() {
           {/* Tab Navigation */}
           <TabNav
             activeTab={activeTab}
-            onTabChange={handleTabChange}
             activeGrowthTab={activeGrowthTab}
             onGrowthTabChange={setActiveGrowthTab}
           />
