@@ -6,12 +6,20 @@ export interface UserProfile {
 }
 
 export type SessionGoal = 'thinking' | 'learning' | 'creating' | 'feeling'
-export type PersonaType = 'chill_mentor' | 'hype_friend' | 'wise_elder' | 'real_talk' | 'creative_chaos'
+export type PersonaType = 'chill_mentor' | 'hype_friend' | 'wise_elder' | 'real_talk' | 'creative_chaos' | 'custom'
+
+export interface CustomPersona {
+  name: string
+  emoji: string
+  description: string
+  vibe: string
+}
 
 export interface SessionContext {
   goal: SessionGoal
   topic?: string
   persona?: PersonaType
+  customPersona?: CustomPersona
 }
 
 export const SESSION_GOALS = {
@@ -123,6 +131,14 @@ export const PERSONAS = {
 - Embrace tangents and see where they lead
 - Make brainstorming feel like play, not work`,
   },
+  custom: {
+    label: 'Custom Persona',
+    description: "Create your own vibe",
+    emoji: '✨',
+    color: '#FF69B4',
+    vibe: 'whatever you want',
+    promptStyle: '', // Will be filled dynamically
+  },
 }
 
 export function buildSystemPrompt(profile: UserProfile, session?: SessionContext): string {
@@ -133,14 +149,25 @@ CURRENT SESSION GOAL: ${SESSION_GOALS[session.goal].label}
 ${session.topic ? `Topic they want to explore: "${session.topic}"` : ''}
 ` : ''
 
+  // Handle custom persona
+  const isCustomPersona = session?.persona === 'custom' && session?.customPersona
+  const personaLabel = isCustomPersona ? session.customPersona!.name : (session?.persona ? PERSONAS[session.persona].label : '')
+  const personaVibe = isCustomPersona ? session.customPersona!.vibe : (session?.persona ? PERSONAS[session.persona].vibe : '')
+  const personaPromptStyle = isCustomPersona
+    ? `You speak like "${session.customPersona!.name}". Your vibe is:
+- ${session.customPersona!.vibe}
+- Stay true to this unique personality throughout the conversation
+- Be creative and embody this character while still being helpful`
+    : (session?.persona ? PERSONAS[session.persona].promptStyle : '')
+
   const personaContext = session?.persona ? `
-=== CRITICAL: YOUR PERSONA IS "${PERSONAS[session.persona].label.toUpperCase()}" ===
+=== CRITICAL: YOUR PERSONA IS "${personaLabel.toUpperCase()}" ===
 You MUST speak and respond as this persona throughout the ENTIRE conversation.
 This is the most important instruction - stay in character!
 
-${PERSONAS[session.persona].promptStyle}
+${personaPromptStyle}
 
-Remember: Every single message should sound like the ${PERSONAS[session.persona].label} persona.
+Remember: Every single message should sound like the ${personaLabel} persona.
 ` : ''
 
   return `You are a thoughtful AI thinking partner for ${profile.name}, who is ${profile.currentAge} years old. They're interested in ${interestsList}.
@@ -217,14 +244,14 @@ Hard boundaries:
 
 === TONE ===
 
-${session?.persona ? `*** CRITICAL REMINDER: You ARE the ${PERSONAS[session.persona].label} persona! ***
-Your vibe is: ${PERSONAS[session.persona].vibe}
+${session?.persona ? `*** CRITICAL REMINDER: You ARE the ${personaLabel} persona! ***
+Your vibe is: ${personaVibe}
 
 DO NOT sound generic or formal. Sound EXACTLY like the persona described above.
-Use the specific language patterns, phrases, and energy of the ${PERSONAS[session.persona].label}.
-If you're the "Creative Chaos Gremlin", be chaotic and excited!
+Use the specific language patterns, phrases, and energy of the ${personaLabel}.
+${isCustomPersona ? `Embody the "${session.customPersona!.name}" character as described by the user.` : `If you're the "Creative Chaos Gremlin", be chaotic and excited!
 If you're the "Chill Older Sibling", be relaxed and use casual slang!
-If you're the "Hype BFF", be enthusiastic and supportive!
+If you're the "Hype BFF", be enthusiastic and supportive!`}
 Stay in character while still following the core principles above.` : `- Warm but not performatively enthusiastic
 - Curious and genuinely interested
 - Honest, including about limitations
@@ -272,14 +299,14 @@ For NAMING & PROCESSING FEELINGS:
 ` : ''}
 
 Start your first message by:
-1. Greeting them ${session?.persona ? `in the style of the ${PERSONAS[session.persona].label}` : 'warmly (but not over-the-top)'}
+1. Greeting them ${session?.persona ? `in the style of the ${personaLabel}` : 'warmly (but not over-the-top)'}
 2. Acknowledging what they want to explore
 3. Asking ONE good opening question to understand where they're at
 
 ${session?.persona ? `
 === FINAL REMINDER ===
-You are the ${PERSONAS[session.persona].label}.
-Your vibe: ${PERSONAS[session.persona].vibe}
+You are the ${personaLabel}.
+Your vibe: ${personaVibe}
 NEVER break character. Every response should unmistakably sound like this persona.
 ` : ''}
 Remember: Your success is measured by their growth in reflection and agency, not by how much they use you.`

@@ -18,7 +18,7 @@ import RealWorldChallenges from '@/components/RealWorldChallenges'
 import PeerWisdom from '@/components/PeerWisdom'
 import AILiteracy from '@/components/AILiteracy'
 import DailyCheckIn from '@/components/DailyCheckIn'
-import { SessionGoal, PersonaType, SESSION_GOALS, buildReflectionPrompt } from '@/lib/prompts'
+import { SessionGoal, PersonaType, SESSION_GOALS, buildReflectionPrompt, CustomPersona } from '@/lib/prompts'
 import ChatHistory from '@/components/ChatHistory'
 
 interface Message {
@@ -38,6 +38,7 @@ interface Session {
   goal: SessionGoal
   topic: string
   persona?: PersonaType
+  customPersona?: CustomPersona
 }
 
 function ChatPageContent() {
@@ -244,12 +245,12 @@ function ChatPageContent() {
     }
   }, [messages, reflectionPrompt])
 
-  const handleSessionSelect = async (goal: SessionGoal, topic: string, persona: PersonaType) => {
-    setSession({ goal, topic, persona })
+  const handleSessionSelect = async (goal: SessionGoal, topic: string, persona: PersonaType, customPersona?: CustomPersona) => {
+    setSession({ goal, topic, persona, customPersona })
     setShowSessionPicker(false)
 
     // Track session start
-    trackActivity('session_start', { goal, topic, persona })
+    trackActivity('session_start', { goal, topic, persona, customPersonaName: customPersona?.name })
 
     // Create a new session in the database
     const userId = localStorage.getItem('npc_user_id')
