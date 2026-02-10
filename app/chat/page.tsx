@@ -710,16 +710,10 @@ function ChatPageContent() {
               {activeGrowthTab === 'co-design' && (
                 <CoDesignPortal />
               )}
+              {activeGrowthTab === 'parent' && (
+                <ParentDashboard profile={profile} />
+              )}
             </div>
-          </div>
-        )}
-
-        {/* Parent Tab */}
-        {activeTab === 'parent' && (
-          <div className="h-full overflow-y-auto">
-            <ParentDashboard
-              profile={profile}
-            />
           </div>
         )}
       </div>

@@ -3,8 +3,8 @@
 import { useState } from 'react'
 import { useTheme } from '@/lib/ThemeContext'
 
-export type TabId = 'chat' | 'growth' | 'parent'
-export type GrowthSubTab = 'insights' | 'progress' | 'challenges' | 'epistemic' | 'peers' | 'literacy' | 'anti-engagement' | 'co-design'
+export type TabId = 'chat' | 'growth'
+export type GrowthSubTab = 'insights' | 'progress' | 'challenges' | 'epistemic' | 'peers' | 'literacy' | 'anti-engagement' | 'co-design' | 'parent'
 
 interface TabNavProps {
   activeTab: TabId
@@ -16,7 +16,6 @@ interface TabNavProps {
 const MAIN_TABS = [
   { id: 'growth' as TabId, label: 'growth', emoji: '🌱' },
   { id: 'chat' as TabId, label: 'chat', emoji: '💬' },
-  { id: 'parent' as TabId, label: 'parent', emoji: '👨‍👩‍👧' },
 ]
 
 const GROWTH_SUBTABS = [
@@ -28,6 +27,7 @@ const GROWTH_SUBTABS = [
   { id: 'literacy' as GrowthSubTab, label: 'AI info', emoji: '🤖' },
   { id: 'anti-engagement' as GrowthSubTab, label: 'independence', emoji: '🦋' },
   { id: 'co-design' as GrowthSubTab, label: 'co-design', emoji: '🎨' },
+  { id: 'parent' as GrowthSubTab, label: 'parent', emoji: '👨‍👩‍👧' },
 ]
 
 export default function TabNav({
