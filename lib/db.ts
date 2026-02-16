@@ -51,6 +51,25 @@ async function initDb() {
         END IF;
       END $$;
 
+      -- Add email column if it doesn't exist (for teen email storage)
+      DO $$
+      BEGIN
+        IF NOT EXISTS (SELECT 1 FROM information_schema.columns
+                       WHERE table_name = 'users' AND column_name = 'email') THEN
+          ALTER TABLE users ADD COLUMN email TEXT;
+        END IF;
+      END $$;
+
+      -- Parent auth tokens (for magic link authentication)
+      CREATE TABLE IF NOT EXISTS parent_auth_tokens (
+        id SERIAL PRIMARY KEY,
+        parent_email TEXT NOT NULL,
+        token TEXT NOT NULL UNIQUE,
+        expires_at TIMESTAMP NOT NULL,
+        used_at TIMESTAMP,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      );
+
       -- Activity log
       CREATE TABLE IF NOT EXISTS activity_log (
         id SERIAL PRIMARY KEY,
@@ -228,6 +247,46 @@ async function initDb() {
         completed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         notes TEXT,
         UNIQUE(user_id, challenge_id)
+      );
+
+      -- Parent connections (link teens to parent emails)
+      CREATE TABLE IF NOT EXISTS parent_connections (
+        id SERIAL PRIMARY KEY,
+        user_id TEXT NOT NULL REFERENCES users(id),
+        parent_email TEXT NOT NULL,
+        parent_name TEXT,
+        connection_status TEXT DEFAULT 'pending',
+        verification_code TEXT,
+        verified_at TIMESTAMP,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        UNIQUE(user_id, parent_email)
+      );
+
+      -- Parent reports (AI-generated reports for parents)
+      CREATE TABLE IF NOT EXISTS parent_reports (
+        id SERIAL PRIMARY KEY,
+        user_id TEXT NOT NULL REFERENCES users(id),
+        parent_connection_id INTEGER REFERENCES parent_connections(id),
+        report_type TEXT DEFAULT 'weekly',
+        week_start DATE NOT NULL,
+        week_end DATE NOT NULL,
+
+        -- AI-generated content (teen can edit before approval)
+        themes_discussed TEXT,
+        mood_summary TEXT,
+        growth_highlights TEXT,
+        engagement_stats JSONB,
+        teen_note TEXT,
+
+        -- Approval workflow
+        status TEXT DEFAULT 'draft',
+        generated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        teen_reviewed_at TIMESTAMP,
+        approved_at TIMESTAMP,
+        sent_at TIMESTAMP,
+
+        -- What the teen modified
+        teen_edits JSONB
       );
     `)
     console.log('Database tables initialized')

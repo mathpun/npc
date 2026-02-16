@@ -6,14 +6,20 @@ import Link from 'next/link'
 import NavBar from '@/components/NavBar'
 import { useTheme } from '@/lib/ThemeContext'
 
+type UserType = 'teen' | 'parent'
+
 export default function LoginPage() {
   const router = useRouter()
+  const [userType, setUserType] = useState<UserType>('teen')
   const [name, setName] = useState('')
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
+  const [email, setEmail] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
   const [needsPassword, setNeedsPassword] = useState(false)
+  const [parentLinkSent, setParentLinkSent] = useState(false)
+  const [debugToken, setDebugToken] = useState('')
   const { theme } = useTheme()
 
   const handleLogin = async (e: React.FormEvent) => {
@@ -108,6 +114,40 @@ export default function LoginPage() {
     setLoading(false)
   }
 
+  const handleParentLogin = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!email.trim()) {
+      setError('please enter your email')
+      return
+    }
+
+    setLoading(true)
+    setError('')
+
+    try {
+      const res = await fetch('/api/parent/auth', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: email.trim() }),
+      })
+      const data = await res.json()
+
+      if (res.ok && data.success) {
+        setParentLinkSent(true)
+        // For development, show the token
+        if (data.token) {
+          setDebugToken(data.token)
+        }
+      } else {
+        setError(data.error || 'something went wrong')
+      }
+    } catch (err) {
+      setError('something went wrong, try again')
+    }
+
+    setLoading(false)
+  }
+
   return (
     <main className="min-h-screen flex flex-col" style={{ backgroundColor: theme.colors.background }}>
       {/* Doodle decorations */}
@@ -143,22 +183,153 @@ export default function LoginPage() {
             </svg>
           </div>
 
+          {/* User Type Toggle */}
+          <div className="flex gap-2 mb-6">
+            <button
+              type="button"
+              onClick={() => {
+                setUserType('teen')
+                setError('')
+                setParentLinkSent(false)
+              }}
+              className="flex-1 py-3 font-bold transition-transform hover:scale-105"
+              style={{
+                backgroundColor: userType === 'teen' ? theme.colors.accent1 : 'white',
+                border: '3px solid black',
+                borderRadius: '12px',
+                boxShadow: userType === 'teen' ? '4px 4px 0 black' : '2px 2px 0 black',
+              }}
+            >
+              I&apos;m a teen
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setUserType('parent')
+                setError('')
+                setNeedsPassword(false)
+              }}
+              className="flex-1 py-3 font-bold transition-transform hover:scale-105"
+              style={{
+                backgroundColor: userType === 'parent' ? theme.colors.accent3 : 'white',
+                border: '3px solid black',
+                borderRadius: '12px',
+                boxShadow: userType === 'parent' ? '4px 4px 0 black' : '2px 2px 0 black',
+              }}
+            >
+              I&apos;m a parent
+            </button>
+          </div>
+
           <h1
             className="text-2xl font-bold text-center mb-2 inline-block w-full px-4 py-2"
             style={{
-              backgroundColor: needsPassword ? theme.colors.accent1 : theme.colors.accent2,
+              backgroundColor: userType === 'parent'
+                ? theme.colors.accent3
+                : needsPassword ? theme.colors.accent1 : theme.colors.accent2,
               border: '3px solid black',
               boxShadow: '4px 4px 0 black',
             }}
           >
-            {needsPassword ? `hey ${name}!` : 'welcome back!'}
+            {userType === 'parent'
+              ? 'parent portal'
+              : needsPassword ? `hey ${name}!` : 'welcome back!'}
           </h1>
           <p className="text-center text-gray-600 mb-6 mt-4">
-            {needsPassword
+            {userType === 'parent'
+              ? 'enter your email to receive a login link'
+              : needsPassword
               ? 'we added passwords! create one to keep your account secure'
               : 'enter your name and password to log in'}
           </p>
 
+          {/* Parent Login Form */}
+          {userType === 'parent' && !parentLinkSent && (
+            <form onSubmit={handleParentLogin}>
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="your email..."
+                className="w-full px-4 py-3 text-lg mb-4"
+                style={{
+                  backgroundColor: '#FFFACD',
+                  border: '3px solid black',
+                  borderRadius: '12px',
+                }}
+                autoFocus
+              />
+
+              {error && (
+                <div
+                  className="mb-4 p-3 text-center font-bold"
+                  style={{
+                    backgroundColor: theme.colors.buttonDanger,
+                    border: '2px solid black',
+                    borderRadius: '8px',
+                  }}
+                >
+                  {error}
+                </div>
+              )}
+
+              <button
+                type="submit"
+                disabled={loading}
+                className="w-full py-3 font-bold text-lg hover:scale-105 transition-transform"
+                style={{
+                  backgroundColor: theme.colors.buttonSuccess,
+                  border: '3px solid black',
+                  borderRadius: '12px',
+                  boxShadow: '4px 4px 0 black',
+                }}
+              >
+                {loading ? 'sending...' : 'send login link'}
+              </button>
+            </form>
+          )}
+
+          {/* Parent Link Sent Confirmation */}
+          {userType === 'parent' && parentLinkSent && (
+            <div className="text-center">
+              <div className="text-5xl mb-4">📧</div>
+              <p className="font-bold text-lg mb-2">check your email!</p>
+              <p className="text-gray-600 mb-4">
+                we sent a login link to <strong>{email}</strong>
+              </p>
+              {debugToken && (
+                <div
+                  className="p-3 mb-4 text-sm"
+                  style={{
+                    backgroundColor: '#E6E6FA',
+                    border: '2px dashed black',
+                    borderRadius: '8px',
+                  }}
+                >
+                  <p className="font-bold mb-1">dev mode: click to login</p>
+                  <button
+                    onClick={() => router.push(`/parent?token=${debugToken}`)}
+                    className="underline text-blue-600"
+                  >
+                    /parent?token={debugToken.slice(0, 8)}...
+                  </button>
+                </div>
+              )}
+              <button
+                onClick={() => {
+                  setParentLinkSent(false)
+                  setEmail('')
+                  setDebugToken('')
+                }}
+                className="text-sm underline"
+              >
+                use a different email
+              </button>
+            </div>
+          )}
+
+          {/* Teen Login Form */}
+          {userType === 'teen' && (
           <form onSubmit={handleLogin}>
             {!needsPassword && (
               <input
@@ -262,22 +433,42 @@ export default function LoginPage() {
               </button>
             )}
           </form>
+          )}
 
-          <div className="mt-6 text-center">
-            <p className="text-sm text-gray-600 mb-2">don&apos;t have an account?</p>
-            <Link
-              href="/onboarding"
-              className="inline-block px-6 py-2 font-bold hover:scale-105 transition-transform"
-              style={{
-                backgroundColor: theme.colors.buttonPrimary,
-                border: '3px solid black',
-                borderRadius: '9999px',
-                boxShadow: '3px 3px 0 black',
-              }}
-            >
-              sign up!
-            </Link>
-          </div>
+          {/* Sign up link - only for teens */}
+          {userType === 'teen' && (
+            <div className="mt-6 text-center">
+              <p className="text-sm text-gray-600 mb-2">don&apos;t have an account?</p>
+              <Link
+                href="/onboarding"
+                className="inline-block px-6 py-2 font-bold hover:scale-105 transition-transform"
+                style={{
+                  backgroundColor: theme.colors.buttonPrimary,
+                  border: '3px solid black',
+                  borderRadius: '9999px',
+                  boxShadow: '3px 3px 0 black',
+                }}
+              >
+                sign up!
+              </Link>
+            </div>
+          )}
+
+          {/* Info for parents */}
+          {userType === 'parent' && !parentLinkSent && (
+            <div className="mt-6 text-center">
+              <p
+                className="text-sm p-3"
+                style={{
+                  backgroundColor: '#E6E6FA',
+                  border: '2px dashed black',
+                  borderRadius: '8px',
+                }}
+              >
+                your teen needs to add your email in their app first. ask them to connect you in their growth section!
+              </p>
+            </div>
+          )}
         </div>
       </div>
     </main>
