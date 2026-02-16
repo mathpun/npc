@@ -28,13 +28,15 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
-    const { name, nickname, age, pronouns, interests, goals, password } = body
+    const { name, nickname, age, pronouns, interests, goals, password, email, googleId, authProvider } = body
 
     if (!name || !age || !interests) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
     }
 
-    if (!password || password.length < 4) {
+    // Password required unless using Google auth
+    const isGoogleAuth = authProvider === 'google' || googleId
+    if (!isGoogleAuth && (!password || password.length < 4)) {
       return NextResponse.json({ error: 'Password must be at least 4 characters' }, { status: 400 })
     }
 
@@ -47,23 +49,46 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'This name is already taken' }, { status: 400 })
     }
 
+    // Check if Google ID already exists (if provided)
+    if (googleId) {
+      const existingGoogleUser = await db.prepare(`
+        SELECT id FROM users WHERE google_id = ?
+      `).get(googleId)
+
+      if (existingGoogleUser) {
+        return NextResponse.json({ error: 'This Google account is already registered' }, { status: 400 })
+      }
+    }
+
     const id = uuidv4()
     const interestsStr = Array.isArray(interests) ? interests.join(', ') : interests
     const displayName = nickname || name // default to username if no nickname
 
-    // Hash the password
-    const passwordHash = await bcrypt.hash(password, 10)
+    // Hash the password (only if provided)
+    const passwordHash = password ? await bcrypt.hash(password, 10) : null
 
     await db.prepare(`
-      INSERT INTO users (id, name, nickname, age, pronouns, interests, goals, password_hash)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-    `).run(id, name, displayName, age, pronouns || null, interestsStr, goals || null, passwordHash)
+      INSERT INTO users (id, name, nickname, age, pronouns, interests, goals, password_hash, email, google_id, auth_provider)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `).run(
+      id,
+      name,
+      displayName,
+      age,
+      pronouns || null,
+      interestsStr,
+      goals || null,
+      passwordHash,
+      email || null,
+      googleId || null,
+      authProvider || 'password'
+    )
 
     // Log the activity
     await db.prepare(`
       INSERT INTO activity_log (user_id, activity_type, activity_data)
       VALUES (?, 'signup', ?)
-    `).run(id, JSON.stringify({ name, nickname: displayName, age }))
+    `).run(id, JSON.stringify({ name, nickname: displayName, age, authProvider: authProvider || 'password' }))
 
     // Create first milestone
     await db.prepare(`

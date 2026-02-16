@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
+import { signOut } from 'next-auth/react'
 import { useTheme } from '@/lib/ThemeContext'
 import ThemePicker, { ThemePickerButton } from './ThemePicker'
 import ChangePassword from './ChangePassword'
@@ -31,7 +32,8 @@ export default function NavBar({ showBack = false, backHref = '/', backLabel = '
     }
   }, [])
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    // Clear localStorage
     localStorage.removeItem('youthai_profile')
     localStorage.removeItem('npc_user_id')
     localStorage.removeItem('youthai_journal')
@@ -39,6 +41,8 @@ export default function NavBar({ showBack = false, backHref = '/', backLabel = '
     setIsLoggedIn(false)
     setUserName('')
     setMobileMenuOpen(false)
+    // Sign out from NextAuth (for Google auth users)
+    await signOut({ redirect: false })
     router.push('/')
   }
 

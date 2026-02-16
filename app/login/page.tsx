@@ -1,15 +1,19 @@
 'use client'
 
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useState, useEffect } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
+import { useSession } from 'next-auth/react'
 import NavBar from '@/components/NavBar'
 import { useTheme } from '@/lib/ThemeContext'
+import GoogleSignInButton from '@/components/GoogleSignInButton'
 
 type UserType = 'teen' | 'parent'
 
 export default function LoginPage() {
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const { data: session, status } = useSession()
   const [userType, setUserType] = useState<UserType>('teen')
   const [name, setName] = useState('')
   const [password, setPassword] = useState('')
@@ -21,6 +25,70 @@ export default function LoginPage() {
   const [parentLinkSent, setParentLinkSent] = useState(false)
   const [debugToken, setDebugToken] = useState('')
   const { theme } = useTheme()
+
+  // Handle error from OAuth
+  useEffect(() => {
+    const errorParam = searchParams.get('error')
+    if (errorParam) {
+      if (errorParam === 'NoEmail') {
+        setError('Could not get email from Google account')
+      } else if (errorParam === 'DatabaseError') {
+        setError('Something went wrong, please try again')
+      } else {
+        setError('Sign in failed, please try again')
+      }
+    }
+  }, [searchParams])
+
+  // Handle successful Google auth session
+  useEffect(() => {
+    async function handleGoogleSession() {
+      if (status === 'authenticated' && session?.user) {
+        const { email, googleId, userType: sessionUserType, isNewUser } = session.user
+
+        if (isNewUser) {
+          // New user - redirect to onboarding with Google info
+          const params = new URLSearchParams({
+            google: 'true',
+            email: email || '',
+            name: session.user.name || '',
+          })
+          router.push(`/onboarding?${params}`)
+          return
+        }
+
+        if (sessionUserType === 'parent') {
+          // Parent user - redirect to parent dashboard
+          router.push('/parent')
+          return
+        }
+
+        if (sessionUserType === 'teen' && session.user.id) {
+          // Existing teen user - set up localStorage and redirect
+          try {
+            const res = await fetch(`/api/users/${session.user.id}`)
+            if (res.ok) {
+              const data = await res.json()
+              const profile = {
+                name: data.user.nickname || data.user.name,
+                currentAge: data.user.age,
+                interests: data.user.interests?.split(', ') || [],
+                currentGoals: data.user.goals || '',
+              }
+              localStorage.setItem('youthai_profile', JSON.stringify(profile))
+              localStorage.setItem('npc_user_id', data.user.id)
+              router.push('/dashboard')
+            }
+          } catch (err) {
+            console.error('Error fetching user data:', err)
+            setError('Failed to load your profile')
+          }
+        }
+      }
+    }
+
+    handleGoogleSession()
+  }, [session, status, router])
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -245,6 +313,19 @@ export default function LoginPage() {
 
           {/* Parent Login Form */}
           {userType === 'parent' && !parentLinkSent && (
+            <>
+            {/* Google Sign In Button */}
+            <div className="mb-4">
+              <GoogleSignInButton callbackUrl="/api/auth/google-callback" />
+            </div>
+
+            {/* Divider */}
+            <div className="flex items-center gap-4 mb-4">
+              <div className="flex-1 h-1 bg-black rounded" style={{ opacity: 0.2 }} />
+              <span className="text-sm font-bold text-gray-500">or continue with</span>
+              <div className="flex-1 h-1 bg-black rounded" style={{ opacity: 0.2 }} />
+            </div>
+
             <form onSubmit={handleParentLogin}>
               <input
                 type="email"
@@ -287,6 +368,7 @@ export default function LoginPage() {
                 {loading ? 'sending...' : 'send login link'}
               </button>
             </form>
+            </>
           )}
 
           {/* Parent Link Sent Confirmation */}
@@ -330,6 +412,19 @@ export default function LoginPage() {
 
           {/* Teen Login Form */}
           {userType === 'teen' && (
+          <>
+          {/* Google Sign In Button */}
+          <div className="mb-4">
+            <GoogleSignInButton callbackUrl="/api/auth/google-callback" />
+          </div>
+
+          {/* Divider */}
+          <div className="flex items-center gap-4 mb-4">
+            <div className="flex-1 h-1 bg-black rounded" style={{ opacity: 0.2 }} />
+            <span className="text-sm font-bold text-gray-500">or continue with</span>
+            <div className="flex-1 h-1 bg-black rounded" style={{ opacity: 0.2 }} />
+          </div>
+
           <form onSubmit={handleLogin}>
             {!needsPassword && (
               <input
@@ -433,6 +528,7 @@ export default function LoginPage() {
               </button>
             )}
           </form>
+          </>
           )}
 
           {/* Sign up link - only for teens */}

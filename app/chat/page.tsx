@@ -10,6 +10,7 @@ import SessionPicker from '@/components/SessionPicker'
 import TabNav, { TabId, GrowthSubTab } from '@/components/TabNav'
 import TeenInsights from '@/components/TeenInsights'
 import ParentDashboard from '@/components/ParentDashboard'
+import ParentReports from '@/components/ParentReports'
 import AntiEngagement from '@/components/AntiEngagement'
 import DevelopmentalProgress from '@/components/DevelopmentalProgress'
 import EpistemicHealth from '@/components/EpistemicHealth'
@@ -45,6 +46,7 @@ function ChatPageContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const [profile, setProfile] = useState<UserProfile | null>(null)
+  const [userId, setUserId] = useState<string | null>(null)
   const [session, setSession] = useState<Session | null>(null)
   const [messages, setMessages] = useState<Message[]>([])
   const [isLoading, setIsLoading] = useState(false)
@@ -124,9 +126,12 @@ function ChatPageContent() {
     }
 
     // Check for daily check-in (only if not coming from URL topic)
-    const userId = localStorage.getItem('npc_user_id')
-    if (userId && !topicFromUrl) {
-      checkForDailyCheckIn(userId)
+    const storedUserId = localStorage.getItem('npc_user_id')
+    if (storedUserId) {
+      setUserId(storedUserId)
+      if (!topicFromUrl) {
+        checkForDailyCheckIn(storedUserId)
+      }
     }
 
     // Fetch user stats
@@ -711,7 +716,10 @@ function ChatPageContent() {
                 <CoDesignPortal />
               )}
               {activeGrowthTab === 'parent' && (
-                <ParentDashboard profile={profile} />
+                <div className="space-y-8">
+                  <ParentReports userId={userId || ''} userName={profile.name} />
+                  <ParentDashboard profile={profile} />
+                </div>
               )}
             </div>
           </div>

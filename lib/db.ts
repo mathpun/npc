@@ -60,6 +60,24 @@ async function initDb() {
         END IF;
       END $$;
 
+      -- Add google_id column for Google OAuth authentication
+      DO $$
+      BEGIN
+        IF NOT EXISTS (SELECT 1 FROM information_schema.columns
+                       WHERE table_name = 'users' AND column_name = 'google_id') THEN
+          ALTER TABLE users ADD COLUMN google_id TEXT UNIQUE;
+        END IF;
+      END $$;
+
+      -- Add auth_provider column to track login method
+      DO $$
+      BEGIN
+        IF NOT EXISTS (SELECT 1 FROM information_schema.columns
+                       WHERE table_name = 'users' AND column_name = 'auth_provider') THEN
+          ALTER TABLE users ADD COLUMN auth_provider TEXT DEFAULT 'password';
+        END IF;
+      END $$;
+
       -- Parent auth tokens (for magic link authentication)
       CREATE TABLE IF NOT EXISTS parent_auth_tokens (
         id SERIAL PRIMARY KEY,

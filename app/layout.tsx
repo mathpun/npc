@@ -1,7 +1,7 @@
 import type { Metadata, Viewport } from 'next'
 import { DM_Sans } from 'next/font/google'
 import './globals.css'
-import { ThemeProvider } from '@/lib/ThemeContext'
+import Providers from '@/components/Providers'
 import ServiceWorkerRegistration from '@/components/ServiceWorkerRegistration'
 
 const dmSans = DM_Sans({
@@ -47,7 +47,7 @@ export default function RootLayout({
       </head>
       <body className={dmSans.className}>
         <ServiceWorkerRegistration />
-        <ThemeProvider>{children}</ThemeProvider>
+        <Providers>{children}</Providers>
       </body>
     </html>
   )
