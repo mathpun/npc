@@ -279,9 +279,24 @@ export default function AdminDashboard() {
     }
   }
 
+  // Format date in California time for admin dashboard
   const formatDate = (dateStr: string) => {
     const date = new Date(dateStr)
-    return date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+    return date.toLocaleDateString('en-US', { timeZone: 'America/Los_Angeles' }) + ' ' +
+           date.toLocaleTimeString('en-US', { timeZone: 'America/Los_Angeles', hour: '2-digit', minute: '2-digit' })
+  }
+
+  // Get current California time for display
+  const getCaliforniaTime = () => {
+    return new Date().toLocaleString('en-US', {
+      timeZone: 'America/Los_Angeles',
+      weekday: 'short',
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+      timeZoneName: 'short'
+    })
   }
 
   const getActivityIcon = (type: string) => {
@@ -409,18 +424,30 @@ export default function AdminDashboard() {
             npc admin Dashboard
           </h1>
         </div>
-        <button
-          onClick={logout}
-          className="px-4 py-2 font-bold hover:scale-105 transition-transform"
-          style={{
-            backgroundColor: '#FF69B4',
-            border: '3px solid black',
-            borderRadius: '8px',
-            boxShadow: '3px 3px 0 black',
-          }}
-        >
-          logout
-        </button>
+        <div className="flex items-center gap-3">
+          <div
+            className="px-3 py-2 text-sm font-bold"
+            style={{
+              backgroundColor: '#87CEEB',
+              border: '2px solid black',
+              borderRadius: '8px',
+            }}
+          >
+            🌴 {getCaliforniaTime()}
+          </div>
+          <button
+            onClick={logout}
+            className="px-4 py-2 font-bold hover:scale-105 transition-transform"
+            style={{
+              backgroundColor: '#FF69B4',
+              border: '3px solid black',
+              borderRadius: '8px',
+              boxShadow: '3px 3px 0 black',
+            }}
+          >
+            logout
+          </button>
+        </div>
       </header>
 
       <main className="max-w-6xl mx-auto">
