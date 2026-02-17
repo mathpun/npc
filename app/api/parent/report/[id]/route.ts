@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import db from '@/lib/db'
+import { sendParentReportEmail, ParentReportEmailData } from '@/lib/email'
 
 interface RouteParams {
   params: Promise<{ id: string }>
@@ -85,8 +86,64 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
         return NextResponse.json({ error: 'Report must be approved before sending' }, { status: 400 })
       }
 
-      // TODO: Actually send email to parent
-      // For now, just mark as sent
+      // Fetch full report with parent info
+      const fullReport = await db.prepare(`
+        SELECT pr.*, pc.parent_email, pc.parent_name, u.name as teen_name
+        FROM parent_reports pr
+        LEFT JOIN parent_connections pc ON pr.parent_connection_id = pc.id
+        JOIN users u ON pr.user_id = u.id
+        WHERE pr.id = ?
+      `).get(id) as {
+        week_start: string
+        week_end: string
+        themes_discussed: string
+        mood_summary: string
+        growth_highlights: string
+        teen_note: string
+        engagement_stats: string
+        parent_email: string
+        parent_name: string
+        teen_name: string
+      } | undefined
+
+      if (!fullReport?.parent_email) {
+        return NextResponse.json({ error: 'No parent email found' }, { status: 400 })
+      }
+
+      // Parse engagement stats if they exist
+      let engagementStats = undefined
+      if (fullReport.engagement_stats) {
+        try {
+          engagementStats = typeof fullReport.engagement_stats === 'string'
+            ? JSON.parse(fullReport.engagement_stats)
+            : fullReport.engagement_stats
+        } catch {
+          console.error('Failed to parse engagement stats')
+        }
+      }
+
+      // Send the email
+      const emailData: ParentReportEmailData = {
+        parentName: fullReport.parent_name || 'Parent',
+        parentEmail: fullReport.parent_email,
+        teenName: fullReport.teen_name,
+        weekStart: fullReport.week_start,
+        weekEnd: fullReport.week_end,
+        themesDiscussed: fullReport.themes_discussed || '',
+        moodSummary: fullReport.mood_summary || '',
+        growthHighlights: fullReport.growth_highlights || '',
+        teenNote: fullReport.teen_note,
+        engagementStats,
+      }
+
+      const emailResult = await sendParentReportEmail(emailData)
+
+      if (!emailResult.success) {
+        console.error('Failed to send email:', emailResult.error)
+        return NextResponse.json({ error: 'Failed to send email: ' + (emailResult.error || 'Unknown error') }, { status: 500 })
+      }
+
+      // Mark as sent
       await db.prepare(`
         UPDATE parent_reports
         SET status = 'sent', sent_at = CURRENT_TIMESTAMP
