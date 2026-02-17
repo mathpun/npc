@@ -8,7 +8,7 @@ import Goals from '@/components/Goals'
 import ParentPrompts from '@/components/ParentPrompts'
 import DailyCheckIn from '@/components/DailyCheckIn'
 import InstallPrompt from '@/components/InstallPrompt'
-import { ACHIEVEMENTS } from '@/lib/db'
+import { ACHIEVEMENTS } from '@/lib/achievements'
 import { useTheme } from '@/lib/ThemeContext'
 
 interface UserStats {

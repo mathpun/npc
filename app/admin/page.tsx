@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { ACHIEVEMENTS } from '@/lib/db'
+import { ACHIEVEMENTS } from '@/lib/achievements'
 
 interface User {
   id: string
