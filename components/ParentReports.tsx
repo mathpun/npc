@@ -94,14 +94,26 @@ export default function ParentReports({ userId, userName }: ParentReportsProps) 
   }
 
   const removeConnection = async (connectionId: number) => {
+    console.log('[ParentReports] removeConnection called with:', connectionId)
     if (!confirm('Remove this parent connection?')) return
+
     try {
-      await fetch(`/api/parent/connect?connectionId=${connectionId}&userId=${userId}`, {
+      console.log('[ParentReports] Making DELETE request')
+      const res = await fetch(`/api/parent/connect?connectionId=${connectionId}&userId=${userId}`, {
         method: 'DELETE'
       })
-      fetchData()
+      const data = await res.json()
+      console.log('[ParentReports] Delete response:', data)
+
+      if (data.success) {
+        alert('Parent connection removed!')
+        fetchData()
+      } else {
+        alert('Failed to remove: ' + (data.error || 'Unknown error'))
+      }
     } catch (err) {
       console.error('Failed to remove connection:', err)
+      alert('Failed to remove connection: ' + (err instanceof Error ? err.message : 'Unknown error'))
     }
   }
 
