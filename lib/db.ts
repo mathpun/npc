@@ -280,6 +280,21 @@ async function initDb() {
         UNIQUE(user_id, parent_email)
       );
 
+      -- Flagged messages (content safety alerts for admin)
+      CREATE TABLE IF NOT EXISTS flagged_messages (
+        id SERIAL PRIMARY KEY,
+        message_id INTEGER REFERENCES chat_messages(id),
+        user_id TEXT NOT NULL REFERENCES users(id),
+        content TEXT NOT NULL,
+        flag_type TEXT NOT NULL,
+        flag_reason TEXT NOT NULL,
+        severity TEXT DEFAULT 'medium',
+        reviewed INTEGER DEFAULT 0,
+        reviewed_at TIMESTAMP,
+        reviewed_by TEXT,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      );
+
       -- Parent reports (AI-generated reports for parents)
       CREATE TABLE IF NOT EXISTS parent_reports (
         id SERIAL PRIMARY KEY,

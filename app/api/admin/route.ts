@@ -188,6 +188,30 @@ export async function GET(request: NextRequest) {
       LIMIT 100
     `).all()
 
+    // Get flagged messages for content safety
+    const flaggedMessages = await db.prepare(`
+      SELECT
+        fm.*,
+        u.name as user_name,
+        u.age as user_age
+      FROM flagged_messages fm
+      JOIN users u ON fm.user_id = u.id
+      ORDER BY
+        CASE fm.severity
+          WHEN 'critical' THEN 1
+          WHEN 'high' THEN 2
+          WHEN 'medium' THEN 3
+          ELSE 4
+        END,
+        fm.created_at DESC
+      LIMIT 100
+    `).all()
+
+    // Count unreviewed flagged messages
+    const unreviewedFlags = await db.prepare(`
+      SELECT COUNT(*) as count FROM flagged_messages WHERE reviewed = 0
+    `).get() as { count: number } | undefined
+
     // Retention rate (returning users / total users)
     const retentionRate = totalUsers?.count
       ? Math.round(((returningUsers?.count || 0) / totalUsers.count) * 100)
@@ -207,6 +231,7 @@ export async function GET(request: NextRequest) {
         avgMessagesPerUser: avgMessagesPerUser?.avg || 0,
         returningUsers: returningUsers?.count || 0,
         retentionRate,
+        unreviewedFlags: unreviewedFlags?.count || 0,
       },
       users,
       recentActivity,
@@ -217,6 +242,7 @@ export async function GET(request: NextRequest) {
       topTopics,
       chatMessages,
       dailyCheckins,
+      flaggedMessages,
     })
   } catch (error) {
     console.error('Admin data error:', error)
@@ -237,5 +263,32 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Invalid password' }, { status: 401 })
   } catch (error) {
     return NextResponse.json({ error: 'Invalid request' }, { status: 400 })
+  }
+}
+
+// PUT - mark flagged message as reviewed
+export async function PUT(request: NextRequest) {
+  if (!checkAuth(request)) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
+  try {
+    const body = await request.json()
+    const { flagId, reviewed } = body
+
+    if (!flagId) {
+      return NextResponse.json({ error: 'Missing flagId' }, { status: 400 })
+    }
+
+    await db.prepare(`
+      UPDATE flagged_messages
+      SET reviewed = ?, reviewed_at = CURRENT_TIMESTAMP
+      WHERE id = ?
+    `).run(reviewed ? 1 : 0, flagId)
+
+    return NextResponse.json({ success: true })
+  } catch (error) {
+    console.error('Error updating flagged message:', error)
+    return NextResponse.json({ error: 'Database error' }, { status: 500 })
   }
 }

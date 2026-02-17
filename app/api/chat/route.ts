@@ -2,6 +2,7 @@ import { NextRequest } from 'next/server'
 import Anthropic from '@anthropic-ai/sdk'
 import { buildSystemPrompt, UserProfile, SessionContext } from '@/lib/prompts'
 import db from '@/lib/db'
+import { scanAndFlagMessage } from '@/lib/content-safety'
 
 // Lazy-load the Anthropic client to avoid initialization errors
 let anthropic: Anthropic | null = null
@@ -66,11 +67,15 @@ export async function POST(request: NextRequest) {
 
     const systemPrompt = buildSystemPrompt(userProfile, sessionContext)
 
-    // Save the latest user message to the database
+    // Save the latest user message to the database and scan for safety
     if (userId && messages.length > 0) {
       const lastMessage = messages[messages.length - 1]
       if (lastMessage.role === 'user') {
         saveMessage(userId, 'user', lastMessage.content, sessionId)
+        // Scan message for concerning content (async, don't block response)
+        scanAndFlagMessage(null, userId, lastMessage.content).catch(err => {
+          console.error('Content safety scan error:', err)
+        })
       }
     }
 

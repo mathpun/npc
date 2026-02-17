@@ -72,6 +72,21 @@ interface Prompt {
   response_count: number
 }
 
+interface FlaggedMessage {
+  id: number
+  message_id: number | null
+  user_id: string
+  content: string
+  flag_type: string
+  flag_reason: string
+  severity: string
+  reviewed: number
+  reviewed_at: string | null
+  created_at: string
+  user_name: string
+  user_age: number
+}
+
 interface TimeSeriesData {
   date: string
   total: number
@@ -91,6 +106,7 @@ interface AdminData {
     avgMessagesPerUser: number
     returningUsers: number
     retentionRate: number
+    unreviewedFlags: number
   }
   users: User[]
   recentActivity: Activity[]
@@ -101,6 +117,7 @@ interface AdminData {
   topTopics: { session_topic: string; count: number }[]
   chatMessages: ChatMessage[]
   dailyCheckins: DailyCheckin[]
+  flaggedMessages: FlaggedMessage[]
 }
 
 export default function AdminDashboard() {
@@ -240,6 +257,25 @@ export default function AdminDashboard() {
       fetchPrompts()
     } catch (err) {
       console.error('Failed to delete prompt:', err)
+    }
+  }
+
+  const markFlagReviewed = async (flagId: number, reviewed: boolean) => {
+    const token = localStorage.getItem('adminToken')
+    if (!token) return
+
+    try {
+      await fetch('/api/admin', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ flagId, reviewed }),
+      })
+      fetchData(token)
+    } catch (err) {
+      console.error('Failed to update flag:', err)
     }
   }
 
@@ -429,6 +465,100 @@ export default function AdminDashboard() {
                 ))}
               </div>
             </div>
+
+            {/* Flagged Content Alert Section */}
+            {data.flaggedMessages && data.flaggedMessages.length > 0 && (
+              <div
+                className="mb-6 p-6"
+                style={{
+                  backgroundColor: '#FFE4E1',
+                  border: '3px solid #FF0000',
+                  borderRadius: '12px',
+                  boxShadow: '6px 6px 0 #8B0000',
+                }}
+              >
+                <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
+                  <span>🚨</span> Content Safety Alerts
+                  {data.stats.unreviewedFlags > 0 && (
+                    <span
+                      className="px-3 py-1 text-sm rounded-full animate-pulse"
+                      style={{ backgroundColor: '#FF0000', color: 'white', border: '2px solid black' }}
+                    >
+                      {data.stats.unreviewedFlags} unreviewed
+                    </span>
+                  )}
+                </h2>
+                <div className="space-y-3 max-h-96 overflow-y-auto">
+                  {data.flaggedMessages.map((flag) => {
+                    const severityColors: Record<string, { bg: string; border: string }> = {
+                      critical: { bg: '#FF0000', border: '#8B0000' },
+                      high: { bg: '#FF6B6B', border: '#CC0000' },
+                      medium: { bg: '#FFD700', border: '#B8860B' },
+                      low: { bg: '#90EE90', border: '#228B22' },
+                    }
+                    const colors = severityColors[flag.severity] || severityColors.medium
+                    const typeEmojis: Record<string, string> = {
+                      self_harm: '💔',
+                      violence: '⚠️',
+                      sexual_content: '🔞',
+                      abuse: '🆘',
+                      dangerous_behavior: '⚡',
+                      bullying: '😢',
+                    }
+
+                    return (
+                      <div
+                        key={flag.id}
+                        className={`p-4 ${flag.reviewed ? 'opacity-50' : ''}`}
+                        style={{
+                          backgroundColor: 'white',
+                          border: `3px solid ${colors.border}`,
+                          borderRadius: '8px',
+                          borderLeft: `8px solid ${colors.bg}`,
+                        }}
+                      >
+                        <div className="flex items-start justify-between gap-3">
+                          <div className="flex-1">
+                            <div className="flex items-center gap-2 mb-2 flex-wrap">
+                              <span className="text-xl">{typeEmojis[flag.flag_type] || '⚠️'}</span>
+                              <span
+                                className="px-2 py-0.5 text-xs font-bold rounded uppercase"
+                                style={{ backgroundColor: colors.bg, color: flag.severity === 'critical' ? 'white' : 'black' }}
+                              >
+                                {flag.severity}
+                              </span>
+                              <span className="font-bold">{flag.user_name}</span>
+                              <span className="text-sm text-gray-600">({flag.user_age}yo)</span>
+                              <span className="text-xs text-gray-500">{formatDate(flag.created_at)}</span>
+                            </div>
+                            <div
+                              className="p-2 mb-2 text-sm rounded"
+                              style={{ backgroundColor: '#FFF5F5', border: '1px solid #FFB6C1' }}
+                            >
+                              {flag.content.length > 300 ? flag.content.slice(0, 300) + '...' : flag.content}
+                            </div>
+                            <div className="text-xs text-gray-600">
+                              <strong>Reason:</strong> {flag.flag_reason}
+                            </div>
+                          </div>
+                          <button
+                            onClick={() => markFlagReviewed(flag.id, !flag.reviewed)}
+                            className="px-3 py-2 text-sm font-bold hover:scale-105 transition-transform whitespace-nowrap"
+                            style={{
+                              backgroundColor: flag.reviewed ? '#90EE90' : '#FFD700',
+                              border: '2px solid black',
+                              borderRadius: '6px',
+                            }}
+                          >
+                            {flag.reviewed ? '✓ Reviewed' : 'Mark Reviewed'}
+                          </button>
+                        </div>
+                      </div>
+                    )
+                  })}
+                </div>
+              </div>
+            )}
 
             {/* Stats Cards */}
             <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3 mb-8">
