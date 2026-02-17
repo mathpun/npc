@@ -62,14 +62,14 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
         return NextResponse.json({ error: 'Report already processed' }, { status: 400 })
       }
 
-      // Fetch full report with parent info to send email immediately
+      // Fetch full report with teen info
       const fullReport = await db.prepare(`
-        SELECT pr.*, pc.parent_email, pc.parent_name, u.name as teen_name
+        SELECT pr.*, u.name as teen_name
         FROM parent_reports pr
-        LEFT JOIN parent_connections pc ON pr.parent_connection_id = pc.id
         JOIN users u ON pr.user_id = u.id
         WHERE pr.id = ?
       `).get(id) as {
+        user_id: string
         week_start: string
         week_end: string
         themes_discussed: string
@@ -77,19 +77,28 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
         growth_highlights: string
         teen_note: string
         engagement_stats: string
-        parent_email: string
-        parent_name: string
         teen_name: string
       } | undefined
 
-      if (!fullReport?.parent_email) {
-        // No parent email - just approve without sending
+      if (!fullReport) {
+        return NextResponse.json({ error: 'Report not found' }, { status: 404 })
+      }
+
+      // Get ALL parent connections for this user
+      const parentConnections = await db.prepare(`
+        SELECT parent_email, parent_name
+        FROM parent_connections
+        WHERE user_id = ? AND connection_status = 'active'
+      `).all(fullReport.user_id) as { parent_email: string; parent_name: string }[]
+
+      if (!parentConnections || parentConnections.length === 0) {
+        // No parents connected - just approve without sending
         await db.prepare(`
           UPDATE parent_reports
           SET status = 'approved', approved_at = CURRENT_TIMESTAMP, teen_reviewed_at = CURRENT_TIMESTAMP
           WHERE id = ?
         `).run(id)
-        return NextResponse.json({ success: true, message: 'Report approved! (No parent email to send to)' })
+        return NextResponse.json({ success: true, message: 'Report approved! (No parents connected to send to)' })
       }
 
       // Parse engagement stats
@@ -104,51 +113,61 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
         }
       }
 
-      // Send email immediately on approve
-      try {
-        const emailData: ParentReportEmailData = {
-          parentName: fullReport.parent_name || 'Parent',
-          parentEmail: fullReport.parent_email,
-          teenName: fullReport.teen_name || 'Your teen',
-          weekStart: fullReport.week_start,
-          weekEnd: fullReport.week_end,
-          themesDiscussed: fullReport.themes_discussed || '',
-          moodSummary: fullReport.mood_summary || '',
-          growthHighlights: fullReport.growth_highlights || '',
-          teenNote: fullReport.teen_note,
-          engagementStats,
-        }
+      // Send email to ALL connected parents
+      const successfulSends: string[] = []
+      const failedSends: string[] = []
 
-        console.log('[PARENT REPORT] Sending email to:', fullReport.parent_email)
-        const emailResult = await sendParentReportEmail(emailData)
+      for (const parent of parentConnections) {
+        try {
+          const emailData: ParentReportEmailData = {
+            parentName: parent.parent_name || 'Parent',
+            parentEmail: parent.parent_email,
+            teenName: fullReport.teen_name || 'Your teen',
+            weekStart: fullReport.week_start,
+            weekEnd: fullReport.week_end,
+            themesDiscussed: fullReport.themes_discussed || '',
+            moodSummary: fullReport.mood_summary || '',
+            growthHighlights: fullReport.growth_highlights || '',
+            teenNote: fullReport.teen_note,
+            engagementStats,
+          }
 
-        if (emailResult.success) {
-          // Mark as sent
-          await db.prepare(`
-            UPDATE parent_reports
-            SET status = 'sent', approved_at = CURRENT_TIMESTAMP, teen_reviewed_at = CURRENT_TIMESTAMP, sent_at = CURRENT_TIMESTAMP
-            WHERE id = ?
-          `).run(id)
-          return NextResponse.json({ success: true, message: 'Report approved and sent to parent!' })
-        } else {
-          console.error('[PARENT REPORT] Email failed:', emailResult.error)
-          // Still approve even if email fails
-          await db.prepare(`
-            UPDATE parent_reports
-            SET status = 'approved', approved_at = CURRENT_TIMESTAMP, teen_reviewed_at = CURRENT_TIMESTAMP
-            WHERE id = ?
-          `).run(id)
-          return NextResponse.json({ success: true, message: 'Report approved but email failed: ' + emailResult.error })
+          console.log('[PARENT REPORT] Sending email to:', parent.parent_email)
+          const emailResult = await sendParentReportEmail(emailData)
+
+          if (emailResult.success) {
+            successfulSends.push(parent.parent_email)
+          } else {
+            console.error('[PARENT REPORT] Email failed for', parent.parent_email, ':', emailResult.error)
+            failedSends.push(parent.parent_email)
+          }
+        } catch (emailError) {
+          console.error('[PARENT REPORT] Email error for', parent.parent_email, ':', emailError)
+          failedSends.push(parent.parent_email)
         }
-      } catch (emailError) {
-        console.error('[PARENT REPORT] Email error:', emailError)
-        // Still approve even if email fails
+      }
+
+      // Update report status
+      if (successfulSends.length > 0) {
+        await db.prepare(`
+          UPDATE parent_reports
+          SET status = 'sent', approved_at = CURRENT_TIMESTAMP, teen_reviewed_at = CURRENT_TIMESTAMP, sent_at = CURRENT_TIMESTAMP
+          WHERE id = ?
+        `).run(id)
+
+        let message = `Report sent to ${successfulSends.length} parent(s)!`
+        if (failedSends.length > 0) {
+          message += ` (Failed for: ${failedSends.join(', ')})`
+        }
+        return NextResponse.json({ success: true, message })
+      } else {
+        // All sends failed
         await db.prepare(`
           UPDATE parent_reports
           SET status = 'approved', approved_at = CURRENT_TIMESTAMP, teen_reviewed_at = CURRENT_TIMESTAMP
           WHERE id = ?
         `).run(id)
-        return NextResponse.json({ success: true, message: 'Report approved but email failed to send' })
+        return NextResponse.json({ success: true, message: 'Report approved but all emails failed to send' })
       }
     }
 
