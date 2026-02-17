@@ -83,11 +83,18 @@ export async function POST(request: NextRequest) {
 // DELETE - Remove a parent connection
 export async function DELETE(request: NextRequest) {
   const { searchParams } = new URL(request.url)
-  const connectionId = searchParams.get('connectionId')
+  const connectionIdStr = searchParams.get('connectionId')
   const userId = searchParams.get('userId')
 
-  if (!connectionId || !userId) {
+  console.log('[PARENT CONNECT] DELETE request:', { connectionIdStr, userId })
+
+  if (!connectionIdStr || !userId) {
     return NextResponse.json({ error: 'Missing connectionId or userId' }, { status: 400 })
+  }
+
+  const connectionId = parseInt(connectionIdStr, 10)
+  if (isNaN(connectionId)) {
+    return NextResponse.json({ error: 'Invalid connectionId' }, { status: 400 })
   }
 
   try {
@@ -96,13 +103,21 @@ export async function DELETE(request: NextRequest) {
       SELECT id FROM parent_connections WHERE id = ? AND user_id = ?
     `).get(connectionId, userId)
 
+    console.log('[PARENT CONNECT] Found connection:', connection)
+
     if (!connection) {
       return NextResponse.json({ error: 'Connection not found' }, { status: 404 })
     }
 
-    await db.prepare(`
+    const result = await db.prepare(`
       DELETE FROM parent_connections WHERE id = ? AND user_id = ?
     `).run(connectionId, userId)
+
+    console.log('[PARENT CONNECT] Delete result:', result)
+
+    if (result.changes === 0) {
+      return NextResponse.json({ error: 'No rows deleted' }, { status: 500 })
+    }
 
     return NextResponse.json({ success: true })
   } catch (error) {
