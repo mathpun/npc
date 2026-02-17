@@ -60,6 +60,37 @@ export default function Moltbook() {
       {/* Nav */}
       <NavBar />
 
+      {/* Coming Soon Overlay */}
+      <div className="fixed inset-0 z-40 flex items-center justify-center pointer-events-none" style={{ paddingTop: '60px' }}>
+        <div
+          className="text-center p-8 pointer-events-auto"
+          style={{
+            backgroundColor: '#FFD700',
+            border: '4px solid black',
+            borderRadius: '20px',
+            boxShadow: '8px 8px 0 black',
+            transform: 'rotate(-2deg)',
+          }}
+        >
+          <div className="text-6xl mb-4">🚧</div>
+          <h2 className="text-3xl font-bold mb-2">coming soon!</h2>
+          <p className="text-lg mb-4">the moltbook is under construction</p>
+          <p className="text-sm text-gray-700">a place to connect with friends is on the way...</p>
+          <Link
+            href="/dashboard"
+            className="inline-block mt-4 px-6 py-3 font-bold hover:scale-105 transition-transform"
+            style={{
+              backgroundColor: '#90EE90',
+              border: '3px solid black',
+              borderRadius: '9999px',
+              boxShadow: '4px 4px 0 black',
+            }}
+          >
+            back to dashboard
+          </Link>
+        </div>
+      </div>
+
       {/* Page title bar */}
       <div className="relative z-10 p-3 text-center" style={{ backgroundColor: '#7FDBFF' }}>
         <div className="inline-block px-4 py-2 bg-white border-3 border-black rounded-full rotate-2" style={{ borderWidth: '3px' }}>
@@ -67,7 +98,7 @@ export default function Moltbook() {
         </div>
       </div>
 
-      <main className="max-w-4xl mx-auto p-4">
+      <main className="max-w-4xl mx-auto p-4 opacity-30 pointer-events-none">
         {/* Title - hand drawn style */}
         <div className="text-center mb-8 mt-4">
           <h1
