@@ -126,9 +126,24 @@ export default function ParentReports({ userId, userName }: ParentReportsProps) 
   }
 
   const updateReport = async (action: string) => {
-    if (!selectedReport) return
+    console.log('[ParentReports] updateReport called with action:', action)
+    console.log('[ParentReports] selectedReport:', selectedReport)
+    console.log('[ParentReports] userId:', userId)
+
+    if (!selectedReport) {
+      console.error('[ParentReports] No selected report!')
+      alert('Error: No report selected')
+      return
+    }
+    if (!userId) {
+      console.error('[ParentReports] No userId!')
+      alert('Error: Not logged in')
+      return
+    }
+
     setActionLoading(true)
     try {
+      console.log('[ParentReports] Making PATCH request to:', `/api/parent/report/${selectedReport.id}`)
       const res = await fetch(`/api/parent/report/${selectedReport.id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
@@ -139,14 +154,20 @@ export default function ParentReports({ userId, userName }: ParentReportsProps) 
         })
       })
       const data = await res.json()
+      console.log('[ParentReports] Response:', data)
+
       if (data.success) {
+        alert(data.message || 'Success!')
         if (action === 'approve' || action === 'reject') {
           setSelectedReport(null)
         }
         fetchData()
+      } else {
+        alert('Error: ' + (data.error || 'Unknown error'))
       }
     } catch (err) {
-      console.error('Failed to update report:', err)
+      console.error('[ParentReports] Failed to update report:', err)
+      alert('Failed to update report: ' + (err instanceof Error ? err.message : 'Unknown error'))
     }
     setActionLoading(false)
   }
