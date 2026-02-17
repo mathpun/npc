@@ -109,15 +109,17 @@ export async function DELETE(request: NextRequest) {
       return NextResponse.json({ error: 'Connection not found' }, { status: 404 })
     }
 
+    // First, unlink any reports that reference this connection
+    await db.prepare(`
+      UPDATE parent_reports SET parent_connection_id = NULL WHERE parent_connection_id = ?
+    `).run(connectionId)
+
+    // Now delete the connection
     const result = await db.prepare(`
       DELETE FROM parent_connections WHERE id = ? AND user_id = ?
     `).run(connectionId, userId)
 
     console.log('[PARENT CONNECT] Delete result:', result)
-
-    if (result.changes === 0) {
-      return NextResponse.json({ error: 'No rows deleted' }, { status: 500 })
-    }
 
     return NextResponse.json({ success: true })
   } catch (error) {
