@@ -119,6 +119,12 @@ interface ParentReportStats {
   approved_reports: number
 }
 
+interface CustomPersonaActivity {
+  activity_data: string
+  created_at: string
+  user_name: string
+}
+
 interface AdminData {
   stats: {
     totalUsers: number
@@ -147,6 +153,7 @@ interface AdminData {
   personaStats: PersonaStat[]
   parentReportStats: ParentReportStats
   parentReportsPerDay: TimeSeriesData[]
+  customPersonas: CustomPersonaActivity[]
   chatMessages: ChatMessage[]
   dailyCheckins: DailyCheckin[]
   flaggedMessages: FlaggedMessage[]
@@ -1144,6 +1151,36 @@ export default function AdminDashboard() {
                         </div>
                       )
                     })}
+                  </div>
+                )}
+
+                {/* Custom Personas List */}
+                {data.customPersonas && data.customPersonas.length > 0 && (
+                  <div className="mt-4 pt-4 border-t-2 border-dashed border-gray-300">
+                    <div className="text-sm font-bold mb-2">✨ Custom Personas Created</div>
+                    <div className="space-y-2 max-h-48 overflow-y-auto">
+                      {data.customPersonas.map((cp, i) => {
+                        let parsed: { customPersonaName?: string; goal?: string; topic?: string } = {}
+                        try {
+                          parsed = JSON.parse(cp.activity_data || '{}')
+                        } catch { /* ignore */ }
+                        return (
+                          <div
+                            key={i}
+                            className="p-2 text-sm rounded"
+                            style={{ backgroundColor: '#FFF0F5', border: '1px solid #FFB6C1' }}
+                          >
+                            <div className="flex justify-between items-start">
+                              <span className="font-bold">{parsed.customPersonaName || 'Unknown'}</span>
+                              <span className="text-xs text-gray-500">{cp.user_name}</span>
+                            </div>
+                            {parsed.topic && (
+                              <div className="text-xs text-gray-600 mt-1">Topic: {parsed.topic}</div>
+                            )}
+                          </div>
+                        )
+                      })}
+                    </div>
                   </div>
                 )}
               </div>

@@ -196,6 +196,20 @@ export async function GET(request: NextRequest) {
       ORDER BY date DESC
     `).all()
 
+    // Get custom personas created by users
+    const customPersonas = await db.prepare(`
+      SELECT
+        al.activity_data,
+        al.created_at,
+        u.name as user_name
+      FROM activity_log al
+      JOIN users u ON al.user_id = u.id
+      WHERE al.activity_type = 'session_start'
+        AND al.activity_data LIKE '%"persona":"custom"%'
+      ORDER BY al.created_at DESC
+      LIMIT 50
+    `).all()
+
     // Get recent chat messages
     const chatMessages = await db.prepare(`
       SELECT
@@ -276,6 +290,7 @@ export async function GET(request: NextRequest) {
       personaStats,
       parentReportStats,
       parentReportsPerDay,
+      customPersonas,
       chatMessages,
       dailyCheckins,
       flaggedMessages,
