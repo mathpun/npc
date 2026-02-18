@@ -543,7 +543,10 @@ function ChatPageContent() {
           <>
             {showSessionPicker ? (
               <div className="h-full flex items-center justify-center px-4 py-8">
-                <SessionPicker onSelect={handleSessionSelect} />
+                <SessionPicker
+                  onSelect={handleSessionSelect}
+                  onOpenHistory={() => setShowChatHistory(true)}
+                />
               </div>
             ) : (
               <div className="h-full flex flex-col">

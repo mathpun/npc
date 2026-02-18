@@ -6,13 +6,14 @@ import { SessionGoal, PersonaType, SESSION_GOALS, PERSONAS, CustomPersona } from
 interface SessionPickerProps {
   onSelect: (goal: SessionGoal, topic: string, persona: PersonaType, customPersona?: CustomPersona) => void
   onClose?: () => void
+  onOpenHistory?: () => void
 }
 
 type Step = 'goal' | 'persona' | 'custom'
 
 const EMOJI_OPTIONS = ['😊', '🦊', '🌟', '🔮', '🎭', '🦋', '🌈', '🍄', '🐉', '👽', '🤖', '🧙', '🦄', '🐱', '🎪', '💫']
 
-export default function SessionPicker({ onSelect, onClose }: SessionPickerProps) {
+export default function SessionPicker({ onSelect, onClose, onOpenHistory }: SessionPickerProps) {
   const [step, setStep] = useState<Step>('goal')
   const [selectedGoal, setSelectedGoal] = useState<SessionGoal | null>(null)
   const [selectedPersona, setSelectedPersona] = useState<PersonaType | null>(null)
@@ -191,7 +192,7 @@ export default function SessionPicker({ onSelect, onClose }: SessionPickerProps)
         )}
 
         {/* Continue button */}
-        <div className="flex justify-center">
+        <div className="flex flex-col items-center gap-4">
           <button
             onClick={handleGoalContinue}
             disabled={!selectedGoal}
@@ -206,6 +207,22 @@ export default function SessionPicker({ onSelect, onClose }: SessionPickerProps)
           >
             next: pick your vibe →
           </button>
+
+          {/* Continue past chat button */}
+          {onOpenHistory && (
+            <button
+              onClick={onOpenHistory}
+              className="px-6 py-3 font-bold text-sm transition-all duration-200 hover:scale-105"
+              style={{
+                backgroundColor: '#FFD700',
+                border: '3px solid black',
+                borderRadius: '9999px',
+                boxShadow: '3px 3px 0 black',
+              }}
+            >
+              📋 continue a past chat
+            </button>
+          )}
         </div>
       </div>
     )
