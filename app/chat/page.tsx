@@ -556,7 +556,7 @@ function ChatPageContent() {
                     <div className="flex items-center gap-3">
                       <button
                         onClick={() => setShowChatHistory(true)}
-                        className="w-10 h-10 flex items-center justify-center font-bold hover:scale-105 transition-transform"
+                        className="px-3 h-10 flex items-center gap-1.5 font-bold text-sm hover:scale-105 transition-transform"
                         style={{
                           backgroundColor: '#FFD700',
                           border: '3px solid black',
@@ -565,7 +565,8 @@ function ChatPageContent() {
                         }}
                         title="Chat history"
                       >
-                        📋
+                        <span>📋</span>
+                        <span>history</span>
                       </button>
                       <div className="text-3xl">👻</div>
                       <div>
