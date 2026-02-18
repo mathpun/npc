@@ -165,6 +165,37 @@ export async function GET(request: NextRequest) {
       LIMIT 10
     `).all()
 
+    // Get persona usage stats
+    const personaStats = await db.prepare(`
+      SELECT
+        COALESCE(persona, 'none') as persona,
+        COUNT(*) as count
+      FROM chat_sessions
+      GROUP BY persona
+      ORDER BY count DESC
+    `).all()
+
+    // Get parent report stats
+    const parentReportStats = await db.prepare(`
+      SELECT
+        COUNT(*) as total_reports,
+        SUM(CASE WHEN status = 'sent' THEN 1 ELSE 0 END) as sent_reports,
+        SUM(CASE WHEN status = 'draft' THEN 1 ELSE 0 END) as draft_reports,
+        SUM(CASE WHEN status = 'approved' THEN 1 ELSE 0 END) as approved_reports
+      FROM parent_reports
+    `).get() as { total_reports: number; sent_reports: number; draft_reports: number; approved_reports: number } | undefined
+
+    // Get parent reports sent over time (last 14 days)
+    const parentReportsPerDay = await db.prepare(`
+      SELECT
+        sent_at::date as date,
+        COUNT(*) as total
+      FROM parent_reports
+      WHERE status = 'sent' AND sent_at >= CURRENT_DATE - INTERVAL '14 days'
+      GROUP BY sent_at::date
+      ORDER BY date DESC
+    `).all()
+
     // Get recent chat messages
     const chatMessages = await db.prepare(`
       SELECT
@@ -232,6 +263,8 @@ export async function GET(request: NextRequest) {
         returningUsers: returningUsers?.count || 0,
         retentionRate,
         unreviewedFlags: unreviewedFlags?.count || 0,
+        parentReportsSent: parentReportStats?.sent_reports || 0,
+        parentReportsTotal: parentReportStats?.total_reports || 0,
       },
       users,
       recentActivity,
@@ -240,6 +273,9 @@ export async function GET(request: NextRequest) {
       signupsPerDay,
       checkinsPerDay,
       topTopics,
+      personaStats,
+      parentReportStats,
+      parentReportsPerDay,
       chatMessages,
       dailyCheckins,
       flaggedMessages,

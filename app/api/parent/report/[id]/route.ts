@@ -155,6 +155,12 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
           WHERE id = ?
         `).run(id)
 
+        // Track activity for analytics
+        await db.prepare(`
+          INSERT INTO activity_log (user_id, activity_type, activity_data)
+          VALUES (?, 'parent_report_sent', ?)
+        `).run(userId, JSON.stringify({ reportId: id, recipientCount: successfulSends.length }))
+
         let message = `Report sent to ${successfulSends.length} parent(s)!`
         if (failedSends.length > 0) {
           message += ` (Failed for: ${failedSends.join(', ')})`
@@ -255,6 +261,12 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
         SET status = 'sent', sent_at = CURRENT_TIMESTAMP
         WHERE id = ?
       `).run(id)
+
+      // Track activity for analytics
+      await db.prepare(`
+        INSERT INTO activity_log (user_id, activity_type, activity_data)
+        VALUES (?, 'parent_report_sent', ?)
+      `).run(userId, JSON.stringify({ reportId: id, recipientCount: 1 }))
 
       console.log('[PARENT REPORT] Successfully sent report:', id)
       return NextResponse.json({ success: true, message: 'Report sent to parent!' })

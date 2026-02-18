@@ -107,6 +107,18 @@ interface TimeSeriesData {
   total: number
 }
 
+interface PersonaStat {
+  persona: string
+  count: number
+}
+
+interface ParentReportStats {
+  total_reports: number
+  sent_reports: number
+  draft_reports: number
+  approved_reports: number
+}
+
 interface AdminData {
   stats: {
     totalUsers: number
@@ -122,6 +134,8 @@ interface AdminData {
     returningUsers: number
     retentionRate: number
     unreviewedFlags: number
+    parentReportsSent: number
+    parentReportsTotal: number
   }
   users: User[]
   recentActivity: Activity[]
@@ -130,6 +144,9 @@ interface AdminData {
   signupsPerDay: TimeSeriesData[]
   checkinsPerDay: TimeSeriesData[]
   topTopics: { session_topic: string; count: number }[]
+  personaStats: PersonaStat[]
+  parentReportStats: ParentReportStats
+  parentReportsPerDay: TimeSeriesData[]
   chatMessages: ChatMessage[]
   dailyCheckins: DailyCheckin[]
   flaggedMessages: FlaggedMessage[]
@@ -355,6 +372,8 @@ export default function AdminDashboard() {
       case 'goal_created': return '🎯'
       case 'goal_completed': return '🏆'
       case 'page_view': return '👀'
+      case 'parent_report_sent': return '📬'
+      case 'session_start': return '🎭'
       default: return '📝'
     }
   }
@@ -1069,6 +1088,132 @@ export default function AdminDashboard() {
                     })
                   )}
                 </div>
+              </div>
+            </div>
+
+            {/* Persona Stats & Parent Reports Row */}
+            <div className="grid md:grid-cols-2 gap-6 mt-6">
+              {/* Persona Usage Stats */}
+              <div
+                className="p-6"
+                style={{
+                  backgroundColor: 'white',
+                  border: '3px solid black',
+                  borderRadius: '8px',
+                  boxShadow: '6px 6px 0 black',
+                }}
+              >
+                <h2 className="text-lg font-bold mb-4 flex items-center gap-2">
+                  <span>🎭</span> Chat Persona Usage
+                </h2>
+                {!data.personaStats || data.personaStats.length === 0 ? (
+                  <p className="text-gray-500 text-center py-4">no persona data yet!</p>
+                ) : (
+                  <div className="space-y-2">
+                    {data.personaStats.map((stat) => {
+                      const maxCount = Math.max(...data.personaStats.map(s => s.count), 1)
+                      const percentage = Math.round((stat.count / maxCount) * 100)
+                      const personaLabels: Record<string, { label: string; emoji: string; color: string }> = {
+                        chill_mentor: { label: 'Chill Mentor', emoji: '😎', color: '#87CEEB' },
+                        hype_friend: { label: 'Hype Friend', emoji: '🎉', color: '#FFD700' },
+                        wise_elder: { label: 'Wise Elder', emoji: '🦉', color: '#DDA0DD' },
+                        real_talk: { label: 'Real Talk', emoji: '💯', color: '#FF69B4' },
+                        creative_chaos: { label: 'Creative Chaos', emoji: '🎨', color: '#90EE90' },
+                        custom: { label: 'Custom', emoji: '✨', color: '#FFB6C1' },
+                        none: { label: 'No Persona', emoji: '💬', color: '#E0E0E0' },
+                      }
+                      const info = personaLabels[stat.persona] || { label: stat.persona, emoji: '🤖', color: '#E0E0E0' }
+                      return (
+                        <div key={stat.persona} className="flex items-center gap-3">
+                          <span className="text-xl w-8">{info.emoji}</span>
+                          <div className="flex-1">
+                            <div className="flex justify-between text-sm mb-1">
+                              <span className="font-bold">{info.label}</span>
+                              <span>{stat.count}</span>
+                            </div>
+                            <div
+                              className="h-3 rounded-full"
+                              style={{ backgroundColor: '#f0f0f0', border: '1px solid black' }}
+                            >
+                              <div
+                                className="h-full rounded-full"
+                                style={{ width: `${percentage}%`, backgroundColor: info.color }}
+                              />
+                            </div>
+                          </div>
+                        </div>
+                      )
+                    })}
+                  </div>
+                )}
+              </div>
+
+              {/* Parent Report Stats */}
+              <div
+                className="p-6"
+                style={{
+                  backgroundColor: 'white',
+                  border: '3px solid black',
+                  borderRadius: '8px',
+                  boxShadow: '6px 6px 0 black',
+                }}
+              >
+                <h2 className="text-lg font-bold mb-4 flex items-center gap-2">
+                  <span>📬</span> Parent Reports
+                </h2>
+                {!data.parentReportStats ? (
+                  <p className="text-gray-500 text-center py-4">no report data yet!</p>
+                ) : (
+                  <>
+                    <div className="grid grid-cols-2 gap-3 mb-4">
+                      {[
+                        { label: 'Total', value: data.parentReportStats.total_reports, color: '#87CEEB', emoji: '📊' },
+                        { label: 'Sent', value: data.parentReportStats.sent_reports, color: '#90EE90', emoji: '✅' },
+                        { label: 'Drafts', value: data.parentReportStats.draft_reports, color: '#FFD700', emoji: '📝' },
+                        { label: 'Approved', value: data.parentReportStats.approved_reports, color: '#DDA0DD', emoji: '👍' },
+                      ].map((stat) => (
+                        <div
+                          key={stat.label}
+                          className="p-3 text-center"
+                          style={{
+                            backgroundColor: stat.color,
+                            border: '2px solid black',
+                            borderRadius: '8px',
+                          }}
+                        >
+                          <div className="text-lg">{stat.emoji}</div>
+                          <div className="text-xl font-bold">{stat.value}</div>
+                          <div className="text-xs font-bold">{stat.label}</div>
+                        </div>
+                      ))}
+                    </div>
+                    {/* Reports per day mini chart */}
+                    {data.parentReportsPerDay && data.parentReportsPerDay.length > 0 && (
+                      <div>
+                        <div className="text-sm font-bold mb-2">Reports Sent (14 days)</div>
+                        <div className="flex gap-1 items-end justify-around h-16">
+                          {data.parentReportsPerDay.slice(0, 14).reverse().map((day) => {
+                            const maxTotal = Math.max(...data.parentReportsPerDay.map(d => d.total), 1)
+                            const height = Math.max((day.total / maxTotal) * 50, 4)
+                            return (
+                              <div key={day.date} className="flex flex-col items-center flex-1">
+                                <div className="text-xs font-bold mb-1">{day.total}</div>
+                                <div
+                                  className="w-full max-w-4 rounded-t"
+                                  style={{
+                                    height: `${height}px`,
+                                    backgroundColor: '#90EE90',
+                                    border: '1px solid black',
+                                  }}
+                                />
+                              </div>
+                            )
+                          })}
+                        </div>
+                      </div>
+                    )}
+                  </>
+                )}
               </div>
             </div>
 
