@@ -125,6 +125,15 @@ interface CustomPersonaActivity {
   user_name: string
 }
 
+interface TimeSpentUser {
+  user_id: string
+  user_name: string
+  age: number
+  total_minutes: number
+  session_count: number
+  avg_session_minutes: number
+}
+
 interface AdminData {
   stats: {
     totalUsers: number
@@ -142,6 +151,8 @@ interface AdminData {
     unreviewedFlags: number
     parentReportsSent: number
     parentReportsTotal: number
+    totalTimeMinutes: number
+    avgSessionMinutes: number
   }
   users: User[]
   recentActivity: Activity[]
@@ -154,6 +165,7 @@ interface AdminData {
   parentReportStats: ParentReportStats
   parentReportsPerDay: TimeSeriesData[]
   customPersonas: CustomPersonaActivity[]
+  timeSpentPerUser: TimeSpentUser[]
   chatMessages: ChatMessage[]
   dailyCheckins: DailyCheckin[]
   flaggedMessages: FlaggedMessage[]
@@ -1250,6 +1262,82 @@ export default function AdminDashboard() {
                       </div>
                     )}
                   </>
+                )}
+              </div>
+            </div>
+
+            {/* Time Spent Per User */}
+            <div
+              className="mt-6 p-6"
+              style={{
+                backgroundColor: 'white',
+                border: '3px solid black',
+                borderRadius: '8px',
+                boxShadow: '6px 6px 0 black',
+              }}
+            >
+              <h2 className="text-lg font-bold mb-4 flex items-center gap-2">
+                <span>⏱️</span> Time Spent in App
+              </h2>
+
+              {/* Summary Stats */}
+              <div className="grid grid-cols-2 gap-3 mb-4">
+                <div
+                  className="p-3 text-center"
+                  style={{ backgroundColor: '#87CEEB', border: '2px solid black', borderRadius: '8px' }}
+                >
+                  <div className="text-2xl font-bold">
+                    {data.stats.totalTimeMinutes >= 60
+                      ? `${Math.floor(data.stats.totalTimeMinutes / 60)}h ${data.stats.totalTimeMinutes % 60}m`
+                      : `${data.stats.totalTimeMinutes}m`
+                    }
+                  </div>
+                  <div className="text-xs font-bold">Total Time (all users)</div>
+                </div>
+                <div
+                  className="p-3 text-center"
+                  style={{ backgroundColor: '#90EE90', border: '2px solid black', borderRadius: '8px' }}
+                >
+                  <div className="text-2xl font-bold">{data.stats.avgSessionMinutes}m</div>
+                  <div className="text-xs font-bold">Avg Session Length</div>
+                </div>
+              </div>
+
+              {/* Per-User Breakdown */}
+              <div className="text-sm font-bold mb-2">Time per User</div>
+              <div className="space-y-2 max-h-64 overflow-y-auto">
+                {!data.timeSpentPerUser || data.timeSpentPerUser.length === 0 ? (
+                  <p className="text-gray-500 text-center py-4">no session data yet!</p>
+                ) : (
+                  data.timeSpentPerUser.filter(u => u.total_minutes > 0).map((user) => {
+                    const maxMinutes = Math.max(...data.timeSpentPerUser.map(u => u.total_minutes), 1)
+                    const percentage = Math.round((user.total_minutes / maxMinutes) * 100)
+                    return (
+                      <div key={user.user_id} className="flex items-center gap-3">
+                        <div className="w-24 truncate font-bold text-sm">{user.user_name}</div>
+                        <div className="flex-1">
+                          <div
+                            className="h-4 rounded-full"
+                            style={{ backgroundColor: '#f0f0f0', border: '1px solid black' }}
+                          >
+                            <div
+                              className="h-full rounded-full"
+                              style={{ width: `${percentage}%`, backgroundColor: '#87CEEB' }}
+                            />
+                          </div>
+                        </div>
+                        <div className="w-20 text-right text-sm">
+                          {user.total_minutes >= 60
+                            ? `${Math.floor(user.total_minutes / 60)}h ${user.total_minutes % 60}m`
+                            : `${user.total_minutes}m`
+                          }
+                        </div>
+                        <div className="w-16 text-right text-xs text-gray-500">
+                          {user.session_count} sessions
+                        </div>
+                      </div>
+                    )
+                  })
                 )}
               </div>
             </div>

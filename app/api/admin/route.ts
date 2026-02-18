@@ -196,6 +196,39 @@ export async function GET(request: NextRequest) {
       ORDER BY date DESC
     `).all()
 
+    // Get time spent per user (from chat sessions)
+    const timeSpentPerUser = await db.prepare(`
+      SELECT
+        u.id as user_id,
+        u.name as user_name,
+        u.age,
+        COALESCE(SUM(
+          EXTRACT(EPOCH FROM (COALESCE(cs.ended_at, cs.started_at + INTERVAL '5 minutes') - cs.started_at)) / 60
+        ), 0)::integer as total_minutes,
+        COUNT(cs.id) as session_count,
+        COALESCE(AVG(
+          EXTRACT(EPOCH FROM (COALESCE(cs.ended_at, cs.started_at + INTERVAL '5 minutes') - cs.started_at)) / 60
+        ), 0)::integer as avg_session_minutes
+      FROM users u
+      LEFT JOIN chat_sessions cs ON u.id = cs.user_id
+      GROUP BY u.id, u.name, u.age
+      ORDER BY total_minutes DESC
+      LIMIT 50
+    `).all()
+
+    // Get total time spent in app (all users)
+    const totalTimeStats = await db.prepare(`
+      SELECT
+        COALESCE(SUM(
+          EXTRACT(EPOCH FROM (COALESCE(ended_at, started_at + INTERVAL '5 minutes') - started_at)) / 60
+        ), 0)::integer as total_minutes,
+        COUNT(*) as total_sessions,
+        COALESCE(AVG(
+          EXTRACT(EPOCH FROM (COALESCE(ended_at, started_at + INTERVAL '5 minutes') - started_at)) / 60
+        ), 0)::integer as avg_session_minutes
+      FROM chat_sessions
+    `).get() as { total_minutes: number; total_sessions: number; avg_session_minutes: number } | undefined
+
     // Get custom personas created by users
     const customPersonas = await db.prepare(`
       SELECT
@@ -279,6 +312,8 @@ export async function GET(request: NextRequest) {
         unreviewedFlags: unreviewedFlags?.count || 0,
         parentReportsSent: parentReportStats?.sent_reports || 0,
         parentReportsTotal: parentReportStats?.total_reports || 0,
+        totalTimeMinutes: totalTimeStats?.total_minutes || 0,
+        avgSessionMinutes: totalTimeStats?.avg_session_minutes || 0,
       },
       users,
       recentActivity,
@@ -291,6 +326,7 @@ export async function GET(request: NextRequest) {
       parentReportStats,
       parentReportsPerDay,
       customPersonas,
+      timeSpentPerUser,
       chatMessages,
       dailyCheckins,
       flaggedMessages,
