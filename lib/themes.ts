@@ -11,6 +11,10 @@ export interface Theme {
     backgroundAlt: string
     backgroundAccent: string
 
+    // Text colors
+    text: string
+    textMuted: string
+
     // Primary palette (array of colors for components)
     primary: string[]
 
@@ -55,6 +59,9 @@ export const themes: Record<string, Theme> = {
       backgroundAlt: '#7FDBFF',
       backgroundAccent: '#98FB98',
 
+      text: '#000000',
+      textMuted: '#555555',
+
       primary: ['#FF69B4', '#90EE90', '#87CEEB', '#FFD700', '#DDA0DD', '#FFA500', '#98FB98', '#FF6B6B'],
 
       navHome: '#FFB6C1',
@@ -91,6 +98,9 @@ export const themes: Record<string, Theme> = {
       background: '#B4E7FF',
       backgroundAlt: '#7FDBFF',
       backgroundAccent: '#48D1CC',
+
+      text: '#000000',
+      textMuted: '#555555',
 
       primary: ['#00CED1', '#48D1CC', '#20B2AA', '#5F9EA0', '#87CEEB', '#B0E0E6', '#7FDBFF', '#40E0D0'],
 
@@ -129,6 +139,9 @@ export const themes: Record<string, Theme> = {
       backgroundAlt: '#FFDAB9',
       backgroundAccent: '#FFD700',
 
+      text: '#000000',
+      textMuted: '#555555',
+
       primary: ['#FF8C00', '#FFA500', '#FFD700', '#FF7F50', '#FF6347', '#FFDAB9', '#F4A460', '#FFB347'],
 
       navHome: '#FFD700',
@@ -165,6 +178,9 @@ export const themes: Record<string, Theme> = {
       background: '#E6E6FA',
       backgroundAlt: '#DDA0DD',
       backgroundAccent: '#9370DB',
+
+      text: '#000000',
+      textMuted: '#555555',
 
       primary: ['#9370DB', '#8A2BE2', '#9932CC', '#BA55D3', '#DA70D6', '#EE82EE', '#DDA0DD', '#E6E6FA'],
 
@@ -203,6 +219,9 @@ export const themes: Record<string, Theme> = {
       backgroundAlt: '#90EE90',
       backgroundAccent: '#3CB371',
 
+      text: '#000000',
+      textMuted: '#555555',
+
       primary: ['#2E8B57', '#3CB371', '#90EE90', '#98FB98', '#8FBC8F', '#66CDAA', '#20B2AA', '#00FA9A'],
 
       navHome: '#90EE90',
@@ -239,6 +258,9 @@ export const themes: Record<string, Theme> = {
       background: '#FFB6C1',
       backgroundAlt: '#E6E6FA',
       backgroundAccent: '#DDA0DD',
+
+      text: '#000000',
+      textMuted: '#555555',
 
       primary: ['#FF69B4', '#DA70D6', '#FF1493', '#FF6EB4', '#FFB6C1', '#DDA0DD', '#EE82EE', '#FF77FF'],
 
@@ -277,6 +299,9 @@ export const themes: Record<string, Theme> = {
       backgroundAlt: '#F5F5F5',
       backgroundAccent: '#E0E0E0',
 
+      text: '#000000',
+      textMuted: '#555555',
+
       primary: ['#000000', '#333333', '#666666', '#999999', '#CCCCCC', '#E0E0E0', '#F5F5F5', '#FFFFFF'],
 
       navHome: '#F5F5F5',
@@ -313,6 +338,9 @@ export const themes: Record<string, Theme> = {
       background: '#1A1A2E',
       backgroundAlt: '#16213E',
       backgroundAccent: '#0F3460',
+
+      text: '#FFFFFF',
+      textMuted: '#BBBBBB',
 
       primary: ['#E94560', '#7B68EE', '#00D9FF', '#50FA7B', '#FFB86C', '#FF79C6', '#BD93F9', '#F1FA8C'],
 

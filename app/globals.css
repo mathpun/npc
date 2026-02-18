@@ -7,6 +7,8 @@
   --theme-background: #FFB6C1;
   --theme-background-alt: #7FDBFF;
   --theme-background-accent: #98FB98;
+  --theme-text: #000000;
+  --theme-text-muted: #555555;
   --theme-glow: rgba(255, 105, 180, 0.3);
   --theme-accent1: #FF69B4;
   --theme-accent2: #FFD700;
@@ -30,22 +32,69 @@ body {
   transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-/* Dark theme text color */
+/* Dark theme styles */
 body.dark-theme {
   color: #FFFFFF;
+}
+
+body.dark-theme h1,
+body.dark-theme h2,
+body.dark-theme h3,
+body.dark-theme h4,
+body.dark-theme h5,
+body.dark-theme h6,
+body.dark-theme p,
+body.dark-theme span,
+body.dark-theme label,
+body.dark-theme div {
+  color: inherit;
 }
 
 body.dark-theme input,
 body.dark-theme textarea,
 body.dark-theme select {
-  background-color: #2D2D2D;
+  background-color: #2D2D44;
   color: #FFFFFF;
-  border-color: #404040;
+  border-color: #404060;
 }
 
 body.dark-theme input::placeholder,
 body.dark-theme textarea::placeholder {
   color: #999999;
+}
+
+/* Dark theme overrides for common UI elements */
+body.dark-theme .text-black {
+  color: #FFFFFF !important;
+}
+
+body.dark-theme .text-gray-500,
+body.dark-theme .text-gray-600,
+body.dark-theme .text-gray-700 {
+  color: #BBBBBB !important;
+}
+
+body.dark-theme .text-gray-400 {
+  color: #999999 !important;
+}
+
+/* Dark theme cards and boxes - ensure readable text */
+body.dark-theme [style*="background-color: white"],
+body.dark-theme [style*="backgroundColor: white"],
+body.dark-theme [style*="background-color: #fff"],
+body.dark-theme [style*="backgroundColor: #fff"] {
+  background-color: #2D2D44 !important;
+  color: #FFFFFF !important;
+}
+
+/* Dark theme borders */
+body.dark-theme [style*="border"][style*="black"] {
+  border-color: #555577 !important;
+}
+
+/* Dark theme specific component overrides */
+body.dark-theme .font-bold {
+  color: inherit;
 }
 
 /* Custom scrollbar */

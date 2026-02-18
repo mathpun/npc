@@ -37,6 +37,8 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     root.style.setProperty('--theme-background', theme.colors.background)
     root.style.setProperty('--theme-background-alt', theme.colors.backgroundAlt)
     root.style.setProperty('--theme-background-accent', theme.colors.backgroundAccent)
+    root.style.setProperty('--theme-text', theme.colors.text)
+    root.style.setProperty('--theme-text-muted', theme.colors.textMuted)
     root.style.setProperty('--theme-glow', theme.colors.glow)
     root.style.setProperty('--theme-accent1', theme.colors.accent1)
     root.style.setProperty('--theme-accent2', theme.colors.accent2)
@@ -47,8 +49,9 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     root.style.setProperty('--theme-button-secondary', theme.colors.buttonSecondary)
     root.style.setProperty('--theme-button-success', theme.colors.buttonSuccess)
 
-    // Update body background
+    // Update body background and text color
     document.body.style.backgroundColor = theme.colors.background
+    document.body.style.color = theme.colors.text
 
     // Handle dark theme class for text colors
     if (themeId === 'dark') {
