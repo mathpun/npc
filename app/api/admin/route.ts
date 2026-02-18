@@ -22,11 +22,11 @@ export async function GET(request: NextRequest) {
     // Get overall stats
     const totalUsers = await db.prepare('SELECT COUNT(*) as count FROM users').get() as { count: number } | undefined
 
-    // DAU - Daily Active Users
+    // DAU - Daily Active Users (using Pacific timezone)
     const activeToday = await db.prepare(`
       SELECT COUNT(DISTINCT user_id) as count
       FROM activity_log
-      WHERE created_at::date = CURRENT_DATE
+      WHERE (created_at AT TIME ZONE 'UTC' AT TIME ZONE 'America/Los_Angeles')::date = (CURRENT_TIMESTAMP AT TIME ZONE 'America/Los_Angeles')::date
     `).get() as { count: number } | undefined
 
     // WAU - Weekly Active Users
@@ -57,10 +57,10 @@ export async function GET(request: NextRequest) {
       WHERE created_at >= CURRENT_DATE - INTERVAL '7 days'
     `).get() as { count: number } | undefined
 
-    // New users today
+    // New users today (using Pacific timezone)
     const newUsersToday = await db.prepare(`
       SELECT COUNT(*) as count FROM users
-      WHERE created_at::date = CURRENT_DATE
+      WHERE (created_at AT TIME ZONE 'UTC' AT TIME ZONE 'America/Los_Angeles')::date = (CURRENT_TIMESTAMP AT TIME ZONE 'America/Los_Angeles')::date
     `).get() as { count: number } | undefined
 
     // Total check-ins
