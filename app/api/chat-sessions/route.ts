@@ -17,6 +17,7 @@ export async function GET(request: NextRequest) {
   const userId = searchParams.get('userId')
   const sessionId = searchParams.get('sessionId')
   const category = searchParams.get('category')
+  const bucketId = searchParams.get('bucketId')
 
   if (!userId) {
     return NextResponse.json({ error: 'User ID required' }, { status: 400 })
@@ -26,7 +27,10 @@ export async function GET(request: NextRequest) {
     // If sessionId provided, get that specific session with messages
     if (sessionId) {
       const session = await db.prepare(`
-        SELECT * FROM chat_sessions WHERE id = ? AND user_id = ?
+        SELECT cs.*, cb.name as bucket_name, cb.emoji as bucket_emoji
+        FROM chat_sessions cs
+        LEFT JOIN chat_buckets cb ON cs.bucket_id = cb.id
+        WHERE cs.id = ? AND cs.user_id = ?
       `).get(parseInt(sessionId), userId)
 
       if (!session) {
@@ -43,12 +47,15 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ session, messages })
     }
 
-    // Otherwise, get all sessions (optionally filtered by category)
+    // Otherwise, get all sessions (optionally filtered by category or bucket)
     let query = `
       SELECT
         cs.*,
+        cb.name as bucket_name,
+        cb.emoji as bucket_emoji,
         (SELECT content FROM chat_messages WHERE session_id = cs.id ORDER BY created_at ASC LIMIT 1) as first_message
       FROM chat_sessions cs
+      LEFT JOIN chat_buckets cb ON cs.bucket_id = cb.id
       WHERE cs.user_id = ?
     `
     const params: (string | number)[] = [userId]
@@ -56,6 +63,15 @@ export async function GET(request: NextRequest) {
     if (category && category !== 'all') {
       query += ` AND cs.category = ?`
       params.push(category)
+    }
+
+    if (bucketId) {
+      if (bucketId === 'none') {
+        query += ` AND cs.bucket_id IS NULL`
+      } else {
+        query += ` AND cs.bucket_id = ?`
+        params.push(parseInt(bucketId))
+      }
     }
 
     query += ` ORDER BY cs.started_at DESC LIMIT 50`
@@ -73,7 +89,7 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
-    const { userId, title, category, sessionGoal, sessionTopic, persona } = body
+    const { userId, title, category, sessionGoal, sessionTopic, persona, bucketId } = body
 
     if (!userId) {
       return NextResponse.json({ error: 'User ID required' }, { status: 400 })
@@ -81,9 +97,9 @@ export async function POST(request: NextRequest) {
 
     // Create the session
     const result = await db.prepare(`
-      INSERT INTO chat_sessions (user_id, title, category, session_goal, session_topic, persona)
-      VALUES (?, ?, ?, ?, ?, ?)
-    `).run(userId, title || null, category || 'general', sessionGoal || null, sessionTopic || null, persona || null)
+      INSERT INTO chat_sessions (user_id, title, category, session_goal, session_topic, persona, bucket_id)
+      VALUES (?, ?, ?, ?, ?, ?, ?)
+    `).run(userId, title || null, category || 'general', sessionGoal || null, sessionTopic || null, persona || null, bucketId || null)
 
     // Get the created session (PostgreSQL doesn't return lastInsertRowid the same way)
     const session = await db.prepare(`
@@ -100,22 +116,44 @@ export async function POST(request: NextRequest) {
   }
 }
 
-// PUT - update a chat session (title, category)
+// PUT - update a chat session (title, category, bucketId)
 export async function PUT(request: NextRequest) {
   try {
     const body = await request.json()
-    const { sessionId, userId, title, category } = body
+    const { sessionId, userId, title, category, bucketId } = body
 
     if (!sessionId || !userId) {
       return NextResponse.json({ error: 'Session ID and User ID required' }, { status: 400 })
     }
 
+    // Build dynamic update query
+    const updates: string[] = []
+    const values: unknown[] = []
+
+    if (title !== undefined) {
+      updates.push('title = ?')
+      values.push(title)
+    }
+    if (category !== undefined) {
+      updates.push('category = ?')
+      values.push(category)
+    }
+    if (bucketId !== undefined) {
+      updates.push('bucket_id = ?')
+      values.push(bucketId === null || bucketId === 'none' ? null : bucketId)
+    }
+
+    if (updates.length === 0) {
+      return NextResponse.json({ error: 'No updates provided' }, { status: 400 })
+    }
+
+    values.push(sessionId, userId)
+
     await db.prepare(`
       UPDATE chat_sessions
-      SET title = COALESCE(?, title),
-          category = COALESCE(?, category)
+      SET ${updates.join(', ')}
       WHERE id = ? AND user_id = ?
-    `).run(title, category, sessionId, userId)
+    `).run(...values)
 
     return NextResponse.json({ success: true })
   } catch (error) {

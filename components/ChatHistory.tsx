@@ -10,6 +10,9 @@ interface ChatSession {
   session_goal: string | null
   session_topic: string | null
   persona: string | null
+  bucket_id: number | null
+  bucket_name: string | null
+  bucket_emoji: string | null
   message_count: number
   started_at: string
   first_message: string | null
@@ -20,6 +23,15 @@ interface Category {
   label: string
   emoji: string
   color: string
+}
+
+interface Bucket {
+  id: number
+  name: string
+  emoji: string
+  color: string
+  description: string | null
+  session_count: number
 }
 
 interface ChatHistoryProps {
@@ -39,18 +51,40 @@ export default function ChatHistory({
 }: ChatHistoryProps) {
   const [sessions, setSessions] = useState<ChatSession[]>([])
   const [categories, setCategories] = useState<Category[]>([])
+  const [buckets, setBuckets] = useState<Bucket[]>([])
   const [selectedCategory, setSelectedCategory] = useState<string>('all')
+  const [selectedBucket, setSelectedBucket] = useState<string>('all')
   const [loading, setLoading] = useState(true)
   const [editingSession, setEditingSession] = useState<number | null>(null)
   const [editTitle, setEditTitle] = useState('')
   const [editCategory, setEditCategory] = useState('')
+  const [editBucketId, setEditBucketId] = useState<number | null>(null)
+  const [showNewBucket, setShowNewBucket] = useState(false)
+  const [newBucketName, setNewBucketName] = useState('')
+  const [newBucketEmoji, setNewBucketEmoji] = useState('📁')
   const { theme } = useTheme()
 
   useEffect(() => {
     if (isOpen) {
       fetchSessions()
+      fetchBuckets()
     }
-  }, [isOpen, selectedCategory])
+  }, [isOpen, selectedCategory, selectedBucket])
+
+  const fetchBuckets = async () => {
+    const userId = localStorage.getItem('npc_user_id')
+    if (!userId) return
+
+    try {
+      const res = await fetch(`/api/chat-buckets?userId=${userId}`)
+      const data = await res.json()
+      if (res.ok) {
+        setBuckets(data.buckets || [])
+      }
+    } catch (err) {
+      console.error('Failed to fetch buckets:', err)
+    }
+  }
 
   const fetchSessions = async () => {
     const userId = localStorage.getItem('npc_user_id')
@@ -58,9 +92,15 @@ export default function ChatHistory({
 
     setLoading(true)
     try {
-      const url = selectedCategory === 'all'
-        ? `/api/chat-sessions?userId=${userId}`
-        : `/api/chat-sessions?userId=${userId}&category=${selectedCategory}`
+      let url = `/api/chat-sessions?userId=${userId}`
+
+      if (selectedCategory !== 'all') {
+        url += `&category=${selectedCategory}`
+      }
+
+      if (selectedBucket !== 'all') {
+        url += `&bucketId=${selectedBucket}`
+      }
 
       const res = await fetch(url)
       const data = await res.json()
@@ -82,6 +122,7 @@ export default function ChatHistory({
     setEditingSession(session.id)
     setEditTitle(session.title || '')
     setEditCategory(session.category || 'general')
+    setEditBucketId(session.bucket_id)
   }
 
   const handleSaveEdit = async () => {
@@ -99,13 +140,60 @@ export default function ChatHistory({
           userId,
           title: editTitle || null,
           category: editCategory,
+          bucketId: editBucketId,
         }),
       })
 
       setEditingSession(null)
       fetchSessions()
+      fetchBuckets()
     } catch (err) {
       console.error('Failed to update session:', err)
+    }
+  }
+
+  const handleCreateBucket = async () => {
+    if (!newBucketName.trim()) return
+
+    const userId = localStorage.getItem('npc_user_id')
+    if (!userId) return
+
+    try {
+      const res = await fetch('/api/chat-buckets', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          userId,
+          name: newBucketName.trim(),
+          emoji: newBucketEmoji,
+        }),
+      })
+
+      if (res.ok) {
+        setNewBucketName('')
+        setNewBucketEmoji('📁')
+        setShowNewBucket(false)
+        fetchBuckets()
+      }
+    } catch (err) {
+      console.error('Failed to create bucket:', err)
+    }
+  }
+
+  const handleDeleteBucket = async (bucketId: number) => {
+    if (!confirm('Delete this project? Chats will be moved to "No Project".')) return
+
+    const userId = localStorage.getItem('npc_user_id')
+    if (!userId) return
+
+    try {
+      await fetch(`/api/chat-buckets?bucketId=${bucketId}&userId=${userId}`, {
+        method: 'DELETE',
+      })
+      fetchBuckets()
+      fetchSessions()
+    } catch (err) {
+      console.error('Failed to delete bucket:', err)
     }
   }
 
@@ -207,6 +295,7 @@ export default function ChatHistory({
 
         {/* Category Filter */}
         <div className="px-4 py-3 border-b-2 border-dashed border-gray-300">
+          <div className="text-xs font-bold text-gray-500 mb-2">Categories</div>
           <div className="flex flex-wrap gap-2">
             <button
               onClick={() => setSelectedCategory('all')}
@@ -234,6 +323,143 @@ export default function ChatHistory({
               >
                 {cat.emoji} {cat.label}
               </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Projects/Buckets Filter */}
+        <div className="px-4 py-3 border-b-2 border-dashed border-gray-300">
+          <div className="flex items-center justify-between mb-2">
+            <div className="text-xs font-bold text-gray-500">Projects</div>
+            <button
+              onClick={() => setShowNewBucket(!showNewBucket)}
+              className="text-xs font-bold px-2 py-0.5 hover:scale-105 transition-transform"
+              style={{
+                backgroundColor: theme.colors.buttonSuccess,
+                border: '2px solid black',
+                borderRadius: '6px',
+              }}
+            >
+              + new
+            </button>
+          </div>
+
+          {/* New Bucket Form */}
+          {showNewBucket && (
+            <div
+              className="mb-3 p-2 space-y-2"
+              style={{
+                backgroundColor: '#FFFACD',
+                border: '2px solid black',
+                borderRadius: '8px',
+              }}
+            >
+              <div className="flex gap-2">
+                <select
+                  value={newBucketEmoji}
+                  onChange={(e) => setNewBucketEmoji(e.target.value)}
+                  className="w-12 text-center"
+                  style={{
+                    backgroundColor: 'white',
+                    border: '2px solid black',
+                    borderRadius: '6px',
+                  }}
+                >
+                  {['📁', '🚀', '💡', '📚', '🎯', '🎨', '💼', '🔬', '🎮', '✨'].map((e) => (
+                    <option key={e} value={e}>{e}</option>
+                  ))}
+                </select>
+                <input
+                  type="text"
+                  value={newBucketName}
+                  onChange={(e) => setNewBucketName(e.target.value)}
+                  placeholder="Project name..."
+                  className="flex-1 px-2 py-1 text-sm"
+                  style={{
+                    backgroundColor: 'white',
+                    border: '2px solid black',
+                    borderRadius: '6px',
+                  }}
+                />
+              </div>
+              <div className="flex gap-2">
+                <button
+                  onClick={handleCreateBucket}
+                  className="flex-1 py-1 text-sm font-bold"
+                  style={{
+                    backgroundColor: theme.colors.buttonSuccess,
+                    border: '2px solid black',
+                    borderRadius: '6px',
+                  }}
+                >
+                  create
+                </button>
+                <button
+                  onClick={() => setShowNewBucket(false)}
+                  className="flex-1 py-1 text-sm font-bold"
+                  style={{
+                    backgroundColor: 'white',
+                    border: '2px solid black',
+                    borderRadius: '6px',
+                  }}
+                >
+                  cancel
+                </button>
+              </div>
+            </div>
+          )}
+
+          <div className="flex flex-wrap gap-2">
+            <button
+              onClick={() => setSelectedBucket('all')}
+              className="px-3 py-1 text-sm font-bold transition-transform hover:scale-105"
+              style={{
+                backgroundColor: selectedBucket === 'all' ? theme.colors.accent2 : 'white',
+                border: '2px solid black',
+                borderRadius: '9999px',
+                boxShadow: selectedBucket === 'all' ? '2px 2px 0 black' : 'none',
+              }}
+            >
+              all
+            </button>
+            <button
+              onClick={() => setSelectedBucket('none')}
+              className="px-3 py-1 text-sm font-bold transition-transform hover:scale-105"
+              style={{
+                backgroundColor: selectedBucket === 'none' ? '#E0E0E0' : 'white',
+                border: '2px solid black',
+                borderRadius: '9999px',
+                boxShadow: selectedBucket === 'none' ? '2px 2px 0 black' : 'none',
+              }}
+            >
+              no project
+            </button>
+            {buckets.map((bucket) => (
+              <div key={bucket.id} className="relative group/bucket">
+                <button
+                  onClick={() => setSelectedBucket(String(bucket.id))}
+                  className="px-3 py-1 text-sm font-bold transition-transform hover:scale-105"
+                  style={{
+                    backgroundColor: selectedBucket === String(bucket.id) ? bucket.color : 'white',
+                    border: '2px solid black',
+                    borderRadius: '9999px',
+                    boxShadow: selectedBucket === String(bucket.id) ? '2px 2px 0 black' : 'none',
+                  }}
+                >
+                  {bucket.emoji} {bucket.name} ({bucket.session_count})
+                </button>
+                <button
+                  onClick={() => handleDeleteBucket(bucket.id)}
+                  className="absolute -top-1 -right-1 w-4 h-4 text-xs opacity-0 group-hover/bucket:opacity-100 transition-opacity"
+                  style={{
+                    backgroundColor: '#FFB6C1',
+                    border: '1px solid black',
+                    borderRadius: '50%',
+                  }}
+                >
+                  ×
+                </button>
+              </div>
             ))}
           </div>
         </div>
@@ -300,6 +526,23 @@ export default function ChatHistory({
                           </option>
                         ))}
                       </select>
+                      <select
+                        value={editBucketId ?? 'none'}
+                        onChange={(e) => setEditBucketId(e.target.value === 'none' ? null : parseInt(e.target.value))}
+                        className="w-full px-2 py-1 text-sm"
+                        style={{
+                          backgroundColor: 'white',
+                          border: '2px solid black',
+                          borderRadius: '6px',
+                        }}
+                      >
+                        <option value="none">📂 No Project</option>
+                        {buckets.map((bucket) => (
+                          <option key={bucket.id} value={bucket.id}>
+                            {bucket.emoji} {bucket.name}
+                          </option>
+                        ))}
+                      </select>
                       <div className="flex gap-2">
                         <button
                           onClick={handleSaveEdit}
@@ -345,9 +588,22 @@ export default function ChatHistory({
                           <p className="font-bold text-sm truncate">
                             {getSessionTitle(session)}
                           </p>
-                          <p className="text-xs text-gray-500 mt-1">
-                            {formatDate(session.started_at)} · {session.message_count} messages
-                          </p>
+                          <div className="flex items-center gap-2 mt-1">
+                            <p className="text-xs text-gray-500">
+                              {formatDate(session.started_at)} · {session.message_count} msgs
+                            </p>
+                            {session.bucket_name && (
+                              <span
+                                className="text-xs px-1.5 py-0.5 rounded"
+                                style={{
+                                  backgroundColor: '#E8F5E9',
+                                  border: '1px solid #81C784',
+                                }}
+                              >
+                                {session.bucket_emoji} {session.bucket_name}
+                              </span>
+                            )}
+                          </div>
                         </div>
                       </div>
 

@@ -97,6 +97,18 @@ async function initDb() {
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       );
 
+      -- Chat buckets (user-created folders/projects for organizing chats)
+      CREATE TABLE IF NOT EXISTS chat_buckets (
+        id SERIAL PRIMARY KEY,
+        user_id TEXT NOT NULL REFERENCES users(id),
+        name TEXT NOT NULL,
+        emoji TEXT DEFAULT '📁',
+        color TEXT DEFAULT '#87CEEB',
+        description TEXT,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        UNIQUE(user_id, name)
+      );
+
       -- Chat sessions
       CREATE TABLE IF NOT EXISTS chat_sessions (
         id SERIAL PRIMARY KEY,
@@ -106,6 +118,7 @@ async function initDb() {
         session_goal TEXT,
         session_topic TEXT,
         persona TEXT,
+        bucket_id INTEGER REFERENCES chat_buckets(id) ON DELETE SET NULL,
         message_count INTEGER DEFAULT 0,
         started_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         ended_at TIMESTAMP
@@ -125,6 +138,10 @@ async function initDb() {
         IF NOT EXISTS (SELECT 1 FROM information_schema.columns
                        WHERE table_name = 'chat_sessions' AND column_name = 'persona') THEN
           ALTER TABLE chat_sessions ADD COLUMN persona TEXT;
+        END IF;
+        IF NOT EXISTS (SELECT 1 FROM information_schema.columns
+                       WHERE table_name = 'chat_sessions' AND column_name = 'bucket_id') THEN
+          ALTER TABLE chat_sessions ADD COLUMN bucket_id INTEGER REFERENCES chat_buckets(id) ON DELETE SET NULL;
         END IF;
       END $$;
 
