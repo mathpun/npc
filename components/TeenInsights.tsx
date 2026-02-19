@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useTheme } from '@/lib/ThemeContext'
 
 interface UserProfile {
   name: string
@@ -13,8 +14,11 @@ interface TeenInsightsProps {
   profile: UserProfile
 }
 
-// Mock data for demo - in production this would be derived from actual usage
-function generateInsights(profile: UserProfile) {
+export default function TeenInsights({ profile }: TeenInsightsProps) {
+  const [expandedSection, setExpandedSection] = useState<string | null>('digest')
+  const { theme } = useTheme()
+
+  // Generate insights using theme colors
   const themes = [
     { name: 'Self-Discovery', count: 12, trend: 'up', emoji: '🔍' },
     { name: 'School & Learning', count: 8, trend: 'stable', emoji: '📚' },
@@ -47,30 +51,23 @@ function generateInsights(profile: UserProfile) {
   }
 
   const growthAreas = [
-    { area: 'Decision Making', progress: 75, color: '#FF69B4', emoji: '🎯' },
-    { area: 'Self-Awareness', progress: 82, color: '#90EE90', emoji: '🪞' },
-    { area: 'Critical Thinking', progress: 68, color: '#87CEEB', emoji: '🧠' },
+    { area: 'Decision Making', progress: 75, color: theme.colors.accent1, emoji: '🎯' },
+    { area: 'Self-Awareness', progress: 82, color: theme.colors.accent3, emoji: '🪞' },
+    { area: 'Critical Thinking', progress: 68, color: theme.colors.accent4, emoji: '🧠' },
   ]
-
-  return { themes, thinkingPatterns, weeklyDigest, growthAreas }
-}
-
-export default function TeenInsights({ profile }: TeenInsightsProps) {
-  const [expandedSection, setExpandedSection] = useState<string | null>('digest')
-  const insights = generateInsights(profile)
 
   const toggleSection = (section: string) => {
     setExpandedSection(expandedSection === section ? null : section)
   }
 
   return (
-    <div className="max-w-3xl mx-auto px-4 py-6 space-y-6 text-black" style={{  }}>
+    <div className="max-w-3xl mx-auto px-4 py-6 space-y-6">
       {/* Header */}
       <div className="text-center mb-8">
         <h1
           className="text-3xl font-bold mb-3 inline-block px-6 py-2 -rotate-1"
           style={{
-            backgroundColor: '#FFD700',
+            backgroundColor: theme.colors.accent2,
             border: '4px solid black',
             borderRadius: '12px',
             boxShadow: '5px 5px 0 black',
@@ -85,7 +82,7 @@ export default function TeenInsights({ profile }: TeenInsightsProps) {
       <div
         className="p-5 rotate-1"
         style={{
-          backgroundColor: '#DDA0DD',
+          backgroundColor: theme.colors.accent5,
           border: '4px solid black',
           borderRadius: '16px',
           boxShadow: '6px 6px 0 black',
@@ -96,9 +93,9 @@ export default function TeenInsights({ profile }: TeenInsightsProps) {
         </h2>
         <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
           {[
-            { label: 'Sessions', value: insights.weeklyDigest.sessionsCount, color: '#FF69B4', emoji: '💬' },
-            { label: 'Questions', value: insights.weeklyDigest.questionsAsked, color: '#87CEEB', emoji: '❓' },
-            { label: 'Topics', value: insights.weeklyDigest.topTopics.length, color: '#90EE90', emoji: '💡' },
+            { label: 'Sessions', value: weeklyDigest.sessionsCount, color: theme.colors.accent1, emoji: '💬' },
+            { label: 'Questions', value: weeklyDigest.questionsAsked, color: theme.colors.accent4, emoji: '❓' },
+            { label: 'Topics', value: weeklyDigest.topTopics.length, color: theme.colors.accent3, emoji: '💡' },
           ].map((stat, i) => (
             <div
               key={stat.label}
@@ -122,19 +119,19 @@ export default function TeenInsights({ profile }: TeenInsightsProps) {
         <div
           className="mt-4 p-3"
           style={{
-            backgroundColor: 'white',
+            backgroundColor: theme.colors.backgroundAlt,
             border: '3px solid black',
             borderRadius: '12px',
           }}
         >
           <h3 className="font-bold mb-2">🔥 Hot Topics This Week</h3>
           <div className="flex flex-wrap gap-2">
-            {insights.weeklyDigest.topTopics.map((topic, i) => (
+            {weeklyDigest.topTopics.map((topic, i) => (
               <span
                 key={topic}
                 className="px-3 py-1 font-bold"
                 style={{
-                  backgroundColor: ['#FF69B4', '#90EE90', '#87CEEB'][i],
+                  backgroundColor: [theme.colors.accent1, theme.colors.accent3, theme.colors.accent4][i],
                   border: '2px solid black',
                   borderRadius: '9999px',
                 }}
@@ -150,7 +147,7 @@ export default function TeenInsights({ profile }: TeenInsightsProps) {
       <div
         className="p-5 -rotate-1"
         style={{
-          backgroundColor: '#98FB98',
+          backgroundColor: theme.colors.accent3,
           border: '4px solid black',
           borderRadius: '16px',
           boxShadow: '6px 6px 0 black',
@@ -160,12 +157,12 @@ export default function TeenInsights({ profile }: TeenInsightsProps) {
           🧠 Your Thinking Patterns
         </h2>
         <div className="space-y-3">
-          {insights.thinkingPatterns.map((pattern, index) => (
+          {thinkingPatterns.map((pattern, index) => (
             <div
               key={index}
               className="p-3 flex items-start gap-3"
               style={{
-                backgroundColor: 'white',
+                backgroundColor: theme.colors.backgroundAlt,
                 border: '3px solid black',
                 borderRadius: '12px',
                 boxShadow: '3px 3px 0 black',
@@ -186,7 +183,7 @@ export default function TeenInsights({ profile }: TeenInsightsProps) {
       <div
         className="p-5 rotate-1"
         style={{
-          backgroundColor: '#87CEEB',
+          backgroundColor: theme.colors.accent4,
           border: '4px solid black',
           borderRadius: '16px',
           boxShadow: '6px 6px 0 black',
@@ -196,12 +193,12 @@ export default function TeenInsights({ profile }: TeenInsightsProps) {
           📈 Growth Areas
         </h2>
         <div className="space-y-4">
-          {insights.growthAreas.map((area, index) => (
+          {growthAreas.map((area, index) => (
             <div
               key={index}
               className="p-3"
               style={{
-                backgroundColor: 'white',
+                backgroundColor: theme.colors.backgroundAlt,
                 border: '3px solid black',
                 borderRadius: '12px',
                 boxShadow: '3px 3px 0 black',
@@ -244,7 +241,7 @@ export default function TeenInsights({ profile }: TeenInsightsProps) {
       <div
         className="p-5 -rotate-1"
         style={{
-          backgroundColor: '#FFB6C1',
+          backgroundColor: theme.colors.accent1,
           border: '4px solid black',
           borderRadius: '16px',
           boxShadow: '6px 6px 0 black',
@@ -254,22 +251,22 @@ export default function TeenInsights({ profile }: TeenInsightsProps) {
           🗺️ Topics You Explore
         </h2>
         <div className="grid grid-cols-2 gap-3">
-          {insights.themes.map((theme, index) => (
+          {themes.map((themeItem, index) => (
             <div
               key={index}
               className="p-3 flex items-center gap-3"
               style={{
-                backgroundColor: 'white',
+                backgroundColor: theme.colors.backgroundAlt,
                 border: '3px solid black',
                 borderRadius: '12px',
                 boxShadow: '3px 3px 0 black',
                 transform: `rotate(${index % 2 === 0 ? 1 : -1}deg)`,
               }}
             >
-              <span className="text-2xl">{theme.emoji}</span>
+              <span className="text-2xl">{themeItem.emoji}</span>
               <div>
-                <div className="font-bold">{theme.name}</div>
-                <div className="text-sm">{theme.count} sessions {theme.trend === 'up' && '📈'}</div>
+                <div className="font-bold">{themeItem.name}</div>
+                <div className="text-sm">{themeItem.count} sessions {themeItem.trend === 'up' && '📈'}</div>
               </div>
             </div>
           ))}
@@ -280,7 +277,7 @@ export default function TeenInsights({ profile }: TeenInsightsProps) {
       <p
         className="text-center text-sm p-3 -rotate-1"
         style={{
-          backgroundColor: 'white',
+          backgroundColor: theme.colors.backgroundAlt,
           border: '2px dashed black',
           borderRadius: '12px',
         }}

@@ -4,6 +4,7 @@ import { useState, useEffect, useRef, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import NavBar from '@/components/NavBar'
+import { useTheme } from '@/lib/ThemeContext'
 import ChatMessage, { ReflectionPrompt } from '@/components/ChatMessage'
 import ChatInput from '@/components/ChatInput'
 import SessionPicker from '@/components/SessionPicker'
@@ -45,6 +46,7 @@ interface Session {
 function ChatPageContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
+  const { theme } = useTheme()
   const [profile, setProfile] = useState<UserProfile | null>(null)
   const [userId, setUserId] = useState<string | null>(null)
   const [session, setSession] = useState<Session | null>(null)
@@ -140,7 +142,7 @@ function ChatPageContent() {
       // Auto-start a session with this topic
       setShowSessionPicker(false)
       const parsedProfile = JSON.parse(savedProfile)
-      setSession({ goal: 'talk' as SessionGoal, topic: topicFromUrl })
+      setSession({ goal: 'chatting' as SessionGoal, topic: topicFromUrl })
       // Get initial greeting with this topic
       getInitialGreetingWithTopic(parsedProfile, topicFromUrl)
     }
@@ -185,7 +187,7 @@ function ChatPageContent() {
         body: JSON.stringify({
           messages: [{ role: 'user', content: topic }],
           profile: userProfile,
-          session: { goal: 'talk', topic },
+          session: { goal: 'chatting', topic },
           userId: localStorage.getItem('npc_user_id'),
         }),
       })
@@ -266,7 +268,7 @@ function ChatPageContent() {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             userId,
-            category: goal === 'feeling' ? 'feelings' : goal === 'creating' ? 'creative' : 'general',
+            category: goal === 'venting' ? 'feelings' : goal === 'people' ? 'relationships' : goal === 'future' ? 'future' : goal === 'identity' ? 'identity' : 'general',
             sessionGoal: goal,
             sessionTopic: topic,
             persona,
@@ -297,7 +299,7 @@ function ChatPageContent() {
       if (data.session && data.messages) {
         // Set the session context
         setSession({
-          goal: data.session.session_goal || 'thinking',
+          goal: data.session.session_goal || 'stuck',
           topic: data.session.session_topic || '',
           persona: data.session.persona,
         })
@@ -490,7 +492,7 @@ function ChatPageContent() {
 
   if (!profile) {
     return (
-      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: '#7FDBFF' }}>
+      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: theme.colors.background }}>
         <div className="text-center">
           <div className="text-6xl animate-bounce mb-4">👻</div>
           <p className="text-xl font-bold">loading...</p>
@@ -500,7 +502,7 @@ function ChatPageContent() {
   }
 
   return (
-    <main className="min-h-screen flex flex-col text-black" style={{ backgroundColor: '#7FDBFF' }}>
+    <main className="min-h-screen flex flex-col text-black" style={{ backgroundColor: theme.colors.background }}>
       {/* Daily Check-In Modal */}
       {showCheckIn && (
         <DailyCheckIn
@@ -524,7 +526,7 @@ function ChatPageContent() {
       {/* Sub header with tabs */}
       <header
         className="relative z-10 px-4 py-3 border-b-4 border-black border-dashed"
-        style={{ backgroundColor: '#98FB98' }}
+        style={{ backgroundColor: theme.colors.backgroundAccent }}
       >
         <div className="max-w-5xl mx-auto">
           {/* Tab Navigation */}
@@ -553,7 +555,7 @@ function ChatPageContent() {
                 {/* Chat Header */}
                 <div
                   className="px-4 py-3 border-b-4 border-black border-dashed"
-                  style={{ backgroundColor: '#98FB98' }}
+                  style={{ backgroundColor: theme.colors.backgroundAccent }}
                 >
                   <div className="max-w-3xl mx-auto flex items-center justify-between">
                     <div className="flex items-center gap-3">
@@ -561,7 +563,7 @@ function ChatPageContent() {
                         onClick={() => setShowChatHistory(true)}
                         className="px-3 h-10 flex items-center gap-1.5 font-bold text-sm hover:scale-105 transition-transform"
                         style={{
-                          backgroundColor: '#FFD700',
+                          backgroundColor: theme.colors.accent2,
                           border: '3px solid black',
                           borderRadius: '10px',
                           boxShadow: '2px 2px 0 black',
@@ -583,7 +585,7 @@ function ChatPageContent() {
                       onClick={startNewSession}
                       className="px-4 py-2 font-bold hover:scale-105 transition-transform"
                       style={{
-                        backgroundColor: 'white',
+                        backgroundColor: theme.colors.backgroundAlt,
                         border: '3px solid black',
                         borderRadius: '9999px',
                         boxShadow: '3px 3px 0 black',
@@ -626,7 +628,7 @@ function ChatPageContent() {
                         <div
                           className="w-12 h-12 rounded-full flex items-center justify-center text-2xl"
                           style={{
-                            backgroundColor: '#DDA0DD',
+                            backgroundColor: theme.colors.accent5,
                             border: '3px solid black',
                           }}
                         >
@@ -635,15 +637,15 @@ function ChatPageContent() {
                         <div
                           className="px-4 py-3 rounded-2xl"
                           style={{
-                            backgroundColor: 'white',
+                            backgroundColor: theme.colors.backgroundAlt,
                             border: '3px solid black',
                             boxShadow: '4px 4px 0 black',
                           }}
                         >
                           <div className="flex gap-2">
-                            <span className="w-3 h-3 rounded-full animate-bounce" style={{ backgroundColor: '#FF69B4', animationDelay: '0ms' }} />
-                            <span className="w-3 h-3 rounded-full animate-bounce" style={{ backgroundColor: '#FFD700', animationDelay: '150ms' }} />
-                            <span className="w-3 h-3 rounded-full animate-bounce" style={{ backgroundColor: '#90EE90', animationDelay: '300ms' }} />
+                            <span className="w-3 h-3 rounded-full animate-bounce" style={{ backgroundColor: theme.colors.accent1, animationDelay: '0ms' }} />
+                            <span className="w-3 h-3 rounded-full animate-bounce" style={{ backgroundColor: theme.colors.accent2, animationDelay: '150ms' }} />
+                            <span className="w-3 h-3 rounded-full animate-bounce" style={{ backgroundColor: theme.colors.accent3, animationDelay: '300ms' }} />
                           </div>
                         </div>
                       </div>
@@ -656,7 +658,7 @@ function ChatPageContent() {
                 {/* Input */}
                 <div
                   className="px-4 py-4 border-t-4 border-black border-dashed"
-                  style={{ backgroundColor: 'white' }}
+                  style={{ backgroundColor: theme.colors.backgroundAlt }}
                 >
                   <div className="max-w-3xl mx-auto">
                     <ChatInput

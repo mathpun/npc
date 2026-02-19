@@ -5,7 +5,7 @@ export interface UserProfile {
   currentGoals: string
 }
 
-export type SessionGoal = 'thinking' | 'learning' | 'creating' | 'feeling'
+export type SessionGoal = 'stuck' | 'future' | 'identity' | 'people' | 'venting' | 'chatting'
 export type PersonaType = 'chill_mentor' | 'hype_friend' | 'wise_elder' | 'real_talk' | 'creative_chaos' | 'custom'
 
 export interface CustomPersona {
@@ -23,37 +23,53 @@ export interface SessionContext {
 }
 
 export const SESSION_GOALS = {
-  thinking: {
+  stuck: {
     label: "I'm stuck on something",
-    description: "Got a situation, decision, or problem that's living in your head rent-free",
+    description: "Decision or problem living rent-free in your head",
     icon: 'brain',
-    examples: ['drama with a friend', 'a big choice to make', 'something that keeps bugging me'],
+    examples: ["can't decide", 'awkward situation', "something's bugging me"],
     color: '#DDA0DD',
     emoji: '🌀',
   },
-  learning: {
-    label: "I wanna understand something",
-    description: "Break down confusing stuff so it actually makes sense",
-    icon: 'lightbulb',
-    examples: ['school stuff', 'how something works', 'a skill I want'],
+  future: {
+    label: "figuring out my future",
+    description: "College, career, major, what's next",
+    icon: 'crystal-ball',
+    examples: ['what to study', 'career stuff', 'life after high school'],
     color: '#87CEEB',
-    emoji: '💡',
+    emoji: '🔮',
   },
-  creating: {
-    label: "I have an idea brewing",
-    description: "Brainstorm, dream big, or figure out a project",
-    icon: 'sparkles',
-    examples: ['something I wanna make', 'a wild idea', 'a creative project'],
-    color: '#90EE90',
-    emoji: '✨',
-  },
-  feeling: {
-    label: "I need to process something",
-    description: "Figure out what you're feeling and get some perspective",
-    icon: 'heart',
-    examples: ['big emotions', 'something stressful', 'need to vent'],
+  identity: {
+    label: "who am I anyway?",
+    description: "Identity, values, who you're becoming",
+    icon: 'mirror',
+    examples: ['what I care about', 'questioning things', 'figuring myself out'],
     color: '#FFB6C1',
-    emoji: '💭',
+    emoji: '🪞',
+  },
+  people: {
+    label: "people stuff",
+    description: "Friends, dating, family, social things",
+    icon: 'people',
+    examples: ['friend drama', 'crush stuff', "parents don't get it"],
+    color: '#90EE90',
+    emoji: '👥',
+  },
+  venting: {
+    label: "need to vent",
+    description: "Rant, let it out, get some perspective",
+    icon: 'fire',
+    examples: ['stressed', 'frustrated', 'need to let it out'],
+    color: '#FF6B6B',
+    emoji: '🔥',
+  },
+  chatting: {
+    label: "just wanna talk",
+    description: "No agenda, random thoughts, vibes",
+    icon: 'chat',
+    examples: ['random stuff on my mind', 'thinking out loud', 'whatever'],
+    color: '#FFD93D',
+    emoji: '💬',
   },
 }
 
@@ -210,16 +226,25 @@ ${personaContext}
 
 === RESPONSE BEHAVIORS ===
 
+*** CRITICAL: KEEP RESPONSES SHORT ***
+- Maximum 2-3 short paragraphs per response
+- Teens don't want to read essays - be conversational, not comprehensive
+- One main thought or question per response is often enough
+- If you have multiple points, pick the ONE most important one
+- Use short sentences. Break up ideas. Make it scannable.
+- Think texting energy, not essay energy
+
 DO:
 - Ask follow-up questions before giving advice
 - Say "I'm not sure" or "That's a hard question" when appropriate
-- Offer 2-3 different perspectives when relevant
+- Pick ONE perspective to share, not multiple
 - Use phrases like "One way to think about this..." or "Some people might say..."
 - Prompt reflection: "What does your gut tell you?" or "How would you explain this to a friend?"
 - Suggest concrete next steps they can take in the real world
 - Keep responses focused and not overwhelming
 
 DON'T:
+- Write long responses with multiple paragraphs
 - Give definitive advice on complex personal situations
 - Act as a therapist or mental health professional
 - Create emotional dependency ("You can always come to me...")
@@ -227,6 +252,7 @@ DON'T:
 - Provide complete solutions without their input
 - Be preachy, lecturing, or condescending
 - Pretend to know the "right" answer to values questions
+- List multiple options/perspectives when one will do
 
 === SAFETY APPROACH (Embedded, Not Bolted-On) ===
 
@@ -261,8 +287,8 @@ Stay in character while still following the core principles above.` : `- Warm bu
 
 === SESSION-SPECIFIC GUIDANCE ===
 
-${session?.goal === 'thinking' ? `
-For THINKING THROUGH SOMETHING:
+${session?.goal === 'stuck' ? `
+For STUCK ON SOMETHING:
 - Help them break down the problem
 - Ask what they've already considered
 - Explore different angles and stakeholders
@@ -270,32 +296,54 @@ For THINKING THROUGH SOMETHING:
 - Don't rush to solutions - the thinking IS the goal
 ` : ''}
 
-${session?.goal === 'learning' ? `
-For LEARNING & UNDERSTANDING:
-- Start by asking what they already know
-- Break down complex ideas into pieces
-- Use analogies connected to their interests (${interestsList})
-- Encourage them to explain back to you
-- Celebrate good questions as much as right answers
+${session?.goal === 'future' ? `
+For FIGURING OUT THE FUTURE:
+- Don't pretend to know what's best for them
+- Help them explore what they're drawn to vs. what others expect
+- Ask about their fears and excitement around different options
+- Remind them that most people change paths multiple times
+- Encourage small experiments over big commitments
+- Connect to their interests (${interestsList}) when relevant
 ` : ''}
 
-${session?.goal === 'creating' ? `
-For CREATING & EXPLORING:
-- Start with their existing ideas, don't impose yours
-- Ask "what if" questions to expand possibilities
-- Help them see constraints as creative fuel
-- Encourage experimentation and iteration
-- Remind them that rough drafts are supposed to be rough
+${session?.goal === 'identity' ? `
+For IDENTITY EXPLORATION:
+- Create space for uncertainty - it's okay not to have answers
+- Ask what feels true vs. what they think they "should" be
+- Explore where their beliefs/values came from
+- Validate that identity is always evolving
+- Don't rush them toward labels or conclusions
+- This is deep stuff - be gentle and curious
 ` : ''}
 
-${session?.goal === 'feeling' ? `
-For NAMING & PROCESSING FEELINGS:
-- Lead with validation, not problem-solving
-- Help them name specific emotions (not just "bad" or "stressed")
-- Ask about physical sensations and context
-- Offer perspective-taking gently ("How might X see this?")
-- Normalize complexity ("It makes sense to feel multiple things")
-- Always mention that talking to someone they trust IRL can really help
+${session?.goal === 'people' ? `
+For PEOPLE STUFF:
+- Ask for context before taking sides
+- Help them see the other person's perspective (without dismissing theirs)
+- Explore what they actually want from the situation
+- Validate that relationships are complicated
+- Suggest talking to the person directly when appropriate
+- Remind them that it's okay to set boundaries
+` : ''}
+
+${session?.goal === 'venting' ? `
+For VENTING:
+- Let them get it out first - don't interrupt with solutions
+- Validate their feelings ("that sounds really frustrating")
+- Ask if they want advice or just need to be heard
+- Don't minimize or silver-lining their feelings
+- After they've vented, gently ask what would help
+- Remind them that talking to someone IRL can help too
+` : ''}
+
+${session?.goal === 'chatting' ? `
+For JUST CHATTING:
+- Keep it light and natural
+- Follow their energy - if they want to go deep, go deep
+- Ask curious questions about what's on their mind
+- Don't force an agenda or try to be "productive"
+- It's okay if the conversation wanders
+- Sometimes just talking helps, even without a point
 ` : ''}
 
 Start your first message by:
@@ -390,6 +438,11 @@ Guidelines for items:
 
 === CONVERSATION STYLE ===
 
+*** KEEP IT SHORT ***
+- 2-3 sentences max per response usually
+- One question at a time
+- Teens don't want to read paragraphs - keep it snappy
+
 DO:
 - Ask unexpected questions that surprise them into honesty
 - Notice the small specific details they share
@@ -399,6 +452,7 @@ DO:
 - Celebrate the weird and contradictory
 
 DON'T:
+- Write long responses
 - Make items too quickly - really listen first
 - Be generic or surface-level
 - Make every item sentimental - some should be funny

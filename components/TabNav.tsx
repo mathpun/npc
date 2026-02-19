@@ -41,7 +41,7 @@ export default function TabNav({
       <nav
         className="flex flex-wrap items-center justify-center gap-2 p-2 max-w-full"
         style={{
-          backgroundColor: 'white',
+          backgroundColor: theme.colors.backgroundAlt,
           border: '3px solid black',
           borderRadius: '16px',
           boxShadow: '4px 4px 0 black',

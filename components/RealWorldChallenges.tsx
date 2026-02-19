@@ -1,5 +1,7 @@
 'use client'
 
+import { useTheme } from '@/lib/ThemeContext'
+
 import { useState, useEffect } from 'react'
 
 interface Challenge {
@@ -20,6 +22,7 @@ interface Props {
 }
 
 export default function RealWorldChallenges({ completedChallengeIds = [], onChallengeToggle }: Props) {
+  const { theme } = useTheme()
   const [activeChallenge, setActiveChallenge] = useState<Challenge | null>(null)
   const [showReflection, setShowReflection] = useState(false)
   const [reflection, setReflection] = useState('')
@@ -39,7 +42,7 @@ export default function RealWorldChallenges({ completedChallengeIds = [], onChal
       difficulty: 'thoughtful',
       xp: 50,
       emoji: '🔄',
-      color: '#FF69B4',
+      color: theme.colors.accent1,
     },
     {
       id: '2',
@@ -50,7 +53,7 @@ export default function RealWorldChallenges({ completedChallengeIds = [], onChal
       difficulty: 'easy',
       xp: 25,
       emoji: '👀',
-      color: '#FFD700',
+      color: theme.colors.accent2,
     },
     {
       id: '3',
@@ -61,7 +64,7 @@ export default function RealWorldChallenges({ completedChallengeIds = [], onChal
       difficulty: 'medium',
       xp: 40,
       emoji: '💬',
-      color: '#87CEEB',
+      color: theme.colors.accent4,
     },
     {
       id: '4',
@@ -72,7 +75,7 @@ export default function RealWorldChallenges({ completedChallengeIds = [], onChal
       difficulty: 'easy',
       xp: 20,
       emoji: '💝',
-      color: '#90EE90',
+      color: theme.colors.accent3,
     },
     {
       id: '5',
@@ -83,7 +86,7 @@ export default function RealWorldChallenges({ completedChallengeIds = [], onChal
       difficulty: 'medium',
       xp: 30,
       emoji: '📵',
-      color: '#DDA0DD',
+      color: theme.colors.accent5,
     },
   ]
 
@@ -131,7 +134,7 @@ export default function RealWorldChallenges({ completedChallengeIds = [], onChal
         <h1
           className="text-3xl font-bold mb-3 inline-block px-6 py-2 -rotate-1"
           style={{
-            backgroundColor: '#90EE90',
+            backgroundColor: theme.colors.accent3,
             border: '4px solid black',
             borderRadius: '12px',
             boxShadow: '5px 5px 0 black',
@@ -145,9 +148,9 @@ export default function RealWorldChallenges({ completedChallengeIds = [], onChal
       {/* Stats */}
       <div className="grid grid-cols-3 gap-3">
         {[
-          { label: 'Completed', value: completedCount, emoji: '✅', color: '#90EE90' },
-          { label: 'XP Earned', value: totalXP, emoji: '⭐', color: '#FFD700' },
-          { label: 'Streak', value: completedCount >= 5 ? '🔥' : completedCount >= 3 ? '⚡' : '🌱', emoji: '', color: '#FF69B4' },
+          { label: 'Completed', value: completedCount, emoji: '✅', color: theme.colors.accent3 },
+          { label: 'XP Earned', value: totalXP, emoji: '⭐', color: theme.colors.accent2 },
+          { label: 'Streak', value: completedCount >= 5 ? '🔥' : completedCount >= 3 ? '⚡' : '🌱', emoji: '', color: theme.colors.accent1 },
         ].map((stat) => (
           <div
             key={stat.label}
@@ -184,7 +187,7 @@ export default function RealWorldChallenges({ completedChallengeIds = [], onChal
           <div
             className="p-4 mb-4"
             style={{
-              backgroundColor: 'white',
+              backgroundColor: theme.colors.backgroundAlt,
               border: '3px solid black',
               borderRadius: '12px',
             }}
@@ -202,7 +205,7 @@ export default function RealWorldChallenges({ completedChallengeIds = [], onChal
                 onClick={() => setActiveChallenge(null)}
                 className="flex-1 py-3 font-bold"
                 style={{
-                  backgroundColor: 'white',
+                  backgroundColor: theme.colors.backgroundAlt,
                   border: '3px solid black',
                   borderRadius: '12px',
                 }}
@@ -213,7 +216,7 @@ export default function RealWorldChallenges({ completedChallengeIds = [], onChal
                 onClick={() => setShowReflection(true)}
                 className="flex-1 py-3 font-bold hover:scale-105 transition-transform"
                 style={{
-                  backgroundColor: '#90EE90',
+                  backgroundColor: theme.colors.accent3,
                   border: '3px solid black',
                   borderRadius: '12px',
                   boxShadow: '3px 3px 0 black',
@@ -241,7 +244,7 @@ export default function RealWorldChallenges({ completedChallengeIds = [], onChal
                 disabled={!reflection.trim()}
                 className="w-full py-3 font-bold hover:scale-105 transition-transform disabled:opacity-50"
                 style={{
-                  backgroundColor: '#FFD700',
+                  backgroundColor: theme.colors.accent2,
                   border: '3px solid black',
                   borderRadius: '12px',
                   boxShadow: '3px 3px 0 black',
@@ -259,7 +262,7 @@ export default function RealWorldChallenges({ completedChallengeIds = [], onChal
         <div
           className="p-5 rotate-1"
           style={{
-            backgroundColor: '#87CEEB',
+            backgroundColor: theme.colors.accent4,
             border: '4px solid black',
             borderRadius: '16px',
             boxShadow: '6px 6px 0 black',
@@ -290,7 +293,7 @@ export default function RealWorldChallenges({ completedChallengeIds = [], onChal
                         <span
                           className="px-2 py-1 text-xs font-bold"
                           style={{
-                            backgroundColor: isCompleted ? '#90EE90' : 'white',
+                            backgroundColor: isCompleted ? theme.colors.accent3 : theme.colors.backgroundAlt,
                             border: '2px solid black',
                             borderRadius: '8px',
                           }}
@@ -316,7 +319,7 @@ export default function RealWorldChallenges({ completedChallengeIds = [], onChal
       <div
         className="p-4 text-center -rotate-1"
         style={{
-          backgroundColor: 'white',
+          backgroundColor: theme.colors.backgroundAlt,
           border: '2px dashed black',
           borderRadius: '12px',
         }}

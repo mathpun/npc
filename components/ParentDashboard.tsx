@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { useTheme } from '@/lib/ThemeContext'
 
 interface UserProfile {
   name: string
@@ -62,6 +63,7 @@ function generateParentSummary(profile: UserProfile) {
 export default function ParentDashboard({
   profile,
 }: ParentDashboardProps) {
+  const { theme } = useTheme()
   const [expandedSection, setExpandedSection] = useState<string | null>('overview')
   const [showPrivacyInfo, setShowPrivacyInfo] = useState(false)
   const [suggestedThemes, setSuggestedThemes] = useState<SuggestedTheme[]>([])
@@ -108,7 +110,7 @@ export default function ParentDashboard({
         <h1
           className="text-3xl font-bold mb-3 inline-block px-6 py-2 -rotate-1"
           style={{
-            backgroundColor: '#FF69B4',
+            backgroundColor: theme.colors.accent1,
             border: '4px solid black',
             borderRadius: '12px',
             boxShadow: '5px 5px 0 black',
@@ -123,7 +125,7 @@ export default function ParentDashboard({
       <div
         className="p-4 rotate-1"
         style={{
-          backgroundColor: '#DDA0DD',
+          backgroundColor: theme.colors.accent5,
           border: '4px solid black',
           borderRadius: '16px',
           boxShadow: '6px 6px 0 black',
@@ -144,7 +146,7 @@ export default function ParentDashboard({
           <div
             className="mt-4 p-3 space-y-2"
             style={{
-              backgroundColor: 'white',
+              backgroundColor: theme.colors.backgroundAlt,
               border: '3px solid black',
               borderRadius: '12px',
             }}
@@ -161,7 +163,7 @@ export default function ParentDashboard({
       <div
         className="p-5 -rotate-1"
         style={{
-          backgroundColor: '#FFD700',
+          backgroundColor: theme.colors.accent2,
           border: '4px solid black',
           borderRadius: '16px',
           boxShadow: '6px 6px 0 black',
@@ -179,7 +181,7 @@ export default function ParentDashboard({
         <div
           className="p-3 mb-4"
           style={{
-            backgroundColor: 'white',
+            backgroundColor: theme.colors.backgroundAlt,
             border: '3px solid black',
             borderRadius: '12px',
           }}
@@ -197,7 +199,7 @@ export default function ParentDashboard({
             disabled={!newTheme.trim()}
             className="w-full py-2 font-bold hover:scale-105 transition-transform disabled:opacity-50"
             style={{
-              backgroundColor: '#90EE90',
+              backgroundColor: theme.colors.accent3,
               border: '2px solid black',
               borderRadius: '8px',
             }}
@@ -210,24 +212,24 @@ export default function ParentDashboard({
         {suggestedThemes.length > 0 ? (
           <div className="space-y-2">
             <p className="text-sm font-bold">This Week's Themes:</p>
-            {suggestedThemes.map((theme, index) => (
+            {suggestedThemes.map((themeItem, index) => (
               <div
-                key={theme.id}
+                key={themeItem.id}
                 className="p-3 flex items-center justify-between gap-2"
                 style={{
-                  backgroundColor: index % 2 === 0 ? '#87CEEB' : '#FFB6C1',
+                  backgroundColor: index % 2 === 0 ? theme.colors.accent4 : theme.colors.background,
                   border: '3px solid black',
                   borderRadius: '12px',
                   boxShadow: '2px 2px 0 black',
                   transform: `rotate(${index % 2 === 0 ? 1 : -1}deg)`,
                 }}
               >
-                <span className="text-sm flex-1">"{theme.text}"</span>
+                <span className="text-sm flex-1">"{themeItem.text}"</span>
                 <button
-                  onClick={() => handleRemoveTheme(theme.id)}
+                  onClick={() => handleRemoveTheme(themeItem.id)}
                   className="px-2 py-1 font-bold hover:scale-105 transition-transform"
                   style={{
-                    backgroundColor: 'white',
+                    backgroundColor: theme.colors.backgroundAlt,
                     border: '2px solid black',
                     borderRadius: '8px',
                   }}
@@ -241,7 +243,7 @@ export default function ParentDashboard({
           <div
             className="p-3 text-center"
             style={{
-              backgroundColor: 'white',
+              backgroundColor: theme.colors.backgroundAlt,
               border: '2px dashed black',
               borderRadius: '12px',
             }}
@@ -255,7 +257,7 @@ export default function ParentDashboard({
       <div
         className="p-5 rotate-1"
         style={{
-          backgroundColor: '#90EE90',
+          backgroundColor: theme.colors.accent3,
           border: '4px solid black',
           borderRadius: '16px',
           boxShadow: '6px 6px 0 black',
@@ -281,10 +283,10 @@ export default function ParentDashboard({
         {expandedSection === 'overview' && (
           <div className="grid grid-cols-2 gap-3">
             {[
-              { value: summary.usageHealth.avgSessionsPerWeek, label: 'Sessions/Week', color: '#FF69B4' },
-              { value: summary.usageHealth.avgSessionLength, label: 'Avg Length', color: '#87CEEB' },
-              { value: summary.usageHealth.lastActive, label: 'Last Active', color: '#FFD700' },
-              { value: summary.usageHealth.trend, label: 'Trend', color: '#DDA0DD' },
+              { value: summary.usageHealth.avgSessionsPerWeek, label: 'Sessions/Week', color: theme.colors.accent1 },
+              { value: summary.usageHealth.avgSessionLength, label: 'Avg Length', color: theme.colors.accent4 },
+              { value: summary.usageHealth.lastActive, label: 'Last Active', color: theme.colors.accent2 },
+              { value: summary.usageHealth.trend, label: 'Trend', color: theme.colors.accent5 },
             ].map((stat, i) => (
               <div
                 key={stat.label}
@@ -309,7 +311,7 @@ export default function ParentDashboard({
       <div
         className="p-5 -rotate-1"
         style={{
-          backgroundColor: summary.safetyStatus.allClear ? '#90EE90' : '#FFB6C1',
+          backgroundColor: summary.safetyStatus.allClear ? theme.colors.accent3 : theme.colors.background,
           border: '4px solid black',
           borderRadius: '16px',
           boxShadow: '6px 6px 0 black',
@@ -338,7 +340,7 @@ export default function ParentDashboard({
                 key={index}
                 className="p-3 flex items-start gap-2"
                 style={{
-                  backgroundColor: note.type === 'positive' ? '#98FB98' : note.type === 'info' ? '#87CEEB' : '#FFD700',
+                  backgroundColor: note.type === 'positive' ? theme.colors.backgroundAccent : note.type === 'info' ? theme.colors.accent4 : theme.colors.accent2,
                   border: '3px solid black',
                   borderRadius: '12px',
                   boxShadow: '2px 2px 0 black',
@@ -358,7 +360,7 @@ export default function ParentDashboard({
       <div
         className="p-5 rotate-1"
         style={{
-          backgroundColor: '#DDA0DD',
+          backgroundColor: theme.colors.accent5,
           border: '4px solid black',
           borderRadius: '16px',
           boxShadow: '6px 6px 0 black',
@@ -380,12 +382,12 @@ export default function ParentDashboard({
 
         {expandedSection === 'themes' && (
           <div className="space-y-2">
-            {summary.weeklyThemes.map((theme, index) => (
+            {summary.weeklyThemes.map((weeklyTheme, index) => (
               <div
                 key={index}
                 className="p-3 flex items-center justify-between"
                 style={{
-                  backgroundColor: index === 0 ? '#FF69B4' : index === 1 ? '#87CEEB' : '#FFD700',
+                  backgroundColor: index === 0 ? theme.colors.accent1 : index === 1 ? theme.colors.accent4 : theme.colors.accent2,
                   border: '3px solid black',
                   borderRadius: '12px',
                   boxShadow: '2px 2px 0 black',
@@ -393,18 +395,18 @@ export default function ParentDashboard({
                 }}
               >
                 <div>
-                  <h3 className="font-bold">{theme.theme}</h3>
-                  <p className="text-xs">{theme.sessions} sessions</p>
+                  <h3 className="font-bold">{weeklyTheme.theme}</h3>
+                  <p className="text-xs">{weeklyTheme.sessions} sessions</p>
                 </div>
                 <span
                   className="px-3 py-1 text-xs font-bold"
                   style={{
-                    backgroundColor: 'white',
+                    backgroundColor: theme.colors.backgroundAlt,
                     border: '2px solid black',
                     borderRadius: '8px',
                   }}
                 >
-                  {theme.sentiment === 'curious' ? '🤔' : theme.sentiment === 'reflective' ? '💭' : '✨'} {theme.sentiment}
+                  {weeklyTheme.sentiment === 'curious' ? '🤔' : weeklyTheme.sentiment === 'reflective' ? '💭' : '✨'} {weeklyTheme.sentiment}
                 </span>
               </div>
             ))}
@@ -417,7 +419,7 @@ export default function ParentDashboard({
       <div
         className="p-5 -rotate-1"
         style={{
-          backgroundColor: '#87CEEB',
+          backgroundColor: theme.colors.accent4,
           border: '4px solid black',
           borderRadius: '16px',
           boxShadow: '6px 6px 0 black',
@@ -441,10 +443,10 @@ export default function ParentDashboard({
           <div className="space-y-3">
             {Object.entries(summary.engagementQuality).map(([key, value], index) => {
               const labels: Record<string, { label: string; emoji: string; color: string }> = {
-                reflectiveThinking: { label: 'Reflective Thinking', emoji: '🧠', color: '#FF69B4' },
-                questionsAsked: { label: 'Asks Questions', emoji: '❓', color: '#90EE90' },
-                multiPerspective: { label: 'Multiple Views', emoji: '🔀', color: '#FFD700' },
-                actionsTaken: { label: 'Takes Action', emoji: '🚀', color: '#DDA0DD' }
+                reflectiveThinking: { label: 'Reflective Thinking', emoji: '🧠', color: theme.colors.accent1 },
+                questionsAsked: { label: 'Asks Questions', emoji: '❓', color: theme.colors.accent3 },
+                multiPerspective: { label: 'Multiple Views', emoji: '🔀', color: theme.colors.accent2 },
+                actionsTaken: { label: 'Takes Action', emoji: '🚀', color: theme.colors.accent5 }
               }
               const info = labels[key]
               return (
@@ -466,7 +468,7 @@ export default function ParentDashboard({
                     <span
                       className="px-2 py-1 font-bold"
                       style={{
-                        backgroundColor: 'white',
+                        backgroundColor: theme.colors.backgroundAlt,
                         border: '2px solid black',
                         borderRadius: '8px',
                       }}
@@ -476,13 +478,13 @@ export default function ParentDashboard({
                   </div>
                   <div
                     className="h-4 rounded-full overflow-hidden"
-                    style={{ backgroundColor: 'white', border: '2px solid black' }}
+                    style={{ backgroundColor: theme.colors.backgroundAlt, border: '2px solid black' }}
                   >
                     <div
                       className="h-full rounded-full"
                       style={{
                         width: `${value}%`,
-                        backgroundColor: value >= 70 ? '#90EE90' : '#FFD700',
+                        backgroundColor: value >= 70 ? theme.colors.accent3 : theme.colors.accent2,
                       }}
                     />
                   </div>
@@ -500,7 +502,7 @@ export default function ParentDashboard({
       <div
         className="p-5 -rotate-1"
         style={{
-          backgroundColor: '#98FB98',
+          backgroundColor: theme.colors.backgroundAccent,
           border: '4px solid black',
           borderRadius: '16px',
           boxShadow: '6px 6px 0 black',
@@ -529,22 +531,22 @@ export default function ParentDashboard({
             {/* Conversation Starters */}
             {[
               {
-                theme: "School & Learning",
+                topicLabel: "School & Learning",
                 starter: "What's something you've been learning that you find interesting?",
                 why: "They've been exploring topics around academics and growth",
-                color: '#FF69B4'
+                color: theme.colors.accent1
               },
               {
-                theme: "Friendships",
+                topicLabel: "Friendships",
                 starter: "How are things going with your friends lately?",
                 why: "They've been reflecting on relationships this week",
-                color: '#87CEEB'
+                color: theme.colors.accent4
               },
               {
-                theme: "Creative Projects",
+                topicLabel: "Creative Projects",
                 starter: "I'd love to see what you've been working on. Want to show me?",
                 why: "They've expressed excitement about creative work",
-                color: '#FFD700'
+                color: theme.colors.accent2
               }
             ].map((item, index) => (
               <div
@@ -558,12 +560,12 @@ export default function ParentDashboard({
                   transform: `rotate(${index % 2 === 0 ? 1 : -1}deg)`,
                 }}
               >
-                <span className="text-xs font-bold">About: {item.theme}</span>
+                <span className="text-xs font-bold">About: {item.topicLabel}</span>
                 <p className="font-bold my-2">"{item.starter}"</p>
                 <div
                   className="p-2"
                   style={{
-                    backgroundColor: 'white',
+                    backgroundColor: theme.colors.backgroundAlt,
                     border: '2px solid black',
                     borderRadius: '8px',
                   }}
@@ -577,7 +579,7 @@ export default function ParentDashboard({
             <div
               className="p-4"
               style={{
-                backgroundColor: 'white',
+                backgroundColor: theme.colors.backgroundAlt,
                 border: '3px solid black',
                 borderRadius: '12px',
               }}
@@ -596,7 +598,7 @@ export default function ParentDashboard({
             <div
               className="p-4"
               style={{
-                backgroundColor: '#DDA0DD',
+                backgroundColor: theme.colors.accent5,
                 border: '3px solid black',
                 borderRadius: '12px',
                 boxShadow: '2px 2px 0 black',
@@ -607,7 +609,7 @@ export default function ParentDashboard({
                 <span
                   className="px-2 py-1 text-xs font-bold"
                   style={{
-                    backgroundColor: '#90EE90',
+                    backgroundColor: theme.colors.accent3,
                     border: '2px solid black',
                     borderRadius: '8px',
                   }}
@@ -617,11 +619,11 @@ export default function ParentDashboard({
               </div>
               <div
                 className="h-4 rounded-full overflow-hidden"
-                style={{ backgroundColor: 'white', border: '2px solid black' }}
+                style={{ backgroundColor: theme.colors.backgroundAlt, border: '2px solid black' }}
               >
                 <div
                   className="h-full rounded-full"
-                  style={{ width: '66%', backgroundColor: '#FF69B4' }}
+                  style={{ width: '66%', backgroundColor: theme.colors.accent1 }}
                 />
               </div>
               <p className="text-xs mt-2">
@@ -636,7 +638,7 @@ export default function ParentDashboard({
       <div
         className="p-4 text-center"
         style={{
-          backgroundColor: 'white',
+          backgroundColor: theme.colors.backgroundAlt,
           border: '2px dashed black',
           borderRadius: '12px',
         }}

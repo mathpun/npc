@@ -1,8 +1,11 @@
 'use client'
 
+import { useTheme } from '@/lib/ThemeContext'
+
 import { useState } from 'react'
 
 export default function PeerWisdom() {
+  const { theme } = useTheme()
   const [markedHelpful, setMarkedHelpful] = useState<Set<string>>(new Set())
 
   const commonWonders = [
@@ -18,7 +21,7 @@ export default function PeerWisdom() {
       topic: 'Making decisions',
       insight: "I used to think every decision was permanent. Then I realized most aren't - you can adjust!",
       emoji: '🎯',
-      color: '#FF69B4',
+      color: theme.colors.accent1,
       helpfulCount: 234,
     },
     {
@@ -26,7 +29,7 @@ export default function PeerWisdom() {
       topic: 'Friend drama',
       insight: "Ask yourself: 'will this matter in a year?' Most friend drama won't.",
       emoji: '👥',
-      color: '#87CEEB',
+      color: theme.colors.accent4,
       helpfulCount: 189,
     },
     {
@@ -34,7 +37,7 @@ export default function PeerWisdom() {
       topic: 'Feeling different',
       insight: "Everyone feels like they're pretending. We're all figuring it out together!",
       emoji: '🌟',
-      color: '#90EE90',
+      color: theme.colors.accent3,
       helpfulCount: 312,
     },
     {
@@ -42,7 +45,7 @@ export default function PeerWisdom() {
       topic: 'Social media',
       insight: "I unfollowed anyone who made me feel bad. My feed is smaller but I actually enjoy it.",
       emoji: '📱',
-      color: '#FFD700',
+      color: theme.colors.accent2,
       helpfulCount: 278,
     },
   ]
@@ -64,7 +67,7 @@ export default function PeerWisdom() {
         <h1
           className="text-3xl font-bold mb-3 inline-block px-6 py-2 -rotate-1"
           style={{
-            backgroundColor: '#FF69B4',
+            backgroundColor: theme.colors.accent1,
             border: '4px solid black',
             borderRadius: '12px',
             boxShadow: '5px 5px 0 black',
@@ -79,7 +82,7 @@ export default function PeerWisdom() {
       <div
         className="p-3 flex items-center gap-2"
         style={{
-          backgroundColor: '#90EE90',
+          backgroundColor: theme.colors.accent3,
           border: '3px solid black',
           borderRadius: '12px',
         }}
@@ -92,7 +95,7 @@ export default function PeerWisdom() {
       <div
         className="p-5 rotate-1"
         style={{
-          backgroundColor: '#DDA0DD',
+          backgroundColor: theme.colors.accent5,
           border: '4px solid black',
           borderRadius: '16px',
           boxShadow: '6px 6px 0 black',
@@ -105,7 +108,7 @@ export default function PeerWisdom() {
               key={index}
               className="p-3 flex items-center justify-between"
               style={{
-                backgroundColor: 'white',
+                backgroundColor: theme.colors.backgroundAlt,
                 border: '3px solid black',
                 borderRadius: '12px',
                 boxShadow: '2px 2px 0 black',
@@ -116,7 +119,7 @@ export default function PeerWisdom() {
               <div
                 className="px-3 py-1 ml-2"
                 style={{
-                  backgroundColor: '#FFD700',
+                  backgroundColor: theme.colors.accent2,
                   border: '2px solid black',
                   borderRadius: '8px',
                 }}
@@ -133,7 +136,7 @@ export default function PeerWisdom() {
       <div
         className="p-5 -rotate-1"
         style={{
-          backgroundColor: '#87CEEB',
+          backgroundColor: theme.colors.accent4,
           border: '4px solid black',
           borderRadius: '16px',
           boxShadow: '6px 6px 0 black',
@@ -160,7 +163,7 @@ export default function PeerWisdom() {
                   <span
                     className="px-2 py-1 text-xs font-bold"
                     style={{
-                      backgroundColor: 'white',
+                      backgroundColor: theme.colors.backgroundAlt,
                       border: '2px solid black',
                       borderRadius: '8px',
                     }}
@@ -174,7 +177,7 @@ export default function PeerWisdom() {
                     onClick={() => handleMarkHelpful(insight.id)}
                     className="px-3 py-1 font-bold hover:scale-105 transition-transform"
                     style={{
-                      backgroundColor: isHelpful ? '#FFD700' : 'white',
+                      backgroundColor: isHelpful ? theme.colors.accent2 : theme.colors.backgroundAlt,
                       border: '2px solid black',
                       borderRadius: '8px',
                     }}
@@ -195,7 +198,7 @@ export default function PeerWisdom() {
       <div
         className="p-4 text-center"
         style={{
-          backgroundColor: '#FFB6C1',
+          backgroundColor: theme.colors.background,
           border: '3px solid black',
           borderRadius: '12px',
           boxShadow: '4px 4px 0 black',

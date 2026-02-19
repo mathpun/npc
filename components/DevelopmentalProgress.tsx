@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useTheme } from '@/lib/ThemeContext'
 
 interface DevelopmentalProgressProps {
   userName: string
@@ -17,6 +17,8 @@ export default function DevelopmentalProgress({
   sessionsCompleted = 12,
   challengesCompleted = 4
 }: DevelopmentalProgressProps) {
+  const { theme } = useTheme()
+
   const capabilities = [
     {
       name: 'Deeper Questions',
@@ -24,7 +26,7 @@ export default function DevelopmentalProgress({
       emoji: '🧠',
       isUnlocked: sessionsCompleted >= 5,
       progress: Math.min(100, (sessionsCompleted / 5) * 100),
-      color: '#FF69B4',
+      color: theme.colors.accent1,
     },
     {
       name: 'Embrace Complexity',
@@ -32,7 +34,7 @@ export default function DevelopmentalProgress({
       emoji: '🧭',
       isUnlocked: reflectiveThinkingScore > 60,
       progress: Math.min(100, (reflectiveThinkingScore / 60) * 100),
-      color: '#87CEEB',
+      color: theme.colors.accent4,
     },
     {
       name: 'Values Deep Dive',
@@ -40,7 +42,7 @@ export default function DevelopmentalProgress({
       emoji: '⭐',
       isUnlocked: challengesCompleted >= 3,
       progress: Math.min(100, (challengesCompleted / 3) * 100),
-      color: '#FFD700',
+      color: theme.colors.accent2,
     },
     {
       name: 'Mentor Mode',
@@ -48,7 +50,7 @@ export default function DevelopmentalProgress({
       emoji: '🛡️',
       isUnlocked: reflectiveThinkingScore > 75 && age >= 16,
       progress: Math.min(100, (reflectiveThinkingScore / 75) * 100),
-      color: '#90EE90',
+      color: theme.colors.accent3,
     },
     {
       name: 'Future Self',
@@ -56,28 +58,28 @@ export default function DevelopmentalProgress({
       emoji: '⚡',
       isUnlocked: sessionsCompleted >= 10 && challengesCompleted >= 3,
       progress: Math.min(100, ((sessionsCompleted / 10) * 50) + ((challengesCompleted / 3) * 50)),
-      color: '#DDA0DD',
+      color: theme.colors.accent5,
     },
   ]
 
   const unlockedCount = capabilities.filter(c => c.isUnlocked).length
 
   const getDevStage = () => {
-    if (age <= 14) return { stage: 'Early Teen', emoji: '🌱', color: '#90EE90' }
-    if (age <= 16) return { stage: 'Mid Teen', emoji: '🌿', color: '#87CEEB' }
-    return { stage: 'Late Teen', emoji: '🌳', color: '#DDA0DD' }
+    if (age <= 14) return { stage: 'Early Teen', emoji: '🌱', color: theme.colors.accent3 }
+    if (age <= 16) return { stage: 'Mid Teen', emoji: '🌿', color: theme.colors.accent4 }
+    return { stage: 'Late Teen', emoji: '🌳', color: theme.colors.accent5 }
   }
 
   const devStage = getDevStage()
 
   return (
-    <div className="max-w-3xl mx-auto px-4 py-6 space-y-6 text-black" style={{  }}>
+    <div className="max-w-3xl mx-auto px-4 py-6 space-y-6">
       {/* Header */}
       <div className="text-center mb-8">
         <h1
           className="text-3xl font-bold mb-3 inline-block px-6 py-2 rotate-1"
           style={{
-            backgroundColor: '#FF69B4',
+            backgroundColor: theme.colors.accent1,
             border: '4px solid black',
             borderRadius: '12px',
             boxShadow: '5px 5px 0 black',
@@ -108,7 +110,7 @@ export default function DevelopmentalProgress({
           <div
             className="px-4 py-2 text-center"
             style={{
-              backgroundColor: 'white',
+              backgroundColor: theme.colors.backgroundAlt,
               border: '3px solid black',
               borderRadius: '12px',
               boxShadow: '3px 3px 0 black',
@@ -124,7 +126,7 @@ export default function DevelopmentalProgress({
       <div
         className="p-5 rotate-1"
         style={{
-          backgroundColor: '#FFD700',
+          backgroundColor: theme.colors.accent2,
           border: '4px solid black',
           borderRadius: '16px',
           boxShadow: '6px 6px 0 black',
@@ -137,7 +139,7 @@ export default function DevelopmentalProgress({
               key={cap.name}
               className="p-3"
               style={{
-                backgroundColor: cap.isUnlocked ? cap.color : 'white',
+                backgroundColor: cap.isUnlocked ? cap.color : theme.colors.backgroundAlt,
                 border: '3px solid black',
                 borderRadius: '12px',
                 boxShadow: '3px 3px 0 black',
@@ -178,7 +180,7 @@ export default function DevelopmentalProgress({
       <div
         className="p-4 text-center -rotate-1"
         style={{
-          backgroundColor: 'white',
+          backgroundColor: theme.colors.backgroundAlt,
           border: '2px dashed black',
           borderRadius: '12px',
         }}

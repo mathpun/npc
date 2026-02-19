@@ -122,7 +122,7 @@ export default function SessionPicker({ onSelect, onClose, onOpenHistory }: Sess
 
         {/* Goal selection */}
         <div className="grid md:grid-cols-2 gap-4 mb-8">
-          {(Object.entries(SESSION_GOALS) as [SessionGoal, typeof SESSION_GOALS.thinking][]).map(([key, goal], i) => {
+          {(Object.entries(SESSION_GOALS) as [SessionGoal, typeof SESSION_GOALS.stuck][]).map(([key, goal], i) => {
             const isSelected = selectedGoal === key
 
             return (

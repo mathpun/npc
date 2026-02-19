@@ -1,5 +1,7 @@
 'use client'
 
+import { useTheme } from '@/lib/ThemeContext'
+
 import { useState } from 'react'
 
 interface AntiEngagementProps {
@@ -17,6 +19,7 @@ export default function AntiEngagement({
   independentDecisions = 8,
   irlActionsReported = 3
 }: AntiEngagementProps) {
+  const { theme } = useTheme()
   const independenceScore = Math.min(100, Math.round(
     (independentDecisions * 5) +
     (irlActionsReported * 10) +
@@ -25,10 +28,10 @@ export default function AntiEngagement({
   ))
 
   const getLevel = () => {
-    if (independenceScore >= 80) return { label: 'Thriving! 🌟', color: '#90EE90' }
-    if (independenceScore >= 60) return { label: 'Growing 🌿', color: '#87CEEB' }
-    if (independenceScore >= 40) return { label: 'Building 🌱', color: '#FFD700' }
-    return { label: 'Starting 🌰', color: '#FFB6C1' }
+    if (independenceScore >= 80) return { label: 'Thriving! 🌟', color: theme.colors.accent3 }
+    if (independenceScore >= 60) return { label: 'Growing 🌿', color: theme.colors.accent4 }
+    if (independenceScore >= 40) return { label: 'Building 🌱', color: theme.colors.accent2 }
+    return { label: 'Starting 🌰', color: theme.colors.background }
   }
 
   const level = getLevel()
@@ -47,7 +50,7 @@ export default function AntiEngagement({
         <h1
           className="text-3xl font-bold mb-3 inline-block px-6 py-2 rotate-1"
           style={{
-            backgroundColor: '#90EE90',
+            backgroundColor: theme.colors.accent3,
             border: '4px solid black',
             borderRadius: '12px',
             boxShadow: '5px 5px 0 black',
@@ -58,7 +61,7 @@ export default function AntiEngagement({
         <div
           className="mt-4 inline-block px-4 py-2"
           style={{
-            backgroundColor: '#FFD700',
+            backgroundColor: theme.colors.accent2,
             border: '2px solid black',
             borderRadius: '9999px',
           }}
@@ -81,7 +84,7 @@ export default function AntiEngagement({
         <div
           className="w-36 h-36 mx-auto mb-4 flex flex-col items-center justify-center"
           style={{
-            backgroundColor: 'white',
+            backgroundColor: theme.colors.backgroundAlt,
             border: '4px solid black',
             borderRadius: '50%',
             boxShadow: '4px 4px 0 black',
@@ -98,7 +101,7 @@ export default function AntiEngagement({
         <div
           className="p-5 rotate-1"
           style={{
-            backgroundColor: '#FFD700',
+            backgroundColor: theme.colors.accent2,
             border: '4px solid black',
             borderRadius: '16px',
             boxShadow: '6px 6px 0 black',
@@ -111,7 +114,7 @@ export default function AntiEngagement({
                 key={i}
                 className="p-3 flex items-center gap-2"
                 style={{
-                  backgroundColor: 'white',
+                  backgroundColor: theme.colors.backgroundAlt,
                   border: '3px solid black',
                   borderRadius: '12px',
                   boxShadow: '2px 2px 0 black',
@@ -129,10 +132,10 @@ export default function AntiEngagement({
       {/* Anti-Metrics Grid */}
       <div className="grid grid-cols-2 gap-3">
         {[
-          { label: 'Decisions without AI', value: independentDecisions, emoji: '🧠', color: '#FF69B4' },
-          { label: 'Real-world actions', value: irlActionsReported, emoji: '🌍', color: '#87CEEB' },
-          { label: 'Avg session (mins)', value: `${avgSessionLength}m`, emoji: '⏱️', color: '#90EE90' },
-          { label: 'Days without us', value: Math.max(0, 7 - sessionsThisWeek), emoji: '☕', color: '#DDA0DD' },
+          { label: 'Decisions without AI', value: independentDecisions, emoji: '🧠', color: theme.colors.accent1 },
+          { label: 'Real-world actions', value: irlActionsReported, emoji: '🌍', color: theme.colors.accent4 },
+          { label: 'Avg session (mins)', value: `${avgSessionLength}m`, emoji: '⏱️', color: theme.colors.accent3 },
+          { label: 'Days without us', value: Math.max(0, 7 - sessionsThisWeek), emoji: '☕', color: theme.colors.accent5 },
         ].map((stat, i) => (
           <div
             key={stat.label}
@@ -157,7 +160,7 @@ export default function AntiEngagement({
         <div
           className="p-4"
           style={{
-            backgroundColor: '#FFB6C1',
+            backgroundColor: theme.colors.background,
             border: '3px solid black',
             borderRadius: '12px',
             boxShadow: '4px 4px 0 black',
@@ -174,7 +177,7 @@ export default function AntiEngagement({
       <div
         className="p-4 text-center"
         style={{
-          backgroundColor: 'white',
+          backgroundColor: theme.colors.backgroundAlt,
           border: '2px dashed black',
           borderRadius: '12px',
         }}

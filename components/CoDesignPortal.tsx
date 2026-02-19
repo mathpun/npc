@@ -1,5 +1,7 @@
 'use client'
 
+import { useTheme } from '@/lib/ThemeContext'
+
 import { useState } from 'react'
 
 interface FeatureProposal {
@@ -15,6 +17,7 @@ interface FeatureProposal {
 }
 
 export default function CoDesignPortal() {
+  const { theme } = useTheme()
   const [proposals, setProposals] = useState<FeatureProposal[]>([
     {
       id: '1',
@@ -25,7 +28,7 @@ export default function CoDesignPortal() {
       proposedBy: 'Maya, 16',
       userVoted: false,
       emoji: '👥',
-      color: '#FF69B4',
+      color: theme.colors.accent1,
     },
     {
       id: '2',
@@ -36,7 +39,7 @@ export default function CoDesignPortal() {
       proposedBy: 'Jordan, 15',
       userVoted: true,
       emoji: '🎤',
-      color: '#87CEEB',
+      color: theme.colors.accent4,
     },
     {
       id: '3',
@@ -47,7 +50,7 @@ export default function CoDesignPortal() {
       proposedBy: 'Alex, 17',
       userVoted: false,
       emoji: '📅',
-      color: '#90EE90',
+      color: theme.colors.accent3,
     },
     {
       id: '4',
@@ -58,7 +61,7 @@ export default function CoDesignPortal() {
       proposedBy: 'Sam, 14',
       userVoted: true,
       emoji: '😊',
-      color: '#FFD700',
+      color: theme.colors.accent2,
     },
   ])
 
@@ -75,11 +78,11 @@ export default function CoDesignPortal() {
 
   const getStatusBadge = (status: string) => {
     switch (status) {
-      case 'voting': return { label: '🗳️ Voting', color: '#87CEEB' }
-      case 'planned': return { label: '📋 Planned', color: '#DDA0DD' }
-      case 'building': return { label: '🔨 Building', color: '#FFD700' }
-      case 'shipped': return { label: '🚀 Shipped!', color: '#90EE90' }
-      default: return { label: status, color: '#f0f0f0' }
+      case 'voting': return { label: '🗳️ Voting', color: theme.colors.accent4 }
+      case 'planned': return { label: '📋 Planned', color: theme.colors.accent5 }
+      case 'building': return { label: '🔨 Building', color: theme.colors.accent2 }
+      case 'shipped': return { label: '🚀 Shipped!', color: theme.colors.accent3 }
+      default: return { label: status, color: theme.colors.backgroundAlt }
     }
   }
 
@@ -96,7 +99,7 @@ export default function CoDesignPortal() {
         <h1
           className="text-3xl font-bold mb-3 inline-block px-6 py-2 -rotate-1"
           style={{
-            backgroundColor: '#DDA0DD',
+            backgroundColor: theme.colors.accent5,
             border: '4px solid black',
             borderRadius: '12px',
             boxShadow: '5px 5px 0 black',
@@ -111,7 +114,7 @@ export default function CoDesignPortal() {
       <div
         className="p-4 rotate-1"
         style={{
-          backgroundColor: '#90EE90',
+          backgroundColor: theme.colors.accent3,
           border: '4px solid black',
           borderRadius: '16px',
           boxShadow: '6px 6px 0 black',
@@ -120,9 +123,9 @@ export default function CoDesignPortal() {
         <h2 className="text-lg font-bold mb-3 text-center">⭐ Your Voice Matters</h2>
         <div className="grid grid-cols-3 gap-2">
           {[
-            { value: '47', label: 'Teen ideas shipped', color: '#FF69B4' },
-            { value: '1,234', label: 'Active advisors', color: '#87CEEB' },
-            { value: '89%', label: 'Features by teens', color: '#FFD700' },
+            { value: '47', label: 'Teen ideas shipped', color: theme.colors.accent1 },
+            { value: '1,234', label: 'Active advisors', color: theme.colors.accent4 },
+            { value: '89%', label: 'Features by teens', color: theme.colors.accent2 },
           ].map((stat) => (
             <div
               key={stat.label}
@@ -144,7 +147,7 @@ export default function CoDesignPortal() {
       <div
         className="p-5 -rotate-1"
         style={{
-          backgroundColor: '#87CEEB',
+          backgroundColor: theme.colors.accent4,
           border: '4px solid black',
           borderRadius: '16px',
           boxShadow: '6px 6px 0 black',
@@ -156,7 +159,7 @@ export default function CoDesignPortal() {
             onClick={() => setShowIdeaForm(!showIdeaForm)}
             className="px-3 py-1 font-bold hover:scale-105 transition-transform"
             style={{
-              backgroundColor: '#FFD700',
+              backgroundColor: theme.colors.accent2,
               border: '2px solid black',
               borderRadius: '8px',
             }}
@@ -169,7 +172,7 @@ export default function CoDesignPortal() {
           <div
             className="mb-4 p-3"
             style={{
-              backgroundColor: 'white',
+              backgroundColor: theme.colors.backgroundAlt,
               border: '3px solid black',
               borderRadius: '12px',
             }}
@@ -186,7 +189,7 @@ export default function CoDesignPortal() {
               onClick={() => { setShowIdeaForm(false); setNewIdea('') }}
               className="w-full py-2 font-bold hover:scale-105 transition-transform"
               style={{
-                backgroundColor: '#90EE90',
+                backgroundColor: theme.colors.accent3,
                 border: '2px solid black',
                 borderRadius: '8px',
               }}
@@ -217,7 +220,7 @@ export default function CoDesignPortal() {
                     disabled={proposal.status !== 'voting'}
                     className="flex flex-col items-center p-2 font-bold hover:scale-105 transition-transform disabled:opacity-50"
                     style={{
-                      backgroundColor: proposal.userVoted ? '#FFD700' : 'white',
+                      backgroundColor: proposal.userVoted ? theme.colors.accent2 : theme.colors.backgroundAlt,
                       border: '2px solid black',
                       borderRadius: '8px',
                     }}
@@ -256,7 +259,7 @@ export default function CoDesignPortal() {
       <div
         className="p-5 rotate-1"
         style={{
-          backgroundColor: '#FFB6C1',
+          backgroundColor: theme.colors.background,
           border: '4px solid black',
           borderRadius: '16px',
           boxShadow: '6px 6px 0 black',
@@ -269,7 +272,7 @@ export default function CoDesignPortal() {
               key={index}
               className="p-3"
               style={{
-                backgroundColor: 'white',
+                backgroundColor: theme.colors.backgroundAlt,
                 border: '3px solid black',
                 borderRadius: '12px',
                 boxShadow: '2px 2px 0 black',
@@ -280,7 +283,7 @@ export default function CoDesignPortal() {
               <div
                 className="p-2"
                 style={{
-                  backgroundColor: '#90EE90',
+                  backgroundColor: theme.colors.accent3,
                   border: '2px solid black',
                   borderRadius: '8px',
                 }}
@@ -296,7 +299,7 @@ export default function CoDesignPortal() {
       <div
         className="p-4 text-center"
         style={{
-          backgroundColor: '#FFD700',
+          backgroundColor: theme.colors.accent2,
           border: '3px solid black',
           borderRadius: '12px',
           boxShadow: '4px 4px 0 black',

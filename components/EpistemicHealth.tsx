@@ -1,5 +1,7 @@
 'use client'
 
+import { useTheme } from '@/lib/ThemeContext'
+
 interface EpistemicHealthProps {
   userName: string
   sessionsCompleted?: number
@@ -13,6 +15,7 @@ export default function EpistemicHealth({
   checkinsCompleted = 0,
   challengesCompleted = 0,
 }: EpistemicHealthProps) {
+  const { theme } = useTheme()
   // Calculate scores based on user activity
   // Each metric has a base score of 30, and can grow to 100 based on activity
 
@@ -38,28 +41,28 @@ export default function EpistemicHealth({
       emoji: '⚖️',
       score: uncertaintyScore,
       description: "Knowing what you know vs. don't know",
-      color: '#FF69B4',
+      color: theme.colors.accent1,
     },
     {
       name: 'Perspective Seeking',
       emoji: '🔀',
       score: perspectiveScore,
       description: 'Actively seeking different viewpoints',
-      color: '#90EE90',
+      color: theme.colors.accent3,
     },
     {
       name: 'Source Questioning',
       emoji: '🔍',
       score: sourceScore,
       description: 'Questioning where info comes from',
-      color: '#87CEEB',
+      color: theme.colors.accent4,
     },
     {
       name: 'Complexity Tolerance',
       emoji: '🧩',
       score: complexityScore,
       description: 'Sitting with ambiguity without rushing',
-      color: '#FFD700',
+      color: theme.colors.accent2,
     },
   ]
 
@@ -68,10 +71,10 @@ export default function EpistemicHealth({
   )
 
   const getHealthLabel = (score: number) => {
-    if (score >= 80) return { label: 'Excellent! 🌟', color: '#90EE90' }
-    if (score >= 60) return { label: 'Healthy 💪', color: '#87CEEB' }
-    if (score >= 40) return { label: 'Growing 🌱', color: '#FFD700' }
-    return { label: 'Building 🔨', color: '#FF69B4' }
+    if (score >= 80) return { label: 'Excellent! 🌟', color: theme.colors.accent3 }
+    if (score >= 60) return { label: 'Healthy 💪', color: theme.colors.accent4 }
+    if (score >= 40) return { label: 'Growing 🌱', color: theme.colors.accent2 }
+    return { label: 'Building 🔨', color: theme.colors.accent1 }
   }
 
   const healthLabel = getHealthLabel(overallHealth)
@@ -83,7 +86,7 @@ export default function EpistemicHealth({
         <h1
           className="text-3xl font-bold mb-3 inline-block px-6 py-2 rotate-1"
           style={{
-            backgroundColor: '#DDA0DD',
+            backgroundColor: theme.colors.accent5,
             border: '4px solid black',
             borderRadius: '12px',
             boxShadow: '5px 5px 0 black',
@@ -108,7 +111,7 @@ export default function EpistemicHealth({
         <div
           className="w-32 h-32 mx-auto mb-3 flex items-center justify-center"
           style={{
-            backgroundColor: 'white',
+            backgroundColor: theme.colors.backgroundAlt,
             border: '4px solid black',
             borderRadius: '50%',
             boxShadow: '4px 4px 0 black',
@@ -124,7 +127,7 @@ export default function EpistemicHealth({
       <div
         className="p-5 rotate-1"
         style={{
-          backgroundColor: '#FFB6C1',
+          backgroundColor: theme.colors.background,
           border: '4px solid black',
           borderRadius: '16px',
           boxShadow: '6px 6px 0 black',
@@ -155,7 +158,7 @@ export default function EpistemicHealth({
                 <div
                   className="px-3 py-1 font-bold"
                   style={{
-                    backgroundColor: 'white',
+                    backgroundColor: theme.colors.backgroundAlt,
                     border: '2px solid black',
                     borderRadius: '8px',
                   }}
@@ -165,13 +168,13 @@ export default function EpistemicHealth({
               </div>
               <div
                 className="h-4 rounded-full overflow-hidden"
-                style={{ backgroundColor: 'white', border: '2px solid black' }}
+                style={{ backgroundColor: theme.colors.backgroundAlt, border: '2px solid black' }}
               >
                 <div
                   className="h-full rounded-full"
                   style={{
                     width: `${metric.score}%`,
-                    backgroundColor: metric.score >= 70 ? '#90EE90' : '#FFD700',
+                    backgroundColor: metric.score >= 70 ? theme.colors.accent3 : theme.colors.accent2,
                   }}
                 />
               </div>
@@ -184,7 +187,7 @@ export default function EpistemicHealth({
       <div
         className="p-4"
         style={{
-          backgroundColor: '#87CEEB',
+          backgroundColor: theme.colors.accent4,
           border: '3px solid black',
           borderRadius: '12px',
           boxShadow: '3px 3px 0 black',
@@ -192,15 +195,15 @@ export default function EpistemicHealth({
       >
         <h3 className="font-bold mb-2">📈 Your Activity</h3>
         <div className="grid grid-cols-3 gap-2 text-center text-sm">
-          <div className="p-2 bg-white rounded-lg border-2 border-black">
+          <div className="p-2 rounded-lg border-2 border-black" style={{ backgroundColor: theme.colors.backgroundAlt }}>
             <div className="font-bold text-lg">{sessionsCompleted}</div>
             <div className="text-xs">Sessions</div>
           </div>
-          <div className="p-2 bg-white rounded-lg border-2 border-black">
+          <div className="p-2 rounded-lg border-2 border-black" style={{ backgroundColor: theme.colors.backgroundAlt }}>
             <div className="font-bold text-lg">{checkinsCompleted}</div>
             <div className="text-xs">Check-ins</div>
           </div>
-          <div className="p-2 bg-white rounded-lg border-2 border-black">
+          <div className="p-2 rounded-lg border-2 border-black" style={{ backgroundColor: theme.colors.backgroundAlt }}>
             <div className="font-bold text-lg">{challengesCompleted}</div>
             <div className="text-xs">Challenges</div>
           </div>
@@ -211,7 +214,7 @@ export default function EpistemicHealth({
       <div
         className="p-5 -rotate-1"
         style={{
-          backgroundColor: '#98FB98',
+          backgroundColor: theme.colors.backgroundAccent,
           border: '4px solid black',
           borderRadius: '16px',
           boxShadow: '6px 6px 0 black',
@@ -229,7 +232,7 @@ export default function EpistemicHealth({
               key={i}
               className="p-2 flex items-center gap-2"
               style={{
-                backgroundColor: 'white',
+                backgroundColor: theme.colors.backgroundAlt,
                 border: '2px solid black',
                 borderRadius: '8px',
               }}
@@ -245,7 +248,7 @@ export default function EpistemicHealth({
       <div
         className="p-4 text-center"
         style={{
-          backgroundColor: 'white',
+          backgroundColor: theme.colors.backgroundAlt,
           border: '2px dashed black',
           borderRadius: '12px',
         }}

@@ -1,5 +1,7 @@
 'use client'
 
+import { useTheme } from '@/lib/ThemeContext'
+
 import { useState } from 'react'
 
 interface UserProfile {
@@ -14,6 +16,7 @@ interface AILiteracyProps {
 }
 
 export default function AILiteracy({ profile }: AILiteracyProps) {
+  const { theme } = useTheme()
   const [expandedSection, setExpandedSection] = useState<string | null>('what-ai-knows')
 
   return (
@@ -23,7 +26,7 @@ export default function AILiteracy({ profile }: AILiteracyProps) {
         <h1
           className="text-3xl font-bold mb-3 inline-block px-6 py-2 -rotate-1"
           style={{
-            backgroundColor: '#87CEEB',
+            backgroundColor: theme.colors.accent4,
             border: '4px solid black',
             borderRadius: '12px',
             boxShadow: '5px 5px 0 black',
@@ -38,7 +41,7 @@ export default function AILiteracy({ profile }: AILiteracyProps) {
       <div
         className="p-5 rotate-1"
         style={{
-          backgroundColor: '#90EE90',
+          backgroundColor: theme.colors.accent3,
           border: '4px solid black',
           borderRadius: '16px',
           boxShadow: '6px 6px 0 black',
@@ -48,21 +51,21 @@ export default function AILiteracy({ profile }: AILiteracyProps) {
         <div
           className="p-4"
           style={{
-            backgroundColor: 'white',
+            backgroundColor: theme.colors.backgroundAlt,
             border: '3px solid black',
             borderRadius: '12px',
           }}
         >
           <div className="space-y-2 text-sm">
-            <div className="flex justify-between p-2" style={{ backgroundColor: '#f0f0f0', borderRadius: '8px' }}>
+            <div className="flex justify-between p-2" style={{ backgroundColor: theme.colors.backgroundAccent, borderRadius: '8px' }}>
               <span className="font-bold">Name:</span>
               <span>{profile.name}</span>
             </div>
-            <div className="flex justify-between p-2" style={{ backgroundColor: '#f0f0f0', borderRadius: '8px' }}>
+            <div className="flex justify-between p-2" style={{ backgroundColor: theme.colors.backgroundAccent, borderRadius: '8px' }}>
               <span className="font-bold">Age:</span>
               <span>{profile.currentAge}</span>
             </div>
-            <div className="flex justify-between p-2" style={{ backgroundColor: '#f0f0f0', borderRadius: '8px' }}>
+            <div className="flex justify-between p-2" style={{ backgroundColor: theme.colors.backgroundAccent, borderRadius: '8px' }}>
               <span className="font-bold">Interests:</span>
               <span>{profile.interests.slice(0, 3).join(', ')}</span>
             </div>
@@ -71,7 +74,7 @@ export default function AILiteracy({ profile }: AILiteracyProps) {
         <div
           className="mt-3 p-3 flex items-center gap-2"
           style={{
-            backgroundColor: '#FFD700',
+            backgroundColor: theme.colors.accent2,
             border: '2px solid black',
             borderRadius: '8px',
           }}
@@ -85,7 +88,7 @@ export default function AILiteracy({ profile }: AILiteracyProps) {
       <div
         className="p-5 -rotate-1"
         style={{
-          backgroundColor: '#DDA0DD',
+          backgroundColor: theme.colors.accent5,
           border: '4px solid black',
           borderRadius: '16px',
           boxShadow: '6px 6px 0 black',
@@ -94,10 +97,10 @@ export default function AILiteracy({ profile }: AILiteracyProps) {
         <h2 className="text-xl font-bold mb-4">⚙️ How Responses Are Generated</h2>
         <div className="space-y-2">
           {[
-            { step: 1, title: 'Your message is sent', emoji: '📤', color: '#FF69B4' },
-            { step: 2, title: 'Safety guidelines applied', emoji: '🛡️', color: '#87CEEB' },
-            { step: 3, title: 'AI generates response', emoji: '🤖', color: '#90EE90' },
-            { step: 4, title: 'Safety checks before showing', emoji: '✓', color: '#FFD700' },
+            { step: 1, title: 'Your message is sent', emoji: '📤', color: theme.colors.accent1 },
+            { step: 2, title: 'Safety guidelines applied', emoji: '🛡️', color: theme.colors.accent4 },
+            { step: 3, title: 'AI generates response', emoji: '🤖', color: theme.colors.accent3 },
+            { step: 4, title: 'Safety checks before showing', emoji: '✓', color: theme.colors.accent2 },
           ].map((item) => (
             <div
               key={item.step}
@@ -112,7 +115,7 @@ export default function AILiteracy({ profile }: AILiteracyProps) {
               <div
                 className="w-8 h-8 flex items-center justify-center font-bold"
                 style={{
-                  backgroundColor: 'white',
+                  backgroundColor: theme.colors.backgroundAlt,
                   border: '2px solid black',
                   borderRadius: '50%',
                 }}
@@ -130,7 +133,7 @@ export default function AILiteracy({ profile }: AILiteracyProps) {
       <div
         className="p-5 rotate-1"
         style={{
-          backgroundColor: '#FFB6C1',
+          backgroundColor: theme.colors.background,
           border: '4px solid black',
           borderRadius: '16px',
           boxShadow: '6px 6px 0 black',
@@ -150,7 +153,7 @@ export default function AILiteracy({ profile }: AILiteracyProps) {
               key={index}
               className="p-2 flex items-center gap-2"
               style={{
-                backgroundColor: 'white',
+                backgroundColor: theme.colors.backgroundAlt,
                 border: '2px solid black',
                 borderRadius: '8px',
               }}
@@ -166,7 +169,7 @@ export default function AILiteracy({ profile }: AILiteracyProps) {
       <div
         className="p-5 -rotate-1"
         style={{
-          backgroundColor: '#98FB98',
+          backgroundColor: theme.colors.backgroundAccent,
           border: '4px solid black',
           borderRadius: '16px',
           boxShadow: '6px 6px 0 black',
@@ -185,7 +188,7 @@ export default function AILiteracy({ profile }: AILiteracyProps) {
               key={index}
               className="p-2 flex items-center gap-2"
               style={{
-                backgroundColor: 'white',
+                backgroundColor: theme.colors.backgroundAlt,
                 border: '2px solid black',
                 borderRadius: '8px',
               }}
@@ -202,7 +205,7 @@ export default function AILiteracy({ profile }: AILiteracyProps) {
       <div
         className="p-4 text-center"
         style={{
-          backgroundColor: 'white',
+          backgroundColor: theme.colors.backgroundAlt,
           border: '2px dashed black',
           borderRadius: '12px',
         }}

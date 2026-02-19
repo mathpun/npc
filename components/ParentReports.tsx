@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { useTheme } from '@/lib/ThemeContext'
 
 interface ParentConnection {
   id: number
@@ -36,6 +37,7 @@ interface ParentReportsProps {
 }
 
 export default function ParentReports({ userId, userName }: ParentReportsProps) {
+  const { theme } = useTheme()
   const [connections, setConnections] = useState<ParentConnection[]>([])
   const [reports, setReports] = useState<ParentReport[]>([])
   const [loading, setLoading] = useState(true)
@@ -213,7 +215,7 @@ export default function ParentReports({ userId, userName }: ParentReportsProps) 
       <div
         className="p-6"
         style={{
-          backgroundColor: '#87CEEB',
+          backgroundColor: theme.colors.accent4,
           border: '4px solid black',
           borderRadius: '20px',
           boxShadow: '6px 6px 0 black',
@@ -228,7 +230,7 @@ export default function ParentReports({ userId, userName }: ParentReportsProps) 
             onClick={() => setShowAddParent(!showAddParent)}
             className="px-4 py-2 font-bold hover:scale-105 transition-transform"
             style={{
-              backgroundColor: '#90EE90',
+              backgroundColor: theme.colors.accent3,
               border: '3px solid black',
               borderRadius: '9999px',
               boxShadow: '3px 3px 0 black',
@@ -243,7 +245,7 @@ export default function ParentReports({ userId, userName }: ParentReportsProps) 
           <div
             className="mb-4 p-4"
             style={{
-              backgroundColor: 'white',
+              backgroundColor: theme.colors.backgroundAlt,
               border: '3px solid black',
               borderRadius: '12px',
             }}
@@ -282,7 +284,7 @@ export default function ParentReports({ userId, userName }: ParentReportsProps) 
                 disabled={actionLoading || !newParentEmail}
                 className="w-full py-2 font-bold hover:scale-105 transition-transform disabled:opacity-50"
                 style={{
-                  backgroundColor: '#FFD700',
+                  backgroundColor: theme.colors.accent2,
                   border: '3px solid black',
                   borderRadius: '9999px',
                   boxShadow: '3px 3px 0 black',
@@ -306,7 +308,7 @@ export default function ParentReports({ userId, userName }: ParentReportsProps) 
                 key={conn.id}
                 className="flex items-center justify-between p-3"
                 style={{
-                  backgroundColor: 'white',
+                  backgroundColor: theme.colors.backgroundAlt,
                   border: '3px solid black',
                   borderRadius: '12px',
                 }}
@@ -319,7 +321,7 @@ export default function ParentReports({ userId, userName }: ParentReportsProps) 
                   <span
                     className="px-2 py-1 text-xs font-bold rounded-full"
                     style={{
-                      backgroundColor: conn.connection_status === 'active' ? '#90EE90' : '#FFD700',
+                      backgroundColor: conn.connection_status === 'active' ? theme.colors.accent3 : theme.colors.accent2,
                       border: '2px solid black',
                     }}
                   >
@@ -342,7 +344,7 @@ export default function ParentReports({ userId, userName }: ParentReportsProps) 
       <div
         className="p-6"
         style={{
-          backgroundColor: '#DDA0DD',
+          backgroundColor: theme.colors.accent5,
           border: '4px solid black',
           borderRadius: '20px',
           boxShadow: '6px 6px 0 black',
@@ -364,7 +366,7 @@ export default function ParentReports({ userId, userName }: ParentReportsProps) 
           disabled={generating}
           className="w-full py-3 font-bold hover:scale-105 transition-transform disabled:opacity-50"
           style={{
-            backgroundColor: '#FFD700',
+            backgroundColor: theme.colors.accent2,
             border: '3px solid black',
             borderRadius: '12px',
             boxShadow: '4px 4px 0 black',
@@ -379,7 +381,7 @@ export default function ParentReports({ userId, userName }: ParentReportsProps) 
         <div
           className="p-6"
           style={{
-            backgroundColor: '#98FB98',
+            backgroundColor: theme.colors.backgroundAccent,
             border: '4px solid black',
             borderRadius: '20px',
             boxShadow: '6px 6px 0 black',
@@ -400,7 +402,7 @@ export default function ParentReports({ userId, userName }: ParentReportsProps) 
                 }}
                 className="w-full p-4 text-left hover:scale-[1.02] transition-transform"
                 style={{
-                  backgroundColor: 'white',
+                  backgroundColor: theme.colors.backgroundAlt,
                   border: '3px solid black',
                   borderRadius: '12px',
                 }}
@@ -418,10 +420,10 @@ export default function ParentReports({ userId, userName }: ParentReportsProps) 
                     className="px-3 py-1 text-sm font-bold rounded-full"
                     style={{
                       backgroundColor:
-                        report.status === 'sent' ? '#90EE90' :
-                        report.status === 'approved' ? '#87CEEB' :
-                        report.status === 'rejected' ? '#FFB6C1' :
-                        '#FFD700',
+                        report.status === 'sent' ? theme.colors.accent3 :
+                        report.status === 'approved' ? theme.colors.accent4 :
+                        report.status === 'rejected' ? theme.colors.background :
+                        theme.colors.accent2,
                       border: '2px solid black',
                     }}
                   >
@@ -444,7 +446,7 @@ export default function ParentReports({ userId, userName }: ParentReportsProps) 
           <div
             className="relative w-full max-w-2xl max-h-[90vh] overflow-y-auto p-6"
             style={{
-              backgroundColor: 'white',
+              backgroundColor: theme.colors.backgroundAlt,
               border: '4px solid black',
               borderRadius: '20px',
               boxShadow: '8px 8px 0 black',
@@ -455,7 +457,7 @@ export default function ParentReports({ userId, userName }: ParentReportsProps) 
               onClick={() => setSelectedReport(null)}
               className="absolute top-4 right-4 w-10 h-10 flex items-center justify-center font-bold text-xl hover:scale-110 transition-transform"
               style={{
-                backgroundColor: '#FFB6C1',
+                backgroundColor: theme.colors.background,
                 border: '3px solid black',
                 borderRadius: '50%',
               }}
@@ -474,9 +476,9 @@ export default function ParentReports({ userId, userName }: ParentReportsProps) 
                 className="inline-block mt-2 px-3 py-1 text-sm font-bold rounded-full"
                 style={{
                   backgroundColor:
-                    selectedReport.status === 'sent' ? '#90EE90' :
-                    selectedReport.status === 'approved' ? '#87CEEB' :
-                    '#FFD700',
+                    selectedReport.status === 'sent' ? theme.colors.accent3 :
+                    selectedReport.status === 'approved' ? theme.colors.accent4 :
+                    theme.colors.accent2,
                   border: '2px solid black',
                 }}
               >
@@ -490,7 +492,7 @@ export default function ParentReports({ userId, userName }: ParentReportsProps) 
               <div
                 className="p-4"
                 style={{
-                  backgroundColor: '#E6E6FA',
+                  backgroundColor: theme.colors.accent5,
                   border: '3px solid black',
                   borderRadius: '12px',
                 }}
@@ -521,7 +523,7 @@ export default function ParentReports({ userId, userName }: ParentReportsProps) 
               <div
                 className="p-4"
                 style={{
-                  backgroundColor: '#FFFACD',
+                  backgroundColor: theme.colors.accent2,
                   border: '3px solid black',
                   borderRadius: '12px',
                 }}
@@ -544,7 +546,7 @@ export default function ParentReports({ userId, userName }: ParentReportsProps) 
               <div
                 className="p-4"
                 style={{
-                  backgroundColor: '#FFB6C1',
+                  backgroundColor: theme.colors.accent1,
                   border: '3px solid black',
                   borderRadius: '12px',
                 }}
@@ -567,7 +569,7 @@ export default function ParentReports({ userId, userName }: ParentReportsProps) 
               <div
                 className="p-4"
                 style={{
-                  backgroundColor: '#98FB98',
+                  backgroundColor: theme.colors.accent3,
                   border: '3px solid black',
                   borderRadius: '12px',
                 }}
@@ -590,7 +592,7 @@ export default function ParentReports({ userId, userName }: ParentReportsProps) 
               <div
                 className="p-4"
                 style={{
-                  backgroundColor: '#87CEEB',
+                  backgroundColor: theme.colors.accent4,
                   border: '3px solid black',
                   borderRadius: '12px',
                 }}
@@ -623,7 +625,7 @@ export default function ParentReports({ userId, userName }: ParentReportsProps) 
                     disabled={actionLoading}
                     className="flex-1 py-3 font-bold hover:scale-105 transition-transform disabled:opacity-50"
                     style={{
-                      backgroundColor: '#FFB6C1',
+                      backgroundColor: theme.colors.background,
                       border: '3px solid black',
                       borderRadius: '12px',
                       boxShadow: '3px 3px 0 black',
@@ -636,7 +638,7 @@ export default function ParentReports({ userId, userName }: ParentReportsProps) 
                     disabled={actionLoading}
                     className="flex-1 py-3 font-bold hover:scale-105 transition-transform disabled:opacity-50"
                     style={{
-                      backgroundColor: '#90EE90',
+                      backgroundColor: theme.colors.accent3,
                       border: '3px solid black',
                       borderRadius: '12px',
                       boxShadow: '3px 3px 0 black',
@@ -655,7 +657,7 @@ export default function ParentReports({ userId, userName }: ParentReportsProps) 
                   disabled={actionLoading}
                   className="w-full py-3 font-bold hover:scale-105 transition-transform disabled:opacity-50"
                   style={{
-                    backgroundColor: '#90EE90',
+                    backgroundColor: theme.colors.accent3,
                     border: '3px solid black',
                     borderRadius: '12px',
                     boxShadow: '4px 4px 0 black',
