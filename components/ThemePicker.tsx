@@ -4,6 +4,17 @@ import { useState } from 'react'
 import { useTheme } from '@/lib/ThemeContext'
 import { themeList } from '@/lib/themes'
 
+// Helper to determine if text should be white or black based on background
+function getContrastTextColor(hexColor: string): string {
+  const hex = hexColor.replace('#', '')
+  const r = parseInt(hex.substr(0, 2), 16)
+  const g = parseInt(hex.substr(2, 2), 16)
+  const b = parseInt(hex.substr(4, 2), 16)
+  // Calculate relative luminance
+  const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255
+  return luminance > 0.5 ? '#000000' : '#FFFFFF'
+}
+
 interface ThemePickerProps {
   isOpen: boolean
   onClose: () => void
@@ -93,8 +104,8 @@ export default function ThemePicker({ isOpen, onClose }: ThemePickerProps) {
                 <div className="flex items-center gap-3 mb-3">
                   <span className="text-3xl">{t.emoji}</span>
                   <div>
-                    <h3 className="font-bold text-lg">{t.name}</h3>
-                    <p className="text-xs">{t.description}</p>
+                    <h3 className="font-bold text-lg" style={{ color: getContrastTextColor(t.colors.background) }}>{t.name}</h3>
+                    <p className="text-xs" style={{ color: getContrastTextColor(t.colors.background), opacity: 0.7 }}>{t.description}</p>
                   </div>
                 </div>
 
@@ -118,6 +129,7 @@ export default function ThemePicker({ isOpen, onClose }: ThemePickerProps) {
                     className="px-3 py-1 text-xs font-bold rounded-full"
                     style={{
                       backgroundColor: t.colors.buttonPrimary,
+                      color: getContrastTextColor(t.colors.buttonPrimary),
                       border: '2px solid black',
                     }}
                   >
@@ -127,6 +139,7 @@ export default function ThemePicker({ isOpen, onClose }: ThemePickerProps) {
                     className="px-3 py-1 text-xs font-bold rounded-full"
                     style={{
                       backgroundColor: t.colors.accent2,
+                      color: getContrastTextColor(t.colors.accent2),
                       border: '2px solid black',
                     }}
                   >
@@ -136,6 +149,7 @@ export default function ThemePicker({ isOpen, onClose }: ThemePickerProps) {
                     className="px-3 py-1 text-xs font-bold rounded-full"
                     style={{
                       backgroundColor: t.colors.userMessage,
+                      color: getContrastTextColor(t.colors.userMessage),
                       border: '2px solid black',
                     }}
                   >
