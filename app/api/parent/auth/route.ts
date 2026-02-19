@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import db from '@/lib/db'
 import crypto from 'crypto'
+import { sendParentLoginEmail } from '@/lib/email'
 
 // POST - Request magic link (generates token, stores in DB)
 export async function POST(request: NextRequest) {
@@ -46,9 +47,24 @@ export async function POST(request: NextRequest) {
       VALUES (?, ?, ?)
     `).run(normalizedEmail, token, expiresAt.toISOString())
 
-    // In a real app, we would send an email here
-    // For now, we'll return the token in the response for testing
     const loginUrl = `/parent?token=${token}`
+
+    // Get teen names for the email
+    const teenNames = (connections as { name: string; nickname?: string }[]).map(
+      (c) => c.nickname || c.name
+    )
+
+    // Send the login email
+    const emailResult = await sendParentLoginEmail({
+      parentEmail: normalizedEmail,
+      loginUrl,
+      teenNames,
+    })
+
+    if (!emailResult.success) {
+      console.error('Failed to send parent login email:', emailResult.error)
+      // Still return success since token was created - they can request again
+    }
 
     return NextResponse.json({
       success: true,

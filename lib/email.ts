@@ -182,3 +182,87 @@ function formatDate(dateStr: string): string {
     return dateStr
   }
 }
+
+export interface ParentLoginEmailData {
+  parentEmail: string
+  loginUrl: string
+  teenNames: string[]
+}
+
+export async function sendParentLoginEmail(data: ParentLoginEmailData): Promise<{ success: boolean; error?: string }> {
+  try {
+    const client = getResendClient()
+
+    const fromEmail = process.env.RESEND_FROM_EMAIL || 'login@npc-app.com'
+    const appName = 'npc'
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://npc-app.com'
+    const fullLoginUrl = `${baseUrl}${data.loginUrl}`
+
+    const teenList = data.teenNames.length === 1
+      ? data.teenNames[0]
+      : data.teenNames.slice(0, -1).join(', ') + ' and ' + data.teenNames[data.teenNames.length - 1]
+
+    const emailHtml = `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Your ${appName} Parent Login Link</title>
+</head>
+<body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #FFF9E6;">
+
+  <!-- Header -->
+  <div style="background: #FFD700; border: 3px solid #000; border-radius: 20px; padding: 25px; text-align: center; margin-bottom: 20px;">
+    <h1 style="color: #000; margin: 0; font-size: 28px; font-weight: 800;">👋 hey there!</h1>
+    <p style="color: #000; margin: 10px 0 0 0; font-size: 18px; font-weight: 600;">your ${appName} login link</p>
+  </div>
+
+  <!-- Main Content -->
+  <div style="background: #fff; border: 3px solid #000; border-radius: 20px; padding: 25px;">
+    <p style="color: #333; margin-top: 0; font-size: 16px;">
+      click the button below to access the parent dashboard for ${teenList}:
+    </p>
+
+    <div style="text-align: center; margin: 30px 0;">
+      <a href="${fullLoginUrl}" style="display: inline-block; background: #90EE90; color: #000; font-size: 18px; font-weight: 700; padding: 15px 40px; border: 3px solid #000; border-radius: 50px; text-decoration: none; box-shadow: 4px 4px 0 #000;">
+        log in to ${appName} ✨
+      </a>
+    </div>
+
+    <p style="color: #666; font-size: 14px; text-align: center;">
+      this link expires in 24 hours
+    </p>
+
+    <div style="border-top: 3px solid #eee; margin: 25px 0; padding-top: 20px;">
+      <p style="color: #999; font-size: 13px; margin: 0;">
+        if you didn't request this login link, you can safely ignore this email.
+      </p>
+      <p style="color: #999; font-size: 13px; margin: 10px 0 0 0;">
+        can't click the button? copy this link: ${fullLoginUrl}
+      </p>
+    </div>
+  </div>
+</body>
+</html>
+`
+
+    const { data: result, error } = await client.emails.send({
+      from: `${appName} <${fromEmail}>`,
+      to: data.parentEmail,
+      subject: `Your ${appName} parent login link`,
+      html: emailHtml,
+    })
+
+    if (error) {
+      console.error('[EMAIL] Failed to send parent login:', error)
+      return { success: false, error: error.message }
+    }
+
+    console.log(`[EMAIL] Successfully sent parent login to ${data.parentEmail}, id: ${result?.id}`)
+    return { success: true }
+  } catch (error) {
+    console.error('[EMAIL] Error sending parent login:', error)
+    return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
+  }
+}
