@@ -112,6 +112,11 @@ interface PersonaStat {
   count: number
 }
 
+interface ThemeStat {
+  theme_id: string
+  user_count: number
+}
+
 interface ParentReportStats {
   total_reports: number
   sent_reports: number
@@ -163,6 +168,7 @@ interface AdminData {
   checkinsPerDay: TimeSeriesData[]
   topTopics: { session_topic: string; count: number }[]
   personaStats: PersonaStat[]
+  themeStats: ThemeStat[]
   parentReportStats: ParentReportStats
   parentReportsPerDay: TimeSeriesData[]
   customPersonas: CustomPersonaActivity[]
@@ -1198,7 +1204,65 @@ export default function AdminDashboard() {
                 )}
               </div>
 
-              {/* Parent Report Stats */}
+              {/* Theme/Skin Stats */}
+              <div
+                className="p-6"
+                style={{
+                  backgroundColor: 'white',
+                  border: '3px solid black',
+                  borderRadius: '8px',
+                  boxShadow: '6px 6px 0 black',
+                }}
+              >
+                <h2 className="text-lg font-bold mb-4 flex items-center gap-2">
+                  <span>🎨</span> Skin/Theme Usage
+                </h2>
+                {!data.themeStats || data.themeStats.length === 0 ? (
+                  <p className="text-gray-500 text-center py-4">no theme data yet!</p>
+                ) : (
+                  <div className="space-y-2">
+                    {data.themeStats.map((stat) => {
+                      const maxCount = Math.max(...data.themeStats.map(s => s.user_count), 1)
+                      const percentage = Math.round((stat.user_count / maxCount) * 100)
+                      const themeLabels: Record<string, { label: string; emoji: string; color: string }> = {
+                        bubblegum: { label: 'Bubblegum Pop', emoji: '🍬', color: '#FFB6C1' },
+                        ocean: { label: 'Ocean Wave', emoji: '🌊', color: '#87CEEB' },
+                        sunset: { label: 'Sunset Glow', emoji: '🌅', color: '#FFD700' },
+                        galaxy: { label: 'Galaxy Quest', emoji: '🌌', color: '#8A2BE2' },
+                        forest: { label: 'Forest Fairy', emoji: '🌲', color: '#90EE90' },
+                        candy: { label: 'Candy Crush', emoji: '🍭', color: '#FF69B4' },
+                        minimal: { label: 'Minimal', emoji: '⬜', color: '#E0E0E0' },
+                        dark: { label: 'Dark Mode', emoji: '🌙', color: '#1a1a2e' },
+                      }
+                      const info = themeLabels[stat.theme_id] || { label: stat.theme_id, emoji: '🎨', color: '#E0E0E0' }
+                      return (
+                        <div key={stat.theme_id} className="flex items-center gap-3">
+                          <span className="text-xl w-8">{info.emoji}</span>
+                          <div className="flex-1">
+                            <div className="flex justify-between text-sm mb-1">
+                              <span className="font-bold">{info.label}</span>
+                              <span>{stat.user_count} users</span>
+                            </div>
+                            <div
+                              className="h-3 rounded-full"
+                              style={{ backgroundColor: '#f0f0f0', border: '1px solid black' }}
+                            >
+                              <div
+                                className="h-full rounded-full"
+                                style={{ width: `${percentage}%`, backgroundColor: info.color }}
+                              />
+                            </div>
+                          </div>
+                        </div>
+                      )
+                    })}
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Parent Report Stats Row */}
+            <div className="mt-6">
               <div
                 className="p-6"
                 style={{

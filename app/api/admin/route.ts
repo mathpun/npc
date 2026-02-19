@@ -175,6 +175,23 @@ export async function GET(request: NextRequest) {
       ORDER BY count DESC
     `).all()
 
+    // Get theme/skin usage stats (most recent theme per user)
+    const themeStats = await db.prepare(`
+      SELECT
+        activity_data->>'themeId' as theme_id,
+        COUNT(DISTINCT user_id) as user_count
+      FROM activity_log
+      WHERE activity_type = 'theme_change'
+        AND activity_data->>'themeId' IS NOT NULL
+        AND id IN (
+          SELECT MAX(id) FROM activity_log
+          WHERE activity_type = 'theme_change'
+          GROUP BY user_id
+        )
+      GROUP BY activity_data->>'themeId'
+      ORDER BY user_count DESC
+    `).all()
+
     // Get parent report stats
     const parentReportStats = await db.prepare(`
       SELECT
@@ -324,6 +341,7 @@ export async function GET(request: NextRequest) {
       checkinsPerDay,
       topTopics,
       personaStats,
+      themeStats,
       parentReportStats,
       parentReportsPerDay,
       customPersonas,

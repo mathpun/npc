@@ -65,6 +65,20 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     if (themes[newThemeId]) {
       setThemeId(newThemeId)
       localStorage.setItem(STORAGE_KEY, newThemeId)
+
+      // Track theme change
+      const userId = localStorage.getItem('npc_user_id')
+      if (userId) {
+        fetch('/api/activity', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            userId,
+            activityType: 'theme_change',
+            activityData: { themeId: newThemeId }
+          }),
+        }).catch(err => console.error('Failed to track theme change:', err))
+      }
     }
   }
 
