@@ -117,6 +117,11 @@ interface ThemeStat {
   user_count: number
 }
 
+interface SessionGoalStat {
+  session_goal: string
+  count: number
+}
+
 interface ParentReportStats {
   total_reports: number
   sent_reports: number
@@ -168,6 +173,7 @@ interface AdminData {
   checkinsPerDay: TimeSeriesData[]
   topTopics: { session_topic: string; count: number }[]
   personaStats: PersonaStat[]
+  sessionGoalStats: SessionGoalStat[]
   themeStats: ThemeStat[]
   parentReportStats: ParentReportStats
   parentReportsPerDay: TimeSeriesData[]
@@ -1117,8 +1123,66 @@ export default function AdminDashboard() {
               </div>
             </div>
 
-            {/* Persona Stats & Parent Reports Row */}
+            {/* Session Goal & Persona Stats Row */}
             <div className="grid md:grid-cols-2 gap-6 mt-6">
+              {/* Session Goal Stats (What's on your mind) */}
+              <div
+                className="p-6"
+                style={{
+                  backgroundColor: 'white',
+                  border: '3px solid black',
+                  borderRadius: '8px',
+                  boxShadow: '6px 6px 0 black',
+                }}
+              >
+                <h2 className="text-lg font-bold mb-4 flex items-center gap-2">
+                  <span>🧠</span> What's On Your Mind
+                </h2>
+                {!data.sessionGoalStats || data.sessionGoalStats.length === 0 ? (
+                  <p className="text-gray-500 text-center py-4">no session data yet!</p>
+                ) : (
+                  <div className="space-y-2">
+                    {data.sessionGoalStats.map((stat) => {
+                      const maxCount = Math.max(...data.sessionGoalStats.map(s => s.count), 1)
+                      const percentage = Math.round((stat.count / maxCount) * 100)
+                      const goalLabels: Record<string, { label: string; emoji: string; color: string }> = {
+                        stuck: { label: "I'm stuck", emoji: '🌀', color: '#DDA0DD' },
+                        future: { label: 'My future', emoji: '🔮', color: '#87CEEB' },
+                        identity: { label: 'Who am I', emoji: '🪞', color: '#FFB6C1' },
+                        people: { label: 'People stuff', emoji: '👥', color: '#90EE90' },
+                        venting: { label: 'Need to vent', emoji: '🔥', color: '#FF6B6B' },
+                        creating: { label: 'Make something', emoji: '✨', color: '#FFD93D' },
+                        thinking: { label: 'Thinking', emoji: '🧠', color: '#DDA0DD' },
+                        learning: { label: 'Learning', emoji: '💡', color: '#87CEEB' },
+                        feeling: { label: 'Feelings', emoji: '💭', color: '#FFB6C1' },
+                        none: { label: 'No goal set', emoji: '💬', color: '#E0E0E0' },
+                      }
+                      const info = goalLabels[stat.session_goal] || { label: stat.session_goal, emoji: '💭', color: '#E0E0E0' }
+                      return (
+                        <div key={stat.session_goal} className="flex items-center gap-3">
+                          <span className="text-xl w-8">{info.emoji}</span>
+                          <div className="flex-1">
+                            <div className="flex justify-between text-sm mb-1">
+                              <span className="font-bold">{info.label}</span>
+                              <span>{stat.count}</span>
+                            </div>
+                            <div
+                              className="h-3 rounded-full"
+                              style={{ backgroundColor: '#f0f0f0', border: '1px solid black' }}
+                            >
+                              <div
+                                className="h-full rounded-full"
+                                style={{ width: `${percentage}%`, backgroundColor: info.color }}
+                              />
+                            </div>
+                          </div>
+                        </div>
+                      )
+                    })}
+                  </div>
+                )}
+              </div>
+
               {/* Persona Usage Stats */}
               <div
                 className="p-6"

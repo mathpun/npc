@@ -175,6 +175,16 @@ export async function GET(request: NextRequest) {
       ORDER BY count DESC
     `).all()
 
+    // Get session goal usage stats (what's on your mind options)
+    const sessionGoalStats = await db.prepare(`
+      SELECT
+        COALESCE(session_goal, 'none') as session_goal,
+        COUNT(*) as count
+      FROM chat_sessions
+      GROUP BY session_goal
+      ORDER BY count DESC
+    `).all()
+
     // Get theme/skin usage stats (most recent theme per user)
     const themeStats = await db.prepare(`
       SELECT
@@ -341,6 +351,7 @@ export async function GET(request: NextRequest) {
       checkinsPerDay,
       topTopics,
       personaStats,
+      sessionGoalStats,
       themeStats,
       parentReportStats,
       parentReportsPerDay,
