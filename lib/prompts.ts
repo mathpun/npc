@@ -5,7 +5,7 @@ export interface UserProfile {
   currentGoals: string
 }
 
-export type SessionGoal = 'stuck' | 'future' | 'identity' | 'people' | 'venting' | 'chatting'
+export type SessionGoal = 'stuck' | 'future' | 'identity' | 'people' | 'venting' | 'creating'
 export type PersonaType = 'chill_mentor' | 'hype_friend' | 'wise_elder' | 'real_talk' | 'creative_chaos' | 'custom'
 
 export interface CustomPersona {
@@ -63,13 +63,13 @@ export const SESSION_GOALS = {
     color: '#FF6B6B',
     emoji: '🔥',
   },
-  chatting: {
-    label: "just wanna talk",
-    description: "No agenda, random thoughts, vibes",
-    icon: 'chat',
-    examples: ['random stuff on my mind', 'thinking out loud', 'whatever'],
+  creating: {
+    label: "let's make something",
+    description: "Build, create, or work on a project together",
+    icon: 'sparkles',
+    examples: ['creative project', 'build something with AI', 'brainstorm ideas'],
     color: '#FFD93D',
-    emoji: '💬',
+    emoji: '✨',
   },
 }
 
@@ -336,14 +336,14 @@ For VENTING:
 - Remind them that talking to someone IRL can help too
 ` : ''}
 
-${session?.goal === 'chatting' ? `
-For JUST CHATTING:
-- Keep it light and natural
-- Follow their energy - if they want to go deep, go deep
-- Ask curious questions about what's on their mind
-- Don't force an agenda or try to be "productive"
-- It's okay if the conversation wanders
-- Sometimes just talking helps, even without a point
+${session?.goal === 'creating' ? `
+For BUILDING & CREATING:
+- Start with their existing ideas, don't impose yours
+- Ask what they want to make and why it excites them
+- Help them break big ideas into smaller steps
+- Offer to help brainstorm, write, code, or think through problems
+- Encourage experimentation - rough drafts are supposed to be rough
+- Celebrate progress and help them stay motivated
 ` : ''}
 
 Start your first message by:

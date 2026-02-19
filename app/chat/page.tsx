@@ -142,7 +142,7 @@ function ChatPageContent() {
       // Auto-start a session with this topic
       setShowSessionPicker(false)
       const parsedProfile = JSON.parse(savedProfile)
-      setSession({ goal: 'chatting' as SessionGoal, topic: topicFromUrl })
+      setSession({ goal: 'creating' as SessionGoal, topic: topicFromUrl })
       // Get initial greeting with this topic
       getInitialGreetingWithTopic(parsedProfile, topicFromUrl)
     }
@@ -187,7 +187,7 @@ function ChatPageContent() {
         body: JSON.stringify({
           messages: [{ role: 'user', content: topic }],
           profile: userProfile,
-          session: { goal: 'chatting', topic },
+          session: { goal: 'creating', topic },
           userId: localStorage.getItem('npc_user_id'),
         }),
       })
