@@ -132,6 +132,7 @@ interface TimeSpentUser {
   total_minutes: number
   session_count: number
   avg_session_minutes: number
+  chat_count: number
 }
 
 interface AdminData {
@@ -1281,7 +1282,7 @@ export default function AdminDashboard() {
               </h2>
 
               {/* Summary Stats */}
-              <div className="grid grid-cols-2 gap-3 mb-4">
+              <div className="grid grid-cols-3 gap-3 mb-4">
                 <div
                   className="p-3 text-center"
                   style={{ backgroundColor: '#87CEEB', border: '2px solid black', borderRadius: '8px' }}
@@ -1292,14 +1293,21 @@ export default function AdminDashboard() {
                       : `${data.stats.totalTimeMinutes}m`
                     }
                   </div>
-                  <div className="text-xs font-bold">Total Time (all users)</div>
+                  <div className="text-xs font-bold">Total Time</div>
+                </div>
+                <div
+                  className="p-3 text-center"
+                  style={{ backgroundColor: '#FF69B4', border: '2px solid black', borderRadius: '8px' }}
+                >
+                  <div className="text-2xl font-bold">{data.stats.totalChats}</div>
+                  <div className="text-xs font-bold">Total Chats</div>
                 </div>
                 <div
                   className="p-3 text-center"
                   style={{ backgroundColor: '#90EE90', border: '2px solid black', borderRadius: '8px' }}
                 >
                   <div className="text-2xl font-bold">{data.stats.avgSessionMinutes}m</div>
-                  <div className="text-xs font-bold">Avg Session Length</div>
+                  <div className="text-xs font-bold">Avg Session</div>
                 </div>
               </div>
 
@@ -1326,14 +1334,17 @@ export default function AdminDashboard() {
                             />
                           </div>
                         </div>
-                        <div className="w-20 text-right text-sm">
+                        <div className="w-16 text-right text-sm">
                           {user.total_minutes >= 60
                             ? `${Math.floor(user.total_minutes / 60)}h ${user.total_minutes % 60}m`
                             : `${user.total_minutes}m`
                           }
                         </div>
+                        <div className="w-20 text-right text-xs" style={{ color: '#FF69B4' }}>
+                          💬 {user.chat_count || 0}
+                        </div>
                         <div className="w-16 text-right text-xs text-gray-500">
-                          {user.session_count} sessions
+                          {user.session_count} sess
                         </div>
                       </div>
                     )

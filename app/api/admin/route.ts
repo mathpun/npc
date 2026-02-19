@@ -196,7 +196,7 @@ export async function GET(request: NextRequest) {
       ORDER BY date DESC
     `).all()
 
-    // Get time spent per user (from chat sessions)
+    // Get time spent per user (from chat sessions) + chat count
     const timeSpentPerUser = await db.prepare(`
       SELECT
         u.id as user_id,
@@ -205,10 +205,11 @@ export async function GET(request: NextRequest) {
         COALESCE(SUM(
           EXTRACT(EPOCH FROM (COALESCE(cs.ended_at, cs.started_at + INTERVAL '5 minutes') - cs.started_at)) / 60
         ), 0)::integer as total_minutes,
-        COUNT(cs.id) as session_count,
+        COUNT(DISTINCT cs.id) as session_count,
         COALESCE(AVG(
           EXTRACT(EPOCH FROM (COALESCE(cs.ended_at, cs.started_at + INTERVAL '5 minutes') - cs.started_at)) / 60
-        ), 0)::integer as avg_session_minutes
+        ), 0)::integer as avg_session_minutes,
+        (SELECT COUNT(*) FROM chat_messages cm WHERE cm.user_id = u.id) as chat_count
       FROM users u
       LEFT JOIN chat_sessions cs ON u.id = cs.user_id
       GROUP BY u.id, u.name, u.age
