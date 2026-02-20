@@ -8,6 +8,7 @@ import Goals from '@/components/Goals'
 import ParentPrompts from '@/components/ParentPrompts'
 import DailyCheckIn from '@/components/DailyCheckIn'
 import InstallPrompt from '@/components/InstallPrompt'
+import DeleteAccount from '@/components/DeleteAccount'
 import { ACHIEVEMENTS } from '@/lib/achievements'
 import { useTheme } from '@/lib/ThemeContext'
 
@@ -55,6 +56,7 @@ export default function Dashboard() {
   const [showPrompts, setShowPrompts] = useState(true)
   const [showCheckIn, setShowCheckIn] = useState(false)
   const [checkedInToday, setCheckedInToday] = useState(false)
+  const [showDeleteAccount, setShowDeleteAccount] = useState(false)
   const { theme } = useTheme()
 
   useEffect(() => {
@@ -512,7 +514,20 @@ export default function Dashboard() {
             </div>
           </div>
         </div>
+
+        {/* Account Settings - at bottom */}
+        <div className="mt-12 pt-8 border-t-2 border-dashed border-black/20">
+          <button
+            onClick={() => setShowDeleteAccount(true)}
+            className="text-sm text-gray-500 hover:text-gray-700 underline"
+          >
+            Delete my account
+          </button>
+        </div>
       </main>
+
+      {/* Delete Account Modal */}
+      <DeleteAccount isOpen={showDeleteAccount} onClose={() => setShowDeleteAccount(false)} />
 
       {/* Bottom Nav - crayon style */}
       <nav

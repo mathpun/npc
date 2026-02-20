@@ -7,7 +7,6 @@ import { signOut } from 'next-auth/react'
 import { useTheme } from '@/lib/ThemeContext'
 import ThemePicker, { ThemePickerButton } from './ThemePicker'
 import ChangePassword from './ChangePassword'
-import DeleteAccount from './DeleteAccount'
 
 interface NavBarProps {
   showBack?: boolean
@@ -21,7 +20,6 @@ export default function NavBar({ showBack = false, backHref = '/', backLabel = '
   const [userName, setUserName] = useState('')
   const [showThemePicker, setShowThemePicker] = useState(false)
   const [showChangePassword, setShowChangePassword] = useState(false)
-  const [showDeleteAccount, setShowDeleteAccount] = useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const { theme } = useTheme()
 
@@ -213,40 +211,22 @@ export default function NavBar({ showBack = false, backHref = '/', backLabel = '
             </button>
 
             {isLoggedIn && (
-              <>
-                <button
-                  onClick={() => {
-                    setMobileMenuOpen(false)
-                    setShowChangePassword(true)
-                  }}
-                  className="flex flex-col items-center gap-1 p-3 font-bold hover:scale-105 transition-transform"
-                  style={{
-                    backgroundColor: theme.colors.accent5,
-                    border: '3px solid black',
-                    borderRadius: '16px',
-                    boxShadow: '3px 3px 0 black',
-                  }}
-                >
-                  <span className="text-2xl">🔐</span>
-                  <span className="text-xs">password</span>
-                </button>
-                <button
-                  onClick={() => {
-                    setMobileMenuOpen(false)
-                    setShowDeleteAccount(true)
-                  }}
-                  className="flex flex-col items-center gap-1 p-3 font-bold hover:scale-105 transition-transform"
-                  style={{
-                    backgroundColor: '#FF6B6B',
-                    border: '3px solid black',
-                    borderRadius: '16px',
-                    boxShadow: '3px 3px 0 black',
-                  }}
-                >
-                  <span className="text-2xl">🗑️</span>
-                  <span className="text-xs">delete</span>
-                </button>
-              </>
+              <button
+                onClick={() => {
+                  setMobileMenuOpen(false)
+                  setShowChangePassword(true)
+                }}
+                className="flex flex-col items-center gap-1 p-3 font-bold hover:scale-105 transition-transform"
+                style={{
+                  backgroundColor: theme.colors.accent5,
+                  border: '3px solid black',
+                  borderRadius: '16px',
+                  boxShadow: '3px 3px 0 black',
+                }}
+              >
+                <span className="text-2xl">🔐</span>
+                <span className="text-xs">password</span>
+              </button>
             )}
           </div>
 
@@ -278,9 +258,6 @@ export default function NavBar({ showBack = false, backHref = '/', backLabel = '
 
       {/* Change Password Modal */}
       <ChangePassword isOpen={showChangePassword} onClose={() => setShowChangePassword(false)} />
-
-      {/* Delete Account Modal */}
-      <DeleteAccount isOpen={showDeleteAccount} onClose={() => setShowDeleteAccount(false)} />
     </>
   )
 }
