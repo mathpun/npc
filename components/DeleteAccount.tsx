@@ -81,7 +81,7 @@ export default function DeleteAccount({ isOpen, onClose }: DeleteAccountProps) {
       <div className="absolute inset-0 bg-black/50" onClick={handleClose} />
 
       <div
-        className="relative w-full max-w-md p-6"
+        className="relative w-full max-w-md p-6 max-h-[90vh] overflow-y-auto"
         style={{
           backgroundColor: 'white',
           border: '4px solid black',

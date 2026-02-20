@@ -516,7 +516,7 @@ export default function Dashboard() {
         </div>
 
         {/* Account Settings - at bottom */}
-        <div className="mt-12 pt-8 border-t-2 border-dashed border-black/20">
+        <div className="mt-12 pt-8 pb-16 border-t-2 border-dashed border-black/20">
           <button
             onClick={() => setShowDeleteAccount(true)}
             className="text-sm text-gray-500 hover:text-gray-700 underline"
