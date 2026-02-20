@@ -22,6 +22,7 @@ export interface Theme {
     navHome: string
     navDashboard: string
     navChat: string
+    navGrowth: string
     navMuseum: string
     navWorld: string
 
@@ -67,6 +68,7 @@ export const themes: Record<string, Theme> = {
       navHome: '#FFB6C1',
       navDashboard: '#87CEEB',
       navChat: '#98FB98',
+      navGrowth: '#FFA500',
       navMuseum: '#DDA0DD',
       navWorld: '#FFD700',
 
@@ -107,6 +109,7 @@ export const themes: Record<string, Theme> = {
       navHome: '#87CEEB',
       navDashboard: '#48D1CC',
       navChat: '#7FDBFF',
+      navGrowth: '#20B2AA',
       navMuseum: '#00CED1',
       navWorld: '#B0E0E6',
 
@@ -147,6 +150,7 @@ export const themes: Record<string, Theme> = {
       navHome: '#FFD700',
       navDashboard: '#FF8C00',
       navChat: '#FFA500',
+      navGrowth: '#FF6347',
       navMuseum: '#FF7F50',
       navWorld: '#FFB347',
 
@@ -187,6 +191,7 @@ export const themes: Record<string, Theme> = {
       navHome: '#DDA0DD',
       navDashboard: '#9370DB',
       navChat: '#BA55D3',
+      navGrowth: '#9932CC',
       navMuseum: '#8A2BE2',
       navWorld: '#DA70D6',
 
@@ -227,6 +232,7 @@ export const themes: Record<string, Theme> = {
       navHome: '#90EE90',
       navDashboard: '#3CB371',
       navChat: '#98FB98',
+      navGrowth: '#3CB371',
       navMuseum: '#2E8B57',
       navWorld: '#66CDAA',
 
@@ -267,6 +273,7 @@ export const themes: Record<string, Theme> = {
       navHome: '#FF69B4',
       navDashboard: '#DA70D6',
       navChat: '#FF6EB4',
+      navGrowth: '#FF1493',
       navMuseum: '#DDA0DD',
       navWorld: '#EE82EE',
 
@@ -307,6 +314,7 @@ export const themes: Record<string, Theme> = {
       navHome: '#F5F5F5',
       navDashboard: '#E0E0E0',
       navChat: '#F5F5F5',
+      navGrowth: '#CCCCCC',
       navMuseum: '#E0E0E0',
       navWorld: '#F5F5F5',
 
@@ -347,6 +355,7 @@ export const themes: Record<string, Theme> = {
       navHome: '#E94560',
       navDashboard: '#7B68EE',
       navChat: '#00D9FF',
+      navGrowth: '#50FA7B',
       navMuseum: '#BD93F9',
       navWorld: '#FFB86C',
 
