@@ -517,11 +517,19 @@ export default function Dashboard() {
 
         {/* Account Settings - at bottom */}
         <div className="mt-12 pt-8 pb-16 border-t-2 border-dashed border-black/20">
+          <p className="text-sm text-gray-500 mb-3">account stuff</p>
           <button
             onClick={() => setShowDeleteAccount(true)}
-            className="text-sm text-gray-500 hover:text-gray-700 underline"
+            className="flex items-center gap-2 px-4 py-2 text-sm font-bold hover:scale-105 transition-transform"
+            style={{
+              backgroundColor: theme.colors.backgroundAccent,
+              border: '2px solid black',
+              borderRadius: '9999px',
+              boxShadow: '2px 2px 0 black',
+            }}
           >
-            Delete my account
+            <span>🗑️</span>
+            <span>delete my account</span>
           </button>
         </div>
       </main>
