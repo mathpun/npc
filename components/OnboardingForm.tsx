@@ -160,12 +160,19 @@ export default function OnboardingForm() {
     }))
   }
 
+  const isValidEmail = (email: string) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    return emailRegex.test(email)
+  }
+
   const canProceed = () => {
     switch (step) {
       case 1:
         const baseRequirements = formData.name.trim().length > 0 &&
                formData.currentAge.trim().length > 0 &&
-               parseInt(formData.currentAge) >= 13
+               parseInt(formData.currentAge) >= 13 &&
+               formData.email.trim().length > 0 &&
+               isValidEmail(formData.email)
         // Password not required for Google signup
         if (isGoogleSignup) {
           return baseRequirements
@@ -318,6 +325,36 @@ export default function OnboardingForm() {
                 }}
                 autoFocus
               />
+            </div>
+
+            {/* Email field - show for all users (Google users have it pre-filled) */}
+            <div>
+              <label className="block text-lg font-bold mb-2">your email</label>
+              <input
+                type="email"
+                value={formData.email}
+                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                placeholder="we'll send you a welcome message!"
+                className="w-full px-4 py-3 text-lg"
+                style={{
+                  backgroundColor: isGoogleSignup ? '#E8F5E9' : '#FFFACD',
+                  border: '3px solid black',
+                  borderRadius: '12px',
+                }}
+                disabled={isGoogleSignup}
+              />
+              {formData.email && !isValidEmail(formData.email) && (
+                <p
+                  className="text-sm mt-2 px-3 py-2 inline-block"
+                  style={{
+                    backgroundColor: '#FFA500',
+                    border: '2px solid black',
+                    borderRadius: '8px',
+                  }}
+                >
+                  please enter a valid email
+                </p>
+              )}
             </div>
 
             <div>

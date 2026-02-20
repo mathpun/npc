@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import db from '@/lib/db'
 import { v4 as uuidv4 } from 'uuid'
 import bcrypt from 'bcryptjs'
+import { sendWelcomeEmail } from '@/lib/email'
 
 // GET all users or single user by id
 export async function GET(request: NextRequest) {
@@ -102,6 +103,17 @@ export async function POST(request: NextRequest) {
       VALUES (?, 'first_steps')
       ON CONFLICT (user_id, achievement_key) DO NOTHING
     `).run(id)
+
+    // Send welcome email if email provided
+    if (email) {
+      sendWelcomeEmail({
+        email,
+        username: name,
+        nickname: displayName,
+      }).catch(err => {
+        console.error('Failed to send welcome email:', err)
+      })
+    }
 
     return NextResponse.json({ id, name, nickname: displayName, age, interests: interestsStr, goals })
   } catch (error) {
