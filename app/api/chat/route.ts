@@ -82,7 +82,7 @@ export async function POST(request: NextRequest) {
     // Create a streaming response
     const stream = await getAnthropicClient().messages.stream({
       model: 'claude-sonnet-4-20250514',
-      max_tokens: 400,
+      max_tokens: 250,
       system: systemPrompt,
       messages: messages.map((msg: { role: string; content: string }) => ({
         role: msg.role as 'user' | 'assistant',
