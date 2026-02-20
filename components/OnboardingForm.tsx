@@ -28,7 +28,7 @@ const INTERESTS = [
   { name: 'Anime', emoji: '⚔️' },
 ]
 
-const STEP_COLORS = ['#FF69B4', '#FFD700', '#90EE90']
+const STEP_COLORS = ['#87CEEB', '#FF69B4', '#FFD700', '#90EE90']
 
 const PRONOUNS = [
   { value: 'she/her', label: 'she/her' },
@@ -48,6 +48,7 @@ interface FormData {
   currentGoals: string
   email: string
   googleId: string
+  dataConsent: boolean
 }
 
 export default function OnboardingForm() {
@@ -65,11 +66,12 @@ export default function OnboardingForm() {
     currentGoals: '',
     email: '',
     googleId: '',
+    dataConsent: false,
   })
   const [signupError, setSignupError] = useState('')
   const [isGoogleSignup, setIsGoogleSignup] = useState(false)
 
-  const totalSteps = 3
+  const totalSteps = 4
 
   // Check if coming from Google OAuth
   useEffect(() => {
@@ -168,6 +170,8 @@ export default function OnboardingForm() {
   const canProceed = () => {
     switch (step) {
       case 1:
+        return formData.dataConsent === true
+      case 2:
         const baseRequirements = formData.name.trim().length > 0 &&
                formData.currentAge.trim().length > 0 &&
                parseInt(formData.currentAge) >= 13 &&
@@ -178,9 +182,9 @@ export default function OnboardingForm() {
           return baseRequirements
         }
         return baseRequirements && formData.password.length >= 4
-      case 2:
-        return formData.interests.length >= 1
       case 3:
+        return formData.interests.length >= 1
+      case 4:
         return true
       default:
         return false
@@ -192,10 +196,10 @@ export default function OnboardingForm() {
       {/* Progress bar - hand drawn style */}
       <div className="mb-8">
         <div className="flex justify-between mb-4">
-          {[1, 2, 3].map((s) => (
+          {[1, 2, 3, 4].map((s) => (
             <div
               key={s}
-              className={`w-14 h-14 rounded-full flex items-center justify-center text-lg font-bold transition-all duration-300`}
+              className={`w-12 h-12 rounded-full flex items-center justify-center text-lg font-bold transition-all duration-300`}
               style={{
                 backgroundColor: s <= step ? STEP_COLORS[s - 1] : 'white',
                 border: '3px solid black',
@@ -203,7 +207,7 @@ export default function OnboardingForm() {
                 transform: s === step ? 'rotate(-3deg) scale(1.1)' : 'rotate(0deg)',
               }}
             >
-              {s <= step ? ['👋', '❤️', '🚀'][s - 1] : s}
+              {s <= step ? ['🔒', '👋', '❤️', '🚀'][s - 1] : s}
             </div>
           ))}
         </div>
@@ -231,8 +235,104 @@ export default function OnboardingForm() {
           boxShadow: '8px 8px 0 black',
         }}
       >
-        {/* Step 1: Name & Age */}
+        {/* Step 1: Data Consent */}
         {step === 1 && (
+          <div className="space-y-6">
+            <div className="text-center mb-6">
+              <div className="text-5xl mb-4">🔒</div>
+              <h2
+                className="text-2xl font-bold mb-2 inline-block px-4 py-2 -rotate-1"
+                style={{
+                  backgroundColor: '#87CEEB',
+                  border: '3px solid black',
+                  boxShadow: '4px 4px 0 black',
+                }}
+              >
+                your privacy matters
+              </h2>
+              <p className="text-lg mt-4">before we start, here&apos;s how npc works</p>
+            </div>
+
+            <div
+              className="p-4 space-y-4"
+              style={{
+                backgroundColor: '#FFFACD',
+                border: '3px solid black',
+                borderRadius: '12px',
+              }}
+            >
+              <div className="flex items-start gap-3">
+                <span className="text-2xl">🤖</span>
+                <div>
+                  <h3 className="font-bold">AI-Powered Conversations</h3>
+                  <p className="text-sm text-gray-700">
+                    npc uses Claude, an AI made by Anthropic, to chat with you and help you reflect on life.
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-3">
+                <span className="text-2xl">💬</span>
+                <div>
+                  <h3 className="font-bold">What We Send</h3>
+                  <p className="text-sm text-gray-700">
+                    Your messages, profile info (name, age, interests), and conversation history are sent to Anthropic to generate responses.
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-3">
+                <span className="text-2xl">🛡️</span>
+                <div>
+                  <h3 className="font-bold">How It&apos;s Protected</h3>
+                  <p className="text-sm text-gray-700">
+                    Anthropic doesn&apos;t use your conversations to train their AI. Your data is transmitted securely and handled according to their privacy policy.
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-3">
+                <span className="text-2xl">🗑️</span>
+                <div>
+                  <h3 className="font-bold">Your Control</h3>
+                  <p className="text-sm text-gray-700">
+                    You can delete your account and all associated data at any time from your settings.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <button
+              onClick={() => setFormData({ ...formData, dataConsent: !formData.dataConsent })}
+              className="w-full flex items-center gap-3 p-4 text-left font-bold transition-all duration-200 hover:scale-[1.02]"
+              style={{
+                backgroundColor: formData.dataConsent ? '#90EE90' : 'white',
+                border: '3px solid black',
+                borderRadius: '12px',
+                boxShadow: formData.dataConsent ? '4px 4px 0 black' : 'none',
+              }}
+            >
+              <div
+                className="w-8 h-8 flex items-center justify-center text-lg"
+                style={{
+                  backgroundColor: formData.dataConsent ? '#FFD700' : 'white',
+                  border: '3px solid black',
+                  borderRadius: '8px',
+                }}
+              >
+                {formData.dataConsent ? '✓' : ''}
+              </div>
+              <span>I understand and agree to send my data to Anthropic for AI conversations</span>
+            </button>
+
+            <p className="text-xs text-center text-gray-500">
+              By continuing, you also agree to our Terms of Service and Privacy Policy.
+            </p>
+          </div>
+        )}
+
+        {/* Step 2: Name & Age */}
+        {step === 2 && (
           <div className="space-y-6">
             <div className="text-center mb-6">
               <div className="flex justify-center mb-4">
@@ -465,8 +565,8 @@ export default function OnboardingForm() {
           </div>
         )}
 
-        {/* Step 2: Interests */}
-        {step === 2 && (
+        {/* Step 3: Interests */}
+        {step === 3 && (
           <div className="space-y-6">
             <div className="text-center mb-6">
               <div className="text-5xl mb-4">❤️</div>
@@ -522,8 +622,8 @@ export default function OnboardingForm() {
           </div>
         )}
 
-        {/* Step 3: Current goals/thoughts */}
-        {step === 3 && (
+        {/* Step 4: Current goals/thoughts */}
+        {step === 4 && (
           <div className="space-y-6">
             <div className="text-center mb-6">
               <div className="text-5xl mb-4">🚀</div>
