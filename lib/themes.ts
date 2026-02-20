@@ -322,11 +322,11 @@ export const themes: Record<string, Theme> = {
       userAvatar: '#333333',
       assistantAvatar: '#666666',
 
-      accent1: '#000000',
-      accent2: '#333333',
-      accent3: '#666666',
-      accent4: '#999999',
-      accent5: '#CCCCCC',
+      accent1: '#E0E0E0',
+      accent2: '#D0D0D0',
+      accent3: '#C0C0C0',
+      accent4: '#B0B0B0',
+      accent5: '#F0F0F0',
 
       buttonPrimary: '#000000',
       buttonSecondary: '#666666',
