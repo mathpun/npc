@@ -39,7 +39,7 @@ export default function ThemePicker({ isOpen, onClose }: ThemePickerProps) {
 
       {/* Modal */}
       <div
-        className="relative w-full max-w-2xl max-h-[90vh] overflow-y-auto p-6"
+        className="relative w-full max-w-2xl max-h-[90vh] overflow-y-auto p-6 text-black"
         style={{
           backgroundColor: 'white',
           border: '4px solid black',

@@ -227,7 +227,7 @@ export default function OnboardingForm() {
 
       {/* Step content */}
       <div
-        className="p-8"
+        className="p-8 text-black"
         style={{
           backgroundColor: 'white',
           border: '4px solid black',

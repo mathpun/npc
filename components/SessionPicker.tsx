@@ -78,7 +78,7 @@ export default function SessionPicker({ onSelect, onClose, onOpenHistory }: Sess
   // Step 1: Goal Selection
   if (step === 'goal') {
     return (
-      <div className="w-full max-w-2xl mx-auto">
+      <div className="w-full max-w-2xl mx-auto text-black">
         {onClose && (
           <button
             onClick={onClose}
@@ -231,7 +231,7 @@ export default function SessionPicker({ onSelect, onClose, onOpenHistory }: Sess
   // Step 3: Custom Persona Creator
   if (step === 'custom') {
     return (
-      <div className="w-full max-w-2xl mx-auto">
+      <div className="w-full max-w-2xl mx-auto text-black">
         {onClose && (
           <button
             onClick={onClose}
@@ -434,7 +434,7 @@ export default function SessionPicker({ onSelect, onClose, onOpenHistory }: Sess
 
   // Step 2: Persona Selection
   return (
-    <div className="w-full max-w-2xl mx-auto">
+    <div className="w-full max-w-2xl mx-auto text-black">
       {onClose && (
         <button
           onClick={onClose}

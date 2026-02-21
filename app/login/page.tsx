@@ -230,7 +230,7 @@ export default function LoginPage() {
 
       <div className="relative z-10 flex-1 flex items-center justify-center py-8 px-4">
         <div
-          className="w-full max-w-md p-8"
+          className="w-full max-w-md p-8 text-black"
           style={{
             backgroundColor: 'white',
             border: '4px solid black',

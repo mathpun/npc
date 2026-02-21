@@ -73,7 +73,7 @@ export default function ChangePassword({ isOpen, onClose }: ChangePasswordProps)
       <div className="absolute inset-0 bg-black/50" onClick={onClose} />
 
       <div
-        className="relative w-full max-w-md p-6"
+        className="relative w-full max-w-md p-6 text-black"
         style={{
           backgroundColor: theme.colors.backgroundAccent,
           border: '4px solid black',
