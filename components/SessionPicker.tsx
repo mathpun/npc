@@ -142,8 +142,8 @@ export default function SessionPicker({ onSelect, onClose, onOpenHistory }: Sess
                   <div
                     className="w-12 h-12 rounded-xl flex items-center justify-center text-2xl"
                     style={{
-                      backgroundColor: 'white',
-                      border: `3px solid ${isSelected ? 'black' : goal.color}`,
+                      backgroundColor: isSelected ? 'white' : goal.color,
+                      border: '2px solid black',
                     }}
                   >
                     {goal.emoji}

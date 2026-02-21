@@ -69,7 +69,7 @@ export const SESSION_GOALS = {
     icon: 'sparkles',
     examples: ['creative project', 'build something with AI', 'brainstorm ideas'],
     color: '#FFD93D',
-    emoji: '✨',
+    emoji: '🚀',
   },
 }
 
