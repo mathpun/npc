@@ -25,6 +25,7 @@ export interface Theme {
     navGrowth: string
     navMuseum: string
     navWorld: string
+    navParent: string
 
     // Message colors
     userMessage: string
@@ -71,6 +72,7 @@ export const themes: Record<string, Theme> = {
       navGrowth: '#FFA500',
       navMuseum: '#DDA0DD',
       navWorld: '#FFD700',
+      navParent: '#FFB6C1',
 
       userMessage: '#90EE90',
       userAvatar: '#FF69B4',
@@ -112,6 +114,7 @@ export const themes: Record<string, Theme> = {
       navGrowth: '#20B2AA',
       navMuseum: '#00CED1',
       navWorld: '#B0E0E6',
+      navParent: '#87CEEB',
 
       userMessage: '#40E0D0',
       userAvatar: '#00CED1',
@@ -153,6 +156,7 @@ export const themes: Record<string, Theme> = {
       navGrowth: '#FF6347',
       navMuseum: '#FF7F50',
       navWorld: '#FFB347',
+      navParent: '#FFDAB9',
 
       userMessage: '#FFD700',
       userAvatar: '#FF8C00',
@@ -194,6 +198,7 @@ export const themes: Record<string, Theme> = {
       navGrowth: '#9932CC',
       navMuseum: '#8A2BE2',
       navWorld: '#DA70D6',
+      navParent: '#E6E6FA',
 
       userMessage: '#EE82EE',
       userAvatar: '#8A2BE2',
@@ -235,6 +240,7 @@ export const themes: Record<string, Theme> = {
       navGrowth: '#3CB371',
       navMuseum: '#2E8B57',
       navWorld: '#66CDAA',
+      navParent: '#8FBC8F',
 
       userMessage: '#98FB98',
       userAvatar: '#2E8B57',
@@ -276,6 +282,7 @@ export const themes: Record<string, Theme> = {
       navGrowth: '#FF1493',
       navMuseum: '#DDA0DD',
       navWorld: '#EE82EE',
+      navParent: '#FFB6C1',
 
       userMessage: '#FF77FF',
       userAvatar: '#FF1493',
@@ -317,6 +324,7 @@ export const themes: Record<string, Theme> = {
       navGrowth: '#CCCCCC',
       navMuseum: '#E0E0E0',
       navWorld: '#F5F5F5',
+      navParent: '#D0D0D0',
 
       userMessage: '#F0F0F0',
       userAvatar: '#333333',
@@ -358,6 +366,7 @@ export const themes: Record<string, Theme> = {
       navGrowth: '#50FA7B',
       navMuseum: '#BD93F9',
       navWorld: '#FFB86C',
+      navParent: '#FF79C6',
 
       userMessage: '#0F3460',
       userAvatar: '#E94560',

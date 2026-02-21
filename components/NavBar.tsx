@@ -53,6 +53,7 @@ export default function NavBar({ showBack = false, backHref = '/', backLabel = '
     { href: '/chat?tab=growth', icon: '🌱', label: 'growth', color: theme.colors.navGrowth },
     { href: '/museum', icon: '🏛️', label: 'museum', color: theme.colors.navMuseum },
     { href: '/moltbook', icon: '🌍', label: 'world', color: theme.colors.navWorld },
+    { href: '/parent', icon: '👨‍👩‍👧', label: 'parent', color: theme.colors.navParent || '#FFB6C1' },
   ]
 
   return (
