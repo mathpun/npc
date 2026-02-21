@@ -1,7 +1,7 @@
 'use client'
 
-import { useState, useEffect, use } from 'react'
-import { useRouter } from 'next/navigation'
+import { useState, useEffect } from 'react'
+import { useRouter, useParams } from 'next/navigation'
 import NavBar from '@/components/NavBar'
 import WorldHeader from '@/components/world/WorldHeader'
 import WorldElementGrid from '@/components/world/WorldElementGrid'
@@ -58,8 +58,9 @@ interface UserProfile {
   currentGoals: string
 }
 
-export default function WorldViewPage({ params }: { params: Promise<{ id: string }> }) {
-  const { id } = use(params)
+export default function WorldViewPage() {
+  const params = useParams()
+  const id = params.id as string
   const router = useRouter()
   const { theme } = useTheme()
   const [profile, setProfile] = useState<UserProfile | null>(null)

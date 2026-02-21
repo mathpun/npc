@@ -1,7 +1,7 @@
 'use client'
 
-import { useState, useEffect, use } from 'react'
-import { useRouter } from 'next/navigation'
+import { useState, useEffect } from 'react'
+import { useParams } from 'next/navigation'
 import Link from 'next/link'
 import NavBar from '@/components/NavBar'
 import WorldElementCard from '@/components/world/WorldElementCard'
@@ -37,9 +37,9 @@ interface Collaborator {
   nickname: string | null
 }
 
-export default function PublicWorldPage({ params }: { params: Promise<{ slug: string }> }) {
-  const { slug } = use(params)
-  const router = useRouter()
+export default function PublicWorldPage() {
+  const params = useParams()
+  const slug = params.slug as string
   const { theme } = useTheme()
   const [world, setWorld] = useState<World | null>(null)
   const [elements, setElements] = useState<WorldElement[]>([])

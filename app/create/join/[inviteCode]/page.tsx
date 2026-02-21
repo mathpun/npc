@@ -1,7 +1,7 @@
 'use client'
 
-import { useState, useEffect, use } from 'react'
-import { useRouter } from 'next/navigation'
+import { useState, useEffect } from 'react'
+import { useRouter, useParams } from 'next/navigation'
 import Link from 'next/link'
 import NavBar from '@/components/NavBar'
 import { useTheme } from '@/lib/ThemeContext'
@@ -19,8 +19,9 @@ interface WorldPreview {
   collaborator_count: number
 }
 
-export default function JoinWorldPage({ params }: { params: Promise<{ inviteCode: string }> }) {
-  const { inviteCode } = use(params)
+export default function JoinWorldPage() {
+  const params = useParams()
+  const inviteCode = params.inviteCode as string
   const router = useRouter()
   const { theme } = useTheme()
   const [userId, setUserId] = useState<string | null>(null)
