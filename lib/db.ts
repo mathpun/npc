@@ -338,6 +338,47 @@ async function initDb() {
         -- What the teen modified
         teen_edits JSONB
       );
+
+      -- Worlds table (for collaborative world building)
+      CREATE TABLE IF NOT EXISTS worlds (
+        id SERIAL PRIMARY KEY,
+        user_id TEXT NOT NULL REFERENCES users(id),
+        world_name TEXT NOT NULL DEFAULT 'My World',
+        world_emoji TEXT DEFAULT '🌍',
+        world_vibe TEXT,
+        world_description TEXT,
+        color_theme TEXT DEFAULT '#FF69B4',
+        share_slug TEXT UNIQUE,
+        invite_code TEXT UNIQUE,
+        is_public INTEGER DEFAULT 0,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      );
+
+      -- World collaborators
+      CREATE TABLE IF NOT EXISTS world_collaborators (
+        id SERIAL PRIMARY KEY,
+        world_id INTEGER NOT NULL REFERENCES worlds(id) ON DELETE CASCADE,
+        user_id TEXT NOT NULL REFERENCES users(id),
+        role TEXT DEFAULT 'collaborator',
+        joined_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        UNIQUE(world_id, user_id)
+      );
+
+      -- World elements
+      CREATE TABLE IF NOT EXISTS world_elements (
+        id SERIAL PRIMARY KEY,
+        world_id INTEGER NOT NULL REFERENCES worlds(id) ON DELETE CASCADE,
+        creator_id TEXT NOT NULL REFERENCES users(id),
+        element_type TEXT NOT NULL,
+        emoji TEXT,
+        name TEXT NOT NULL,
+        description TEXT,
+        details JSONB,
+        connections JSONB,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      );
     `)
     console.log('Database tables initialized')
   } catch (error) {

@@ -25,6 +25,7 @@ export interface Theme {
     navGrowth: string
     navMuseum: string
     navWorld: string
+    navCreate: string
     navParent: string
 
     // Message colors
@@ -72,6 +73,7 @@ export const themes: Record<string, Theme> = {
       navGrowth: '#FFA500',
       navMuseum: '#DDA0DD',
       navWorld: '#FFD700',
+      navCreate: '#FF69B4',
       navParent: '#FFB6C1',
 
       userMessage: '#90EE90',
@@ -114,6 +116,7 @@ export const themes: Record<string, Theme> = {
       navGrowth: '#20B2AA',
       navMuseum: '#00CED1',
       navWorld: '#B0E0E6',
+      navCreate: '#40E0D0',
       navParent: '#87CEEB',
 
       userMessage: '#40E0D0',
@@ -156,6 +159,7 @@ export const themes: Record<string, Theme> = {
       navGrowth: '#FF6347',
       navMuseum: '#FF7F50',
       navWorld: '#FFB347',
+      navCreate: '#F4A460',
       navParent: '#FFDAB9',
 
       userMessage: '#FFD700',
@@ -198,6 +202,7 @@ export const themes: Record<string, Theme> = {
       navGrowth: '#9932CC',
       navMuseum: '#8A2BE2',
       navWorld: '#DA70D6',
+      navCreate: '#EE82EE',
       navParent: '#E6E6FA',
 
       userMessage: '#EE82EE',
@@ -240,6 +245,7 @@ export const themes: Record<string, Theme> = {
       navGrowth: '#3CB371',
       navMuseum: '#2E8B57',
       navWorld: '#66CDAA',
+      navCreate: '#00FA9A',
       navParent: '#8FBC8F',
 
       userMessage: '#98FB98',
@@ -282,6 +288,7 @@ export const themes: Record<string, Theme> = {
       navGrowth: '#FF1493',
       navMuseum: '#DDA0DD',
       navWorld: '#EE82EE',
+      navCreate: '#FF77FF',
       navParent: '#FFB6C1',
 
       userMessage: '#FF77FF',
@@ -324,6 +331,7 @@ export const themes: Record<string, Theme> = {
       navGrowth: '#CCCCCC',
       navMuseum: '#E0E0E0',
       navWorld: '#F5F5F5',
+      navCreate: '#C0C0C0',
       navParent: '#D0D0D0',
 
       userMessage: '#F0F0F0',
@@ -366,6 +374,7 @@ export const themes: Record<string, Theme> = {
       navGrowth: '#50FA7B',
       navMuseum: '#BD93F9',
       navWorld: '#FFB86C',
+      navCreate: '#F1FA8C',
       navParent: '#FF79C6',
 
       userMessage: '#0F3460',
