@@ -63,7 +63,7 @@ export default function ChatInput({
           placeholder={placeholder}
           disabled={disabled}
           rows={1}
-          className="flex-1 bg-transparent border-none outline-none resize-none px-2 py-2 sm:px-3 text-base max-h-36"
+          className="flex-1 bg-transparent border-none outline-none resize-none px-2 py-2 sm:px-3 text-base max-h-36 text-black placeholder:text-gray-500"
           style={{
             backgroundColor: '#FFFACD',
             border: '2px solid black',
