@@ -59,26 +59,26 @@ export default function NavBar({ showBack = false, backHref = '/', backLabel = '
   return (
     <>
       <nav
-        className="relative z-20 flex items-center justify-between px-3 sm:px-4 py-3 border-b-4 border-black border-dashed safe-area-top"
+        className="relative z-20 flex items-center justify-between px-2 sm:px-4 py-2 sm:py-3 border-b-2 sm:border-b-4 border-black border-dashed safe-area-top"
         style={{ backgroundColor: 'white' }}
       >
         {/* Mobile: Hamburger + Logo */}
         <div className="flex items-center gap-2 sm:hidden">
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="flex items-center justify-center w-10 h-10 font-bold"
+            className="flex items-center justify-center w-9 h-9 font-bold text-sm"
             style={{
               backgroundColor: mobileMenuOpen ? theme.colors.accent1 : 'white',
-              border: '3px solid black',
-              borderRadius: '12px',
-              boxShadow: '3px 3px 0 black',
+              border: '2px solid black',
+              borderRadius: '10px',
+              boxShadow: '2px 2px 0 black',
             }}
           >
             {mobileMenuOpen ? '✕' : '☰'}
           </button>
           <Link href="/" className="flex items-center gap-1">
-            <span className="text-2xl">👻</span>
-            <span className="text-lg font-bold">npc</span>
+            <span className="text-xl">👻</span>
+            <span className="text-base font-bold">npc</span>
           </Link>
         </div>
 
@@ -141,12 +141,12 @@ export default function NavBar({ showBack = false, backHref = '/', backLabel = '
               </span>
               <button
                 onClick={handleLogout}
-                className="px-3 sm:px-4 py-2 font-bold hover:scale-105 transition-transform text-sm sm:text-base"
+                className="px-2 py-1 sm:px-4 sm:py-2 font-bold hover:scale-105 transition-transform text-xs sm:text-base"
                 style={{
                   backgroundColor: theme.colors.buttonPrimary,
-                  border: '3px solid black',
+                  border: '2px solid black',
                   borderRadius: '9999px',
-                  boxShadow: '3px 3px 0 black',
+                  boxShadow: '2px 2px 0 black',
                 }}
               >
                 logout
@@ -155,12 +155,12 @@ export default function NavBar({ showBack = false, backHref = '/', backLabel = '
           ) : (
             <Link
               href="/login"
-              className="px-3 sm:px-4 py-2 font-bold hover:scale-105 transition-transform text-sm sm:text-base"
+              className="px-2 py-1 sm:px-4 sm:py-2 font-bold hover:scale-105 transition-transform text-xs sm:text-base"
               style={{
                 backgroundColor: theme.colors.buttonSuccess,
-                border: '3px solid black',
+                border: '2px solid black',
                 borderRadius: '9999px',
-                boxShadow: '3px 3px 0 black',
+                boxShadow: '2px 2px 0 black',
               }}
             >
               log in

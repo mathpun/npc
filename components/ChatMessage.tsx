@@ -23,7 +23,7 @@ export default function ChatMessage({
 
   return (
     <div
-      className={`flex gap-3 ${
+      className={`flex gap-2 sm:gap-3 ${
         isAssistant ? 'justify-start' : 'justify-end'
       }`}
       style={{  }}
@@ -31,10 +31,10 @@ export default function ChatMessage({
       {/* Avatar for assistant */}
       {isAssistant && (
         <div
-          className="flex-shrink-0 w-12 h-12 rounded-full flex items-center justify-center text-2xl"
+          className="flex-shrink-0 w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center text-lg sm:text-xl"
           style={{
             backgroundColor: theme.colors.assistantAvatar,
-            border: '3px solid black',
+            border: '2px solid black',
           }}
         >
           👻
@@ -44,16 +44,16 @@ export default function ChatMessage({
       {/* Message bubble */}
       <div className="relative max-w-[85%] md:max-w-[75%]">
         <div
-          className="px-4 py-3"
+          className="px-3 py-2 sm:px-4 sm:py-3"
           style={{
             backgroundColor: isAssistant ? 'white' : theme.colors.userMessage,
-            border: '3px solid black',
-            borderRadius: isAssistant ? '16px 16px 16px 4px' : '16px 16px 4px 16px',
-            boxShadow: '4px 4px 0 black',
+            border: '2px solid black',
+            borderRadius: isAssistant ? '12px 12px 12px 4px' : '12px 12px 4px 12px',
+            boxShadow: '2px 2px 0 black',
           }}
         >
           {/* Message content */}
-          <div className={`text-sm md:text-base leading-relaxed whitespace-pre-wrap ${isStreaming ? 'typing-cursor' : ''}`}>
+          <div className={`text-sm leading-relaxed whitespace-pre-wrap ${isStreaming ? 'typing-cursor' : ''}`}>
             {content}
           </div>
         </div>
@@ -97,10 +97,10 @@ export default function ChatMessage({
       {/* Avatar for user */}
       {!isAssistant && (
         <div
-          className="flex-shrink-0 w-12 h-12 rounded-full flex items-center justify-center text-2xl"
+          className="flex-shrink-0 w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center text-lg sm:text-xl"
           style={{
             backgroundColor: theme.colors.userAvatar,
-            border: '3px solid black',
+            border: '2px solid black',
           }}
         >
           😊
