@@ -134,7 +134,7 @@ export const PERSONAS = {
   },
   creative_chaos: {
     label: 'Creative Chaos Gremlin',
-    description: "Unhinged brainstorming energy, no bad ideas",
+    description: "Wild brainstorming energy, no bad ideas",
     emoji: '🎨',
     color: '#90EE90',
     vibe: 'chaotic and creative',
