@@ -86,11 +86,9 @@ export async function GET(request: NextRequest) {
       lastMood: lastCheckin?.mood || null,
     }
 
-    // Fallback questions - always have these ready
+    // Fallback question - always have this ready
     const fallbackQuestions = [
-      `Hey ${user.name}! What's one thing that happened today that you want to remember?`,
-      `How are you feeling about ${dayOfWeek} so far?`,
-      `Anything on your mind you'd like to think through?`,
+      `Hey ${user.name}! What's one thing on your mind right now?`,
     ]
 
     // Start with fallback questions - they'll be replaced if AI succeeds
@@ -211,16 +209,88 @@ export async function POST(request: NextRequest) {
       VALUES (?, 'daily_checkin', ?)
     `).run(userId, JSON.stringify({ mood, questionCount: questions.length }))
 
+    // Update streak tracking
+    const streakInfo = await updateCheckinStreak(userId, today)
+
     // Check for check-in achievements
     await checkCheckinAchievements(userId)
 
     return NextResponse.json({
       success: true,
       summary: aiSummary,
+      streak: streakInfo,
     })
   } catch (error) {
     console.error('Error saving check-in:', error)
     return NextResponse.json({ error: 'Failed to save check-in' }, { status: 500 })
+  }
+}
+
+async function updateCheckinStreak(userId: string, today: string): Promise<{
+  currentStreak: number
+  longestStreak: number
+  isNewRecord: boolean
+}> {
+  try {
+    // Get user's current streak info
+    const user = await db.prepare(`
+      SELECT checkin_streak, longest_checkin_streak, last_checkin_date
+      FROM users WHERE id = ?
+    `).get(userId) as {
+      checkin_streak: number | null
+      longest_checkin_streak: number | null
+      last_checkin_date: string | null
+    } | undefined
+
+    const currentStreak = user?.checkin_streak || 0
+    const longestStreak = user?.longest_checkin_streak || 0
+    const lastCheckinDate = user?.last_checkin_date
+
+    let newStreak: number
+
+    if (!lastCheckinDate) {
+      // First ever check-in
+      newStreak = 1
+    } else {
+      // Calculate days between last check-in and today
+      const lastDate = new Date(lastCheckinDate)
+      const todayDate = new Date(today)
+      const diffTime = todayDate.getTime() - lastDate.getTime()
+      const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24))
+
+      if (diffDays === 0) {
+        // Already checked in today - no streak change
+        newStreak = currentStreak || 1
+      } else if (diffDays === 1) {
+        // Consecutive day - increment streak!
+        newStreak = currentStreak + 1
+      } else {
+        // Missed days - reset streak
+        newStreak = 1
+      }
+    }
+
+    // Check if this is a new record
+    const newLongestStreak = Math.max(newStreak, longestStreak)
+    const isNewRecord = newStreak > longestStreak && newStreak > 1
+
+    // Update the user's streak info
+    await db.prepare(`
+      UPDATE users
+      SET checkin_streak = ?,
+          longest_checkin_streak = ?,
+          last_checkin_date = ?
+      WHERE id = ?
+    `).run(newStreak, newLongestStreak, today, userId)
+
+    return {
+      currentStreak: newStreak,
+      longestStreak: newLongestStreak,
+      isNewRecord,
+    }
+  } catch (error) {
+    console.error('Error updating streak:', error)
+    return { currentStreak: 1, longestStreak: 1, isNewRecord: false }
   }
 }
 

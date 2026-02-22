@@ -3,6 +3,13 @@
 import { useState, useEffect, useCallback } from 'react'
 import { MOOD_OPTIONS } from '@/lib/checkin-prompts'
 import { useTheme } from '@/lib/ThemeContext'
+import StreakDisplay, { getStreakMilestone } from './StreakDisplay'
+
+interface StreakInfo {
+  currentStreak: number
+  longestStreak: number
+  isNewRecord: boolean
+}
 
 interface DailyCheckInProps {
   userId: string
@@ -21,12 +28,12 @@ export default function DailyCheckIn({ userId, userName, onComplete, onSkip }: D
   const [currentQuestion, setCurrentQuestion] = useState(0)
   const [showSkipConfirm, setShowSkipConfirm] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [showSuccess, setShowSuccess] = useState(false)
+  const [streakInfo, setStreakInfo] = useState<StreakInfo | null>(null)
 
-  // Local fallback questions in case API fails completely
+  // Local fallback question in case API fails completely
   const localFallbackQuestions = [
-    "What's one thing that happened today that you want to remember?",
-    "How are you feeling right now?",
-    "Anything on your mind you'd like to think through?",
+    `Hey ${userName}! What's one thing on your mind right now?`,
   ]
 
   const fetchQuestions = useCallback(async () => {
@@ -97,7 +104,19 @@ export default function DailyCheckIn({ userId, userName, onComplete, onSkip }: D
         throw new Error('Failed to save check-in')
       }
 
-      onComplete()
+      const data = await res.json()
+
+      // Show success screen with streak info
+      if (data.streak) {
+        setStreakInfo(data.streak)
+        setShowSuccess(true)
+        // Auto-close after showing streak celebration
+        setTimeout(() => {
+          onComplete()
+        }, 3000)
+      } else {
+        onComplete()
+      }
     } catch (err) {
       setError('Failed to save your check-in. Please try again.')
       console.error('Failed to submit:', err)
@@ -169,6 +188,68 @@ export default function DailyCheckIn({ userId, userName, onComplete, onSkip }: D
   const isLastQuestion = currentQuestion === questions.length - 1
   const canSubmit = responses.some(r => r.trim().length > 0)
   const progress = ((currentQuestion + 1) / questions.length) * 100
+
+  // Success screen with streak celebration
+  if (showSuccess && streakInfo) {
+    const milestone = getStreakMilestone(streakInfo.currentStreak)
+
+    return (
+      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 text-black">
+        <div className="absolute inset-0 bg-black/50" />
+        <div
+          className="relative w-full max-w-md p-8 text-center animate-bounce-in"
+          style={{
+            backgroundColor: theme.colors.backgroundAccent,
+            border: '4px solid black',
+            borderRadius: '24px',
+            boxShadow: '8px 8px 0 black',
+            animation: 'bounceIn 0.5s ease-out',
+          }}
+        >
+          {/* Streak display */}
+          <div className="mb-6">
+            <StreakDisplay
+              currentStreak={streakInfo.currentStreak}
+              longestStreak={streakInfo.longestStreak}
+              isNewRecord={streakInfo.isNewRecord}
+              size="large"
+            />
+          </div>
+
+          {/* Celebration message */}
+          <h2 className="text-2xl font-black mb-2">
+            {streakInfo.currentStreak === 1
+              ? "Great start! 🌟"
+              : milestone
+                ? `${milestone.emoji} ${milestone.message}`
+                : `${streakInfo.currentStreak} days strong! 💪`}
+          </h2>
+
+          <p
+            className="text-base mb-6"
+            style={{ color: theme.colors.textMuted }}
+          >
+            {streakInfo.currentStreak === 1
+              ? "You've started your journey! Come back tomorrow to keep the streak going."
+              : "Keep showing up every day - you've got this!"}
+          </p>
+
+          <button
+            onClick={onComplete}
+            className="px-8 py-3 font-bold hover:scale-105 transition-transform"
+            style={{
+              backgroundColor: theme.colors.buttonPrimary,
+              border: '3px solid black',
+              borderRadius: '16px',
+              boxShadow: '4px 4px 0 black',
+            }}
+          >
+            awesome! ✨
+          </button>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 text-black">
@@ -246,29 +327,31 @@ export default function DailyCheckIn({ userId, userName, onComplete, onSkip }: D
 
         {/* Header */}
         <div className="text-center mb-4">
-          <div className="text-4xl mb-2">✨</div>
+          <div className="text-4xl mb-2">🔥</div>
           <h2 className="text-xl font-bold">Daily Check-In</h2>
-          <p className="text-sm">hey {userName}! quick check-in time 📝</p>
+          <p className="text-sm">hey {userName}! quick check-in time</p>
         </div>
 
-        {/* Progress bar */}
-        <div className="mb-6">
-          <div
-            className="h-3 rounded-full overflow-hidden"
-            style={{ backgroundColor: 'white', border: '2px solid black' }}
-          >
+        {/* Progress bar - only show if multiple questions */}
+        {questions.length > 1 && (
+          <div className="mb-6">
             <div
-              className="h-full rounded-full transition-all duration-300"
-              style={{
-                width: `${progress}%`,
-                background: `linear-gradient(90deg, ${theme.colors.accent1}, ${theme.colors.accent2}, ${theme.colors.accent4})`,
-              }}
-            />
+              className="h-3 rounded-full overflow-hidden"
+              style={{ backgroundColor: 'white', border: '2px solid black' }}
+            >
+              <div
+                className="h-full rounded-full transition-all duration-300"
+                style={{
+                  width: `${progress}%`,
+                  background: `linear-gradient(90deg, ${theme.colors.accent1}, ${theme.colors.accent2}, ${theme.colors.accent4})`,
+                }}
+              />
+            </div>
+            <p className="text-xs text-center mt-1 font-bold">
+              {currentQuestion + 1} of {questions.length}
+            </p>
           </div>
-          <p className="text-xs text-center mt-1 font-bold">
-            {currentQuestion + 1} of {questions.length} questions
-          </p>
-        </div>
+        )}
 
         {/* Question card */}
         <div
@@ -281,13 +364,13 @@ export default function DailyCheckIn({ userId, userName, onComplete, onSkip }: D
           }}
         >
           <p className="font-bold mb-3 text-lg">
-            {currentQuestion + 1}. {questions[currentQuestion]}
+            {questions.length > 1 && `${currentQuestion + 1}. `}{questions[currentQuestion]}
           </p>
           <textarea
             value={responses[currentQuestion]}
             onChange={(e) => handleResponseChange(currentQuestion, e.target.value)}
-            placeholder="your answer..."
-            rows={3}
+            placeholder="what's on your mind..."
+            rows={4}
             className="w-full px-3 py-2 text-base resize-none"
             style={{
               border: '2px solid black',
@@ -340,7 +423,7 @@ export default function DailyCheckIn({ userId, userName, onComplete, onSkip }: D
 
         {/* Navigation buttons */}
         <div className="flex gap-3">
-          {currentQuestion > 0 ? (
+          {questions.length > 1 && currentQuestion > 0 ? (
             <button
               onClick={handleBack}
               className="px-4 py-3 font-bold hover:scale-105 transition-transform"
@@ -364,7 +447,7 @@ export default function DailyCheckIn({ userId, userName, onComplete, onSkip }: D
                 boxShadow: '3px 3px 0 black',
               }}
             >
-              skip for now
+              maybe later
             </button>
           )}
 
@@ -373,13 +456,13 @@ export default function DailyCheckIn({ userId, userName, onComplete, onSkip }: D
             disabled={submitting}
             className="flex-1 py-3 font-bold hover:scale-105 transition-transform disabled:opacity-50"
             style={{
-              backgroundColor: isLastQuestion ? theme.colors.buttonPrimary : theme.colors.buttonSecondary,
+              backgroundColor: theme.colors.buttonPrimary,
               border: '3px solid black',
               borderRadius: '12px',
               boxShadow: '3px 3px 0 black',
             }}
           >
-            {submitting ? 'saving...' : isLastQuestion ? (canSubmit ? 'done ✓' : 'skip all') : 'next →'}
+            {submitting ? 'saving...' : isLastQuestion ? (canSubmit ? 'check in 🔥' : 'skip') : 'next →'}
           </button>
         </div>
       </div>

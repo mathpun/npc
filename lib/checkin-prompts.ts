@@ -26,19 +26,19 @@ ${topicsSection}
 Day of week: ${context.dayOfWeek}
 ${moodSection}
 
-Generate exactly 2-3 thoughtful, personalized journal questions for this teen's daily check-in.
+Generate exactly 1 thoughtful, personalized question for this teen's daily check-in.
 
 Requirements:
 - Be warm and conversational (not clinical or formal)
 - Reference their interests when relevant and natural
-- Mix reflection questions (how was today) with forward-looking ones (what's ahead)
-- Keep questions answerable in 1-3 sentences
+- Can be reflective (how was today) or forward-looking (what's ahead) - vary it day to day
+- Keep it answerable in 1-3 sentences
 - Feel age-appropriate and relatable for a ${context.age} year old
 - Don't be preachy or lecturing
-- Make at least one question specific to their interests or recent topics
+- Make it specific and interesting, not generic
 
-Format your response as a JSON array of strings, like:
-["Question 1?", "Question 2?", "Question 3?"]
+Format your response as a JSON array with one string, like:
+["Your question here?"]
 
 Only output the JSON array, nothing else.`
 }

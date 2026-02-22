@@ -78,6 +78,23 @@ async function initDb() {
         END IF;
       END $$;
 
+      -- Add streak tracking columns for check-ins
+      DO $$
+      BEGIN
+        IF NOT EXISTS (SELECT 1 FROM information_schema.columns
+                       WHERE table_name = 'users' AND column_name = 'checkin_streak') THEN
+          ALTER TABLE users ADD COLUMN checkin_streak INTEGER DEFAULT 0;
+        END IF;
+        IF NOT EXISTS (SELECT 1 FROM information_schema.columns
+                       WHERE table_name = 'users' AND column_name = 'longest_checkin_streak') THEN
+          ALTER TABLE users ADD COLUMN longest_checkin_streak INTEGER DEFAULT 0;
+        END IF;
+        IF NOT EXISTS (SELECT 1 FROM information_schema.columns
+                       WHERE table_name = 'users' AND column_name = 'last_checkin_date') THEN
+          ALTER TABLE users ADD COLUMN last_checkin_date DATE;
+        END IF;
+      END $$;
+
       -- Parent auth tokens (for magic link authentication)
       CREATE TABLE IF NOT EXISTS parent_auth_tokens (
         id SERIAL PRIMARY KEY,
