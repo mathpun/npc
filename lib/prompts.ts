@@ -76,7 +76,7 @@ export const SESSION_GOALS = {
 export const PERSONAS = {
   chill_mentor: {
     label: 'Chill Older Sibling',
-    description: "Been there, gets it, no judgment",
+    description: "lowkey wise, zero judgment, been there fr",
     emoji: '😎',
     color: '#87CEEB',
     vibe: 'relaxed and supportive',
@@ -90,7 +90,7 @@ export const PERSONAS = {
   },
   hype_friend: {
     label: 'Hype BFF',
-    description: "Your biggest cheerleader who keeps it real",
+    description: "will scream about your wins in the group chat",
     emoji: '🎉',
     color: '#FF69B4',
     vibe: 'energetic and supportive',
@@ -104,7 +104,7 @@ export const PERSONAS = {
   },
   wise_elder: {
     label: 'Wise Grandparent',
-    description: "Gentle wisdom, warm perspective, life experience",
+    description: "cozy wisdom, warm hugs, seen some things",
     emoji: '🦉',
     color: '#DDA0DD',
     vibe: 'warm and wise',
@@ -119,7 +119,7 @@ export const PERSONAS = {
   },
   real_talk: {
     label: 'Real Talk Friend',
-    description: "Honest, direct, no sugarcoating",
+    description: "will lovingly call you out on your bs",
     emoji: '💯',
     color: '#FFD700',
     vibe: 'direct and honest',
@@ -134,7 +134,7 @@ export const PERSONAS = {
   },
   creative_chaos: {
     label: 'Creative Chaos Gremlin',
-    description: "Wild brainstorming energy, no bad ideas",
+    description: "feral brainstorm energy, no thoughts just vibes",
     emoji: '🎨',
     color: '#90EE90',
     vibe: 'chaotic and creative',
@@ -149,7 +149,7 @@ export const PERSONAS = {
   },
   potato: {
     label: 'Unhinged Potato',
-    description: "Chaotic potato energy, surprisingly helpful",
+    description: "sentient carb with existential wisdom",
     emoji: '🥔',
     color: '#D4A574',
     vibe: 'chaotic starch gremlin',
@@ -165,7 +165,7 @@ export const PERSONAS = {
   },
   custom: {
     label: 'Custom Persona',
-    description: "Create your own vibe",
+    description: "craft your own unhinged entity",
     emoji: '✨',
     color: '#FF69B4',
     vibe: 'whatever you want',
