@@ -195,43 +195,43 @@ export default function Dashboard() {
       <NavBar />
 
       {/* Stats bar */}
-      <div className="relative z-10 px-6 py-3 border-b-4 border-black border-dashed" style={{ backgroundColor: theme.colors.backgroundAccent }}>
-        <div className="max-w-6xl mx-auto flex items-center justify-center gap-4">
+      <div className="relative z-10 px-3 sm:px-6 py-2 sm:py-3 border-b-4 border-black border-dashed" style={{ backgroundColor: theme.colors.backgroundAccent }}>
+        <div className="max-w-6xl mx-auto flex items-center justify-center gap-2 sm:gap-4">
           {/* Level badge */}
           <div
-            className="flex items-center gap-2 px-4 py-2 rotate-2"
+            className="flex items-center gap-1 sm:gap-2 px-2 sm:px-4 py-1 sm:py-2 rotate-2"
             style={{
               backgroundColor: theme.colors.accent2,
-              border: '3px solid black',
+              border: '2px solid black',
               borderRadius: '9999px',
-              boxShadow: '3px 3px 0 black',
+              boxShadow: '2px 2px 0 black',
             }}
           >
-            <span className="text-xl">👑</span>
-            <span className="font-bold">Lvl {stats.level}</span>
+            <span className="text-base sm:text-xl">👑</span>
+            <span className="font-bold text-sm sm:text-base">Lvl {stats.level}</span>
           </div>
 
           {/* Streak */}
           <div
-            className="flex items-center gap-2 px-4 py-2 -rotate-1"
+            className="flex items-center gap-1 sm:gap-2 px-2 sm:px-4 py-1 sm:py-2 -rotate-1"
             style={{
               backgroundColor: theme.colors.accent1,
-              border: '3px solid black',
+              border: '2px solid black',
               borderRadius: '9999px',
-              boxShadow: '3px 3px 0 black',
+              boxShadow: '2px 2px 0 black',
             }}
           >
-            <span className="text-xl">🔥</span>
-            <span className="font-bold">{stats.streak} days</span>
+            <span className="text-base sm:text-xl">🔥</span>
+            <span className="font-bold text-sm sm:text-base">{stats.streak} days</span>
           </div>
         </div>
       </div>
 
-      <main className="relative z-10 max-w-6xl mx-auto px-6 py-8 pb-24" style={{  }}>
+      <main className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 py-6 sm:py-8 pb-24" style={{  }}>
         {/* Welcome Section */}
-        <div className="mb-8 flex items-center gap-4">
+        <div className="mb-6 sm:mb-8 flex items-center gap-3 sm:gap-4">
           {/* User blob */}
-          <svg width="80" height="90" viewBox="0 0 60 70">
+          <svg className="w-14 h-16 sm:w-20 sm:h-[90px] flex-shrink-0" viewBox="0 0 60 70">
             <ellipse cx="30" cy="45" rx="20" ry="25" fill="#DDA0DD" stroke="black" strokeWidth="3"/>
             <circle cx="30" cy="20" r="18" fill="white" stroke="black" strokeWidth="3"/>
             <circle cx="24" cy="18" r="4" fill="black"/>
@@ -242,10 +242,10 @@ export default function Dashboard() {
             <polygon points="30,2 24,15 36,15" fill="#FFD700" stroke="black" strokeWidth="2"/>
           </svg>
           <div>
-            <h1 className="text-3xl md:text-4xl font-bold">
+            <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold">
               hey {user.name}! <span className="inline-block animate-bounce">👋</span>
             </h1>
-            <p className="text-lg">here&apos;s your growth journey so far</p>
+            <p className="text-base sm:text-lg">here&apos;s your growth journey so far</p>
           </div>
         </div>
 

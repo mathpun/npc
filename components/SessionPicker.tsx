@@ -94,10 +94,10 @@ export default function SessionPicker({ onSelect, onClose, onOpenHistory }: Sess
           </button>
         )}
 
-        <div className="text-center mb-8">
+        <div className="text-center mb-6 sm:mb-8">
           {/* Curious blob */}
-          <div className="flex justify-center mb-4">
-            <svg width="80" height="90" viewBox="0 0 60 70">
+          <div className="flex justify-center mb-3 sm:mb-4">
+            <svg className="w-16 h-[72px] sm:w-20 sm:h-[90px]" viewBox="0 0 60 70">
               <ellipse cx="30" cy="45" rx="20" ry="25" fill="#FFD700" stroke="black" strokeWidth="3"/>
               <circle cx="30" cy="20" r="18" fill="white" stroke="black" strokeWidth="3"/>
               <circle cx="24" cy="16" r="5" fill="black"/>
@@ -109,11 +109,11 @@ export default function SessionPicker({ onSelect, onClose, onOpenHistory }: Sess
             </svg>
           </div>
           <h2
-            className="text-2xl font-bold inline-block px-6 py-3 -rotate-1"
+            className="text-xl sm:text-2xl font-bold inline-block px-4 sm:px-6 py-2 sm:py-3 -rotate-1"
             style={{
               backgroundColor: '#FF69B4',
-              border: '4px solid black',
-              boxShadow: '6px 6px 0 black',
+              border: '3px solid black',
+              boxShadow: '4px 4px 0 black',
             }}
           >
             what's on your mind?
@@ -121,7 +121,7 @@ export default function SessionPicker({ onSelect, onClose, onOpenHistory }: Sess
         </div>
 
         {/* Goal selection */}
-        <div className="grid md:grid-cols-2 gap-4 mb-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 mb-6 sm:mb-8">
           {(Object.entries(SESSION_GOALS) as [SessionGoal, typeof SESSION_GOALS.stuck][]).map(([key, goal], i) => {
             const isSelected = selectedGoal === key
 
@@ -129,18 +129,18 @@ export default function SessionPicker({ onSelect, onClose, onOpenHistory }: Sess
               <button
                 key={key}
                 onClick={() => handleGoalSelect(key)}
-                className="p-5 text-left transition-all duration-200 hover:scale-105"
+                className="p-3 sm:p-5 text-left transition-all duration-200 hover:scale-105"
                 style={{
                   backgroundColor: isSelected ? goal.color : 'white',
-                  border: '3px solid black',
+                  border: '2px solid black',
                   borderRadius: '16px',
-                  boxShadow: isSelected ? '6px 6px 0 black' : '4px 4px 0 black',
+                  boxShadow: isSelected ? '4px 4px 0 black' : '3px 3px 0 black',
                   transform: `rotate(${(i % 2 === 0 ? -1 : 1)}deg)`,
                 }}
               >
-                <div className="flex items-start gap-4">
+                <div className="flex items-start gap-3 sm:gap-4">
                   <div
-                    className="w-12 h-12 rounded-xl flex items-center justify-center text-2xl"
+                    className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl flex items-center justify-center text-xl sm:text-2xl flex-shrink-0"
                     style={{
                       backgroundColor: isSelected ? 'white' : goal.color,
                       border: '2px solid black',

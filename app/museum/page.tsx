@@ -84,16 +84,16 @@ export default function MuseumPage() {
 
       {/* Museum Header */}
       <header
-        className="relative z-10 px-4 py-4 border-b-4 border-black border-dashed"
+        className="relative z-10 px-3 sm:px-4 py-3 sm:py-4 border-b-4 border-black border-dashed"
         style={{ backgroundColor: '#DDA0DD' }}
       >
         <div className="max-w-5xl mx-auto">
-          <div className="flex items-center justify-between mb-3">
-            <div className="flex items-center gap-3">
-              <span className="text-4xl">🏛️</span>
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-3">
+            <div className="flex items-center gap-2 sm:gap-3">
+              <span className="text-3xl sm:text-4xl">🏛️</span>
               <div>
-                <h1 className="font-bold text-xl">The Museum of {profile.name}</h1>
-                <p className="text-sm opacity-80">discover what belongs in your gift shop</p>
+                <h1 className="font-bold text-lg sm:text-xl">The Museum of {profile.name}</h1>
+                <p className="text-xs sm:text-sm opacity-80">discover what belongs in your gift shop</p>
               </div>
             </div>
             <MuseumSharePanel userId={userId} itemCount={items.length} />
@@ -103,27 +103,27 @@ export default function MuseumPage() {
           <div className="flex gap-2">
             <button
               onClick={() => setActiveView('chat')}
-              className={`px-4 py-2 font-bold transition-transform hover:scale-105 ${activeView === 'chat' ? 'scale-105' : ''}`}
+              className={`flex-1 sm:flex-none px-3 sm:px-4 py-2 font-bold transition-transform hover:scale-105 text-sm sm:text-base ${activeView === 'chat' ? 'scale-105' : ''}`}
               style={{
                 backgroundColor: activeView === 'chat' ? '#FFD700' : 'white',
-                border: '3px solid black',
+                border: '2px solid black',
                 borderRadius: '9999px',
-                boxShadow: activeView === 'chat' ? '3px 3px 0 black' : 'none',
+                boxShadow: activeView === 'chat' ? '2px 2px 0 black' : 'none',
               }}
             >
-              💬 discover items
+              💬 discover
             </button>
             <button
               onClick={() => setActiveView('shop')}
-              className={`px-4 py-2 font-bold transition-transform hover:scale-105 ${activeView === 'shop' ? 'scale-105' : ''}`}
+              className={`flex-1 sm:flex-none px-3 sm:px-4 py-2 font-bold transition-transform hover:scale-105 text-sm sm:text-base ${activeView === 'shop' ? 'scale-105' : ''}`}
               style={{
                 backgroundColor: activeView === 'shop' ? '#FFD700' : 'white',
-                border: '3px solid black',
+                border: '2px solid black',
                 borderRadius: '9999px',
-                boxShadow: activeView === 'shop' ? '3px 3px 0 black' : 'none',
+                boxShadow: activeView === 'shop' ? '2px 2px 0 black' : 'none',
               }}
             >
-              🛍️ gift shop ({items.length})
+              🛍️ shop ({items.length})
             </button>
           </div>
         </div>

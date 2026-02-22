@@ -194,16 +194,16 @@ export default function OnboardingForm() {
   return (
     <div className="w-full max-w-xl mx-auto" style={{  }}>
       {/* Progress bar - hand drawn style */}
-      <div className="mb-8">
-        <div className="flex justify-between mb-4">
+      <div className="mb-6 sm:mb-8">
+        <div className="flex justify-between mb-3 sm:mb-4">
           {[1, 2, 3, 4].map((s) => (
             <div
               key={s}
-              className={`w-12 h-12 rounded-full flex items-center justify-center text-lg font-bold transition-all duration-300`}
+              className={`w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center text-base sm:text-lg font-bold transition-all duration-300`}
               style={{
                 backgroundColor: s <= step ? STEP_COLORS[s - 1] : 'white',
-                border: '3px solid black',
-                boxShadow: s <= step ? '4px 4px 0 black' : 'none',
+                border: '2px solid black',
+                boxShadow: s <= step ? '3px 3px 0 black' : 'none',
                 transform: s === step ? 'rotate(-3deg) scale(1.1)' : 'rotate(0deg)',
               }}
             >
@@ -227,12 +227,12 @@ export default function OnboardingForm() {
 
       {/* Step content */}
       <div
-        className="p-8 text-black"
+        className="p-4 sm:p-8 text-black"
         style={{
           backgroundColor: 'white',
-          border: '4px solid black',
+          border: '3px solid black',
           borderRadius: '20px',
-          boxShadow: '8px 8px 0 black',
+          boxShadow: '6px 6px 0 black',
         }}
       >
         {/* Step 1: Data Consent */}

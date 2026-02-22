@@ -90,19 +90,19 @@ export default function CreatePage() {
 
       <main className="max-w-4xl mx-auto px-4 py-6">
         {/* Header */}
-        <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold mb-2" style={{ color: theme.colors.text }}>
+        <div className="text-center mb-6 sm:mb-8">
+          <h1 className="text-2xl sm:text-4xl font-bold mb-2" style={{ color: theme.colors.text }}>
             ✨ World Builder
           </h1>
-          <p className="text-lg" style={{ color: theme.colors.textMuted }}>
+          <p className="text-base sm:text-lg" style={{ color: theme.colors.textMuted }}>
             Create worlds, invite friends, build together
           </p>
 
           {/* Quick stats */}
           {(ownedWorlds.length > 0 || collaboratingWorlds.length > 0) && (
-            <div className="flex justify-center gap-4 mt-4">
+            <div className="flex flex-wrap justify-center gap-2 sm:gap-4 mt-4">
               <div
-                className="px-4 py-2 rounded-full"
+                className="px-3 sm:px-4 py-1 sm:py-2 rounded-full text-sm sm:text-base"
                 style={{
                   backgroundColor: theme.colors.accent1,
                   border: '2px solid black',
@@ -111,7 +111,7 @@ export default function CreatePage() {
                 <span className="font-bold">{ownedWorlds.length + collaboratingWorlds.length}</span> worlds
               </div>
               <div
-                className="px-4 py-2 rounded-full"
+                className="px-3 sm:px-4 py-1 sm:py-2 rounded-full text-sm sm:text-base"
                 style={{
                   backgroundColor: theme.colors.accent2,
                   border: '2px solid black',
@@ -120,23 +120,23 @@ export default function CreatePage() {
                 <span className="font-bold">{totalElements}</span> elements
               </div>
               <div
-                className="px-4 py-2 rounded-full"
+                className="px-3 sm:px-4 py-1 sm:py-2 rounded-full text-sm sm:text-base"
                 style={{
                   backgroundColor: theme.colors.accent3,
                   border: '2px solid black',
                 }}
               >
-                <span className="font-bold">{totalCollaborators}</span> collaborators
+                <span className="font-bold">{totalCollaborators}</span> collabs
               </div>
             </div>
           )}
         </div>
 
         {/* Create World Button */}
-        <div className="flex justify-center mb-8">
+        <div className="flex justify-center mb-6 sm:mb-8">
           <button
             onClick={() => setShowCreateModal(true)}
-            className="px-8 py-4 text-xl font-bold hover:scale-105 transition-transform"
+            className="px-6 sm:px-8 py-3 sm:py-4 text-base sm:text-xl font-bold hover:scale-105 transition-transform"
             style={{
               backgroundColor: theme.colors.buttonPrimary,
               border: '3px solid black',
@@ -145,7 +145,7 @@ export default function CreatePage() {
               color: theme.colors.text,
             }}
           >
-            + Create New World
+            + Create World
           </button>
         </div>
 
