@@ -1,11 +1,39 @@
 'use client'
 
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import NavBar from '@/components/NavBar'
 import { useTheme } from '@/lib/ThemeContext'
 
+// HOT SLANG TAGLINES - update these to stay current!
+const SLANG_TAGLINES = [
+  "self-awareness maxxing 🧠",
+  "brain rot? nah, brain growth 🌱",
+  "no cap just clarity ✨",
+  "lowkey life changing fr fr",
+  "main character energy loading... 💫",
+  "delulu is NOT the solulu here",
+  "slay your intrusive thoughts 💅",
+  "understood the assignment 📝",
+  "it's giving... emotional intelligence",
+  "vibe check: actually helpful 🎯",
+]
+
 export default function Home() {
   const { theme } = useTheme()
+  const [taglineIndex, setTaglineIndex] = useState(0)
+  const [isAnimating, setIsAnimating] = useState(false)
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setIsAnimating(true)
+      setTimeout(() => {
+        setTaglineIndex((prev) => (prev + 1) % SLANG_TAGLINES.length)
+        setIsAnimating(false)
+      }, 300)
+    }, 3000)
+    return () => clearInterval(interval)
+  }, [])
 
   return (
     <main className="min-h-screen font-hand" style={{ backgroundColor: theme.colors.background }}>
@@ -25,9 +53,9 @@ export default function Home() {
       {/* Hero Section */}
       <div className="relative z-10 flex flex-col items-center justify-center px-4 py-16">
         <div className="text-center max-w-3xl mx-auto" style={{  }}>
-          {/* Pill badge */}
+          {/* Rotating slang tagline */}
           <div
-            className="inline-block px-6 py-3 mb-8 rotate-2"
+            className="inline-block px-6 py-3 mb-8 rotate-2 min-w-[280px]"
             style={{
               backgroundColor: theme.colors.accent4,
               border: '3px solid black',
@@ -35,7 +63,13 @@ export default function Home() {
               boxShadow: '4px 4px 0 black',
             }}
           >
-            <span className="text-lg font-bold">ur ai bestie that actually gets it ✨</span>
+            <span
+              className={`text-lg font-bold block transition-all duration-300 ${
+                isAnimating ? 'opacity-0 translate-y-2' : 'opacity-100 translate-y-0'
+              }`}
+            >
+              {SLANG_TAGLINES[taglineIndex]}
+            </span>
           </div>
 
           {/* Main heading */}
