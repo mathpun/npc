@@ -38,25 +38,25 @@ export default function WorldHeader({
 
   return (
     <div
-      className="rounded-2xl p-6 mb-6"
+      className="rounded-2xl p-4 sm:p-6 mb-6"
       style={{
         backgroundColor: world.color_theme,
-        border: '4px solid black',
-        boxShadow: '6px 6px 0 black',
+        border: '3px solid black',
+        boxShadow: '4px 4px 0 black',
       }}
     >
       {/* Title Row */}
-      <div className="flex items-start justify-between mb-4">
-        <div className="flex items-center gap-3">
-          <span className="text-5xl">{world.world_emoji}</span>
-          <div>
-            <h1 className="text-3xl font-bold" style={{ color: theme.colors.text }}>
+      <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-4">
+        <div className="flex items-center gap-3 min-w-0">
+          <span className="text-4xl sm:text-5xl flex-shrink-0">{world.world_emoji}</span>
+          <div className="min-w-0">
+            <h1 className="text-2xl sm:text-3xl font-bold truncate" style={{ color: theme.colors.text }}>
               {world.world_name}
             </h1>
-            <div className="flex items-center gap-2 mt-1">
+            <div className="flex flex-wrap items-center gap-2 mt-1">
               {world.world_vibe && (
                 <span
-                  className="text-sm px-3 py-1 rounded-full font-medium"
+                  className="text-xs sm:text-sm px-2 sm:px-3 py-1 rounded-full font-medium"
                   style={{
                     backgroundColor: 'rgba(0,0,0,0.15)',
                     color: theme.colors.text,
@@ -65,7 +65,7 @@ export default function WorldHeader({
                   {world.world_vibe}
                 </span>
               )}
-              <span className="text-sm" style={{ color: theme.colors.text, opacity: 0.7 }}>
+              <span className="text-xs sm:text-sm" style={{ color: theme.colors.text, opacity: 0.7 }}>
                 by {world.owner_nickname || world.owner_name}
               </span>
             </div>
@@ -73,10 +73,10 @@ export default function WorldHeader({
         </div>
 
         {/* Action Buttons */}
-        <div className="flex gap-2">
+        <div className="flex gap-2 flex-shrink-0">
           <button
             onClick={onInviteClick}
-            className="px-4 py-2 font-bold rounded-full hover:scale-105 transition-transform text-sm"
+            className="px-3 sm:px-4 py-2 font-bold rounded-full hover:scale-105 transition-transform text-xs sm:text-sm"
             style={{
               backgroundColor: theme.colors.buttonSecondary,
               border: '2px solid black',
@@ -89,7 +89,7 @@ export default function WorldHeader({
           {isOwner && (
             <button
               onClick={onShareToggle}
-              className="px-4 py-2 font-bold rounded-full hover:scale-105 transition-transform text-sm"
+              className="px-3 sm:px-4 py-2 font-bold rounded-full hover:scale-105 transition-transform text-xs sm:text-sm"
               style={{
                 backgroundColor: world.is_public ? theme.colors.buttonSuccess : theme.colors.backgroundAlt,
                 border: '2px solid black',
