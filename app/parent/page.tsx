@@ -1,8 +1,11 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
+import NavBar from '@/components/NavBar'
+import ParentReports from '@/components/ParentReports'
+import { useTheme } from '@/lib/ThemeContext'
 
 interface ConnectedTeen {
   id: number
@@ -30,29 +33,36 @@ interface Report {
   teen_nickname: string | null
 }
 
-export default function ParentDashboard() {
+function ParentPageContent() {
   const searchParams = useSearchParams()
   const router = useRouter()
+  const { theme } = useTheme()
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
+  const [viewMode, setViewMode] = useState<'teen' | 'parent' | null>(null)
+
+  // Teen state
+  const [userId, setUserId] = useState<string | null>(null)
+  const [userName, setUserName] = useState('')
+
+  // Parent state
   const [parentEmail, setParentEmail] = useState('')
   const [connectedTeens, setConnectedTeens] = useState<ConnectedTeen[]>([])
   const [reports, setReports] = useState<Report[]>([])
   const [selectedReport, setSelectedReport] = useState<Report | null>(null)
 
   useEffect(() => {
-    const initDashboard = async () => {
-      // Check for token in URL
+    const initPage = async () => {
+      // Check for parent token in URL first
       const token = searchParams.get('token')
 
       if (token) {
-        // Verify the token
+        // Parent accessing via magic link
         try {
           const res = await fetch(`/api/parent/auth?token=${token}`)
           const data = await res.json()
 
           if (res.ok && data.success) {
-            // Store parent email in localStorage
             localStorage.setItem('parent_email', data.parentEmail)
             setParentEmail(data.parentEmail)
             setConnectedTeens(data.connectedTeens.map((t: { id: number; user_id: string; name: string; nickname: string | null; created_at: string }) => ({
@@ -61,8 +71,9 @@ export default function ParentDashboard() {
               name: t.nickname || t.name,
               connectedAt: t.created_at
             })))
-            // Remove token from URL for cleaner UX
+            setViewMode('parent')
             router.replace('/parent')
+            await fetchParentDashboard()
           } else {
             setError(data.error || 'Invalid or expired link')
             setLoading(false)
@@ -74,24 +85,37 @@ export default function ParentDashboard() {
           return
         }
       } else {
-        // Check localStorage for existing session
-        const storedEmail = localStorage.getItem('parent_email')
-        if (!storedEmail) {
-          // Redirect to login
-          router.push('/login')
-          return
-        }
-        setParentEmail(storedEmail)
-      }
+        // Check if user is logged in as a teen
+        const storedUserId = localStorage.getItem('npc_user_id')
+        const storedProfile = localStorage.getItem('youthai_profile')
 
-      // Fetch dashboard data
-      await fetchDashboardData()
+        if (storedUserId && storedProfile) {
+          // Teen is logged in - show teen view
+          const profile = JSON.parse(storedProfile)
+          setUserId(storedUserId)
+          setUserName(profile.name || '')
+          setViewMode('teen')
+          setLoading(false)
+        } else {
+          // Check for parent session
+          const storedEmail = localStorage.getItem('parent_email')
+          if (storedEmail) {
+            setParentEmail(storedEmail)
+            setViewMode('parent')
+            await fetchParentDashboard()
+          } else {
+            // No one logged in
+            router.push('/login')
+            return
+          }
+        }
+      }
     }
 
-    initDashboard()
+    initPage()
   }, [searchParams, router])
 
-  const fetchDashboardData = async () => {
+  const fetchParentDashboard = async () => {
     const email = localStorage.getItem('parent_email')
     if (!email) return
 
@@ -112,7 +136,7 @@ export default function ParentDashboard() {
     setLoading(false)
   }
 
-  const handleLogout = () => {
+  const handleParentLogout = () => {
     localStorage.removeItem('parent_email')
     router.push('/login')
   }
@@ -153,10 +177,10 @@ export default function ParentDashboard() {
 
   if (loading) {
     return (
-      <main className="min-h-screen flex items-center justify-center" style={{ backgroundColor: '#F5F5DC' }}>
+      <main className="min-h-screen flex items-center justify-center" style={{ backgroundColor: theme.colors.background }}>
         <div className="text-center">
           <div className="text-6xl mb-4 animate-bounce">👨‍👩‍👧</div>
-          <p className="text-xl font-bold">loading your dashboard...</p>
+          <p className="text-xl font-bold" style={{ color: theme.colors.text }}>loading...</p>
         </div>
       </main>
     )
@@ -164,7 +188,7 @@ export default function ParentDashboard() {
 
   if (error) {
     return (
-      <main className="min-h-screen flex items-center justify-center p-4" style={{ backgroundColor: '#F5F5DC' }}>
+      <main className="min-h-screen flex items-center justify-center p-4" style={{ backgroundColor: theme.colors.background }}>
         <div
           className="max-w-md w-full p-8 text-center"
           style={{
@@ -194,6 +218,49 @@ export default function ParentDashboard() {
     )
   }
 
+  // Teen view - show parent connection and reports management
+  if (viewMode === 'teen' && userId) {
+    return (
+      <main className="min-h-screen" style={{ backgroundColor: theme.colors.background }}>
+        <NavBar />
+
+        <div className="max-w-4xl mx-auto px-4 py-6">
+          {/* Header */}
+          <div className="text-center mb-8">
+            <div className="text-5xl mb-3">👨‍👩‍👧</div>
+            <h1 className="text-2xl sm:text-3xl font-bold mb-2" style={{ color: theme.colors.text }}>
+              Parent Connection
+            </h1>
+            <p style={{ color: theme.colors.textMuted }}>
+              Share your growth journey with a parent or guardian
+            </p>
+          </div>
+
+          {/* Parent Reports Component */}
+          <ParentReports userId={userId} userName={userName} />
+
+          {/* Info Card */}
+          <div
+            className="mt-8 p-6 text-center"
+            style={{
+              backgroundColor: theme.colors.backgroundAlt,
+              border: '3px dashed black',
+              borderRadius: '16px',
+            }}
+          >
+            <div className="text-3xl mb-3">🔒</div>
+            <h3 className="font-bold text-lg mb-2">Your Privacy Matters</h3>
+            <p className="text-sm" style={{ color: theme.colors.textMuted }}>
+              Parents only see weekly summaries that you approve and send.
+              They never see your actual conversations or daily check-ins.
+            </p>
+          </div>
+        </div>
+      </main>
+    )
+  }
+
+  // Parent view - show dashboard with connected teens and reports
   return (
     <main className="min-h-screen" style={{ backgroundColor: '#F5F5DC' }}>
       {/* Header */}
@@ -213,7 +280,7 @@ export default function ParentDashboard() {
             </div>
           </div>
           <button
-            onClick={handleLogout}
+            onClick={handleParentLogout}
             className="px-4 py-2 font-bold hover:scale-105 transition-transform"
             style={{
               backgroundColor: 'white',
@@ -522,5 +589,20 @@ export default function ParentDashboard() {
         </div>
       )}
     </main>
+  )
+}
+
+export default function ParentPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: '#F5F5DC' }}>
+        <div className="text-center">
+          <div className="text-6xl mb-4 animate-bounce">👨‍👩‍👧</div>
+          <p className="text-xl font-bold">loading...</p>
+        </div>
+      </div>
+    }>
+      <ParentPageContent />
+    </Suspense>
   )
 }
