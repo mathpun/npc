@@ -8,6 +8,7 @@ import WorldElementGrid from '@/components/world/WorldElementGrid'
 import WorldChat from '@/components/world/WorldChat'
 import WorldInvite from '@/components/world/WorldInvite'
 import AddElementFlow from '@/components/world/AddElementFlow'
+import WorldCanvas from '@/components/world/WorldCanvas'
 import { useTheme } from '@/lib/ThemeContext'
 
 interface World {
@@ -37,6 +38,9 @@ interface WorldElement {
   description: string | null
   details: string | null
   connections: string | null
+  canvas_x: number
+  canvas_y: number
+  image_url: string | null
   creator_name: string
   creator_nickname: string | null
   created_at: string
@@ -71,10 +75,12 @@ export default function WorldViewPage() {
   const [isOwner, setIsOwner] = useState(false)
   const [isCollaborator, setIsCollaborator] = useState(false)
   const [loading, setLoading] = useState(true)
-  const [activeView, setActiveView] = useState<'grid' | 'chat'>('grid')
+  const [activeView, setActiveView] = useState<'grid' | 'chat' | 'canvas'>('grid')
   const [showInvite, setShowInvite] = useState(false)
   const [showAddElement, setShowAddElement] = useState(false)
   const [filterType, setFilterType] = useState<string | null>(null)
+  const [connections, setConnections] = useState<Array<{ from: number; to: number }>>([])
+  const [localElements, setLocalElements] = useState<WorldElement[]>([])
 
   useEffect(() => {
     const savedProfile = localStorage.getItem('youthai_profile')
@@ -120,6 +126,15 @@ export default function WorldViewPage() {
     setLoading(false)
   }
 
+  // Sync local elements for canvas
+  useEffect(() => {
+    setLocalElements(elements.map((el, i) => ({
+      ...el,
+      canvas_x: el.canvas_x || 150 + (i % 4) * 180,
+      canvas_y: el.canvas_y || 150 + Math.floor(i / 4) * 180,
+    })))
+  }, [elements])
+
   const handleElementAdded = () => {
     fetchWorld()
     setShowAddElement(false)
@@ -155,6 +170,39 @@ export default function WorldViewPage() {
       }
     } catch (err) {
       console.error('Failed to toggle share:', err)
+    }
+  }
+
+  const handleElementMove = async (elementId: number, x: number, y: number) => {
+    // Update local state immediately for smooth dragging
+    setLocalElements(prev => prev.map(el =>
+      el.id === elementId ? { ...el, canvas_x: x, canvas_y: y } : el
+    ))
+
+    // Debounce save to server
+    try {
+      await fetch(`/api/world/${id}/elements/position`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          userId,
+          elementId,
+          canvasX: x,
+          canvasY: y,
+        }),
+      })
+    } catch (err) {
+      console.error('Failed to save position:', err)
+    }
+  }
+
+  const handleConnectionAdd = (fromId: number, toId: number) => {
+    // Check if connection already exists
+    const exists = connections.some(
+      c => (c.from === fromId && c.to === toId) || (c.from === toId && c.to === fromId)
+    )
+    if (!exists) {
+      setConnections(prev => [...prev, { from: fromId, to: toId }])
     }
   }
 
@@ -219,7 +267,19 @@ export default function WorldViewPage() {
               color: theme.colors.text,
             }}
           >
-            Elements
+            Cards
+          </button>
+          <button
+            onClick={() => setActiveView('canvas')}
+            className="px-6 py-2 font-bold rounded-full transition-transform hover:scale-105"
+            style={{
+              backgroundColor: activeView === 'canvas' ? theme.colors.accent3 : theme.colors.backgroundAlt,
+              border: '3px solid black',
+              boxShadow: activeView === 'canvas' ? '3px 3px 0 black' : 'none',
+              color: theme.colors.text,
+            }}
+          >
+            Map
           </button>
           <button
             onClick={() => setActiveView('chat')}
@@ -236,7 +296,7 @@ export default function WorldViewPage() {
         </div>
 
         {/* Content */}
-        {activeView === 'grid' ? (
+        {activeView === 'grid' && (
           <>
             {/* Add Element Button */}
             {canEdit && (
@@ -265,7 +325,41 @@ export default function WorldViewPage() {
               userId={userId}
             />
           </>
-        ) : (
+        )}
+
+        {activeView === 'canvas' && (
+          <>
+            {canEdit && (
+              <div className="flex justify-center mb-6">
+                <button
+                  onClick={() => setShowAddElement(true)}
+                  className="px-6 py-3 font-bold rounded-full hover:scale-105 transition-transform"
+                  style={{
+                    backgroundColor: theme.colors.buttonSuccess,
+                    border: '3px solid black',
+                    boxShadow: '3px 3px 0 black',
+                    color: theme.colors.text,
+                  }}
+                >
+                  + Add Element
+                </button>
+              </div>
+            )}
+
+            <WorldCanvas
+              elements={localElements}
+              connections={connections}
+              worldId={parseInt(id)}
+              userId={userId}
+              canEdit={canEdit}
+              onElementMove={handleElementMove}
+              onElementClick={(el) => console.log('clicked', el)}
+              onConnectionAdd={handleConnectionAdd}
+            />
+          </>
+        )}
+
+        {activeView === 'chat' && (
           <WorldChat
             worldId={parseInt(id)}
             profile={profile}

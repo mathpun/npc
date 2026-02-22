@@ -376,9 +376,29 @@ async function initDb() {
         description TEXT,
         details JSONB,
         connections JSONB,
+        canvas_x REAL DEFAULT 0,
+        canvas_y REAL DEFAULT 0,
+        image_url TEXT,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       );
+
+      -- Add canvas position columns if they don't exist
+      DO $$
+      BEGIN
+        IF NOT EXISTS (SELECT 1 FROM information_schema.columns
+                       WHERE table_name = 'world_elements' AND column_name = 'canvas_x') THEN
+          ALTER TABLE world_elements ADD COLUMN canvas_x REAL DEFAULT 0;
+        END IF;
+        IF NOT EXISTS (SELECT 1 FROM information_schema.columns
+                       WHERE table_name = 'world_elements' AND column_name = 'canvas_y') THEN
+          ALTER TABLE world_elements ADD COLUMN canvas_y REAL DEFAULT 0;
+        END IF;
+        IF NOT EXISTS (SELECT 1 FROM information_schema.columns
+                       WHERE table_name = 'world_elements' AND column_name = 'image_url') THEN
+          ALTER TABLE world_elements ADD COLUMN image_url TEXT;
+        END IF;
+      END $$;
     `)
     console.log('Database tables initialized')
   } catch (error) {
