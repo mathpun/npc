@@ -13,11 +13,14 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
     const body = await request.json()
     const { userId, elementId, canvasX, canvasY } = body
 
-    if (!userId || !elementId) {
-      return NextResponse.json({ error: 'User ID and element ID are required' }, { status: 400 })
+    if (!userId || !elementId || canvasX === undefined || canvasY === undefined) {
+      return NextResponse.json(
+        { error: 'User ID, element ID, and position are required' },
+        { status: 400 }
+      )
     }
 
-    // Check if user has access (owner or collaborator)
+    // Check access
     const world = await db.prepare('SELECT user_id FROM worlds WHERE id = ?').get(id) as { user_id: string } | undefined
     if (!world) {
       return NextResponse.json({ error: 'World not found' }, { status: 404 })
@@ -32,12 +35,21 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
       return NextResponse.json({ error: 'Access denied' }, { status: 403 })
     }
 
+    // Verify element belongs to this world
+    const element = await db.prepare(`
+      SELECT id FROM world_elements WHERE id = ? AND world_id = ?
+    `).get(elementId, id)
+
+    if (!element) {
+      return NextResponse.json({ error: 'Element not found' }, { status: 404 })
+    }
+
     // Update position
     await db.prepare(`
       UPDATE world_elements
       SET canvas_x = ?, canvas_y = ?, updated_at = CURRENT_TIMESTAMP
-      WHERE id = ? AND world_id = ?
-    `).run(canvasX, canvasY, elementId, id)
+      WHERE id = ?
+    `).run(canvasX, canvasY, elementId)
 
     return NextResponse.json({ success: true })
   } catch (error) {

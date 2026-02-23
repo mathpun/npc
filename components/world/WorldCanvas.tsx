@@ -6,15 +6,24 @@ import { ELEMENT_TYPES } from './WorldElementCard'
 
 interface WorldElement {
   id: number
+  world_id?: number
+  creator_id?: string
   element_type: string
   emoji: string | null
   name: string
   description: string | null
+  details?: string | null
+  connections?: string | null
   image_url: string | null
   canvas_x: number
   canvas_y: number
   creator_name: string
+  creator_nickname?: string | null
+  created_at?: string
 }
+
+// Image cache for loaded images
+const imageCache = new Map<string, HTMLImageElement>()
 
 interface Connection {
   from: number
@@ -56,6 +65,22 @@ export default function WorldCanvas({
 
   const ELEMENT_SIZE = 120
   const ELEMENT_RADIUS = 60
+  const [loadedImages, setLoadedImages] = useState<Set<string>>(new Set())
+
+  // Load images for elements
+  useEffect(() => {
+    elements.forEach(el => {
+      if (el.image_url && !imageCache.has(el.image_url)) {
+        const img = new Image()
+        img.crossOrigin = 'anonymous'
+        img.onload = () => {
+          imageCache.set(el.image_url!, img)
+          setLoadedImages(prev => new Set([...Array.from(prev), el.image_url!]))
+        }
+        img.src = el.image_url
+      }
+    })
+  }, [elements])
 
   const getCanvasCoords = useCallback((clientX: number, clientY: number) => {
     const canvas = canvasRef.current
@@ -171,15 +196,47 @@ export default function WorldCanvas({
       ctx.fill()
       ctx.stroke()
 
-      // Image or emoji
-      if (el.image_url) {
-        // Draw image in a circle (would need image loading)
-        ctx.fillStyle = theme.colors.text
-        ctx.font = '40px sans-serif'
+      // Draw image if available
+      const cachedImage = el.image_url ? imageCache.get(el.image_url) : null
+      if (cachedImage) {
+        // Save context and clip to circle
+        ctx.save()
+        ctx.beginPath()
+        ctx.arc(x, y, ELEMENT_RADIUS - 3, 0, Math.PI * 2)
+        ctx.clip()
+
+        // Draw image centered and covering the circle
+        const imgSize = ELEMENT_RADIUS * 2
+        ctx.drawImage(
+          cachedImage,
+          x - ELEMENT_RADIUS + 3,
+          y - ELEMENT_RADIUS + 3,
+          imgSize - 6,
+          imgSize - 6
+        )
+        ctx.restore()
+
+        // Redraw border on top
+        ctx.strokeStyle = 'black'
+        ctx.lineWidth = 3
+        ctx.beginPath()
+        ctx.arc(x, y, ELEMENT_RADIUS, 0, Math.PI * 2)
+        ctx.stroke()
+
+        // Small emoji badge in corner
+        ctx.fillStyle = typeConfig.color
+        ctx.beginPath()
+        ctx.arc(x + 40, y - 40, 18, 0, Math.PI * 2)
+        ctx.fill()
+        ctx.strokeStyle = 'black'
+        ctx.lineWidth = 2
+        ctx.stroke()
+        ctx.font = '16px sans-serif'
         ctx.textAlign = 'center'
         ctx.textBaseline = 'middle'
-        ctx.fillText(el.emoji || typeConfig.emoji, x, y - 15)
+        ctx.fillText(el.emoji || typeConfig.emoji, x + 40, y - 40)
       } else {
+        // No image - show large emoji
         ctx.fillStyle = theme.colors.text
         ctx.font = '40px sans-serif'
         ctx.textAlign = 'center'
@@ -187,19 +244,20 @@ export default function WorldCanvas({
         ctx.fillText(el.emoji || typeConfig.emoji, x, y - 10)
       }
 
-      // Name
+      // Name label below
       ctx.fillStyle = theme.colors.text
       ctx.font = 'bold 12px sans-serif'
-      ctx.fillText(el.name.slice(0, 15), x, y + 30)
+      ctx.textAlign = 'center'
+      ctx.fillText(el.name.slice(0, 15), x, y + ELEMENT_RADIUS + 15)
 
       // Type badge
       ctx.font = '10px sans-serif'
       ctx.fillStyle = theme.colors.text + '80'
-      ctx.fillText(el.element_type, x, y + 45)
+      ctx.fillText(el.element_type, x, y + ELEMENT_RADIUS + 28)
     })
 
     ctx.restore()
-  }, [elements, connections, offset, scale, theme, connecting, mousePos, getCanvasCoords])
+  }, [elements, connections, offset, scale, theme, connecting, mousePos, getCanvasCoords, loadedImages])
 
   useEffect(() => {
     draw()

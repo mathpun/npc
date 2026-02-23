@@ -5,7 +5,7 @@ export interface UserProfile {
   currentGoals: string
 }
 
-export type SessionGoal = 'stuck' | 'future' | 'identity' | 'people' | 'venting' | 'creating'
+export type SessionGoal = 'stuck' | 'future' | 'identity' | 'people' | 'venting' | 'creating' | 'texting'
 export type PersonaType = 'chill_mentor' | 'hype_friend' | 'wise_elder' | 'real_talk' | 'creative_chaos' | 'potato' | 'custom'
 
 export interface CustomPersona {
@@ -70,6 +70,14 @@ export const SESSION_GOALS = {
     examples: ['creative project', 'build something with AI', 'brainstorm ideas'],
     color: '#FFD93D',
     emoji: '🚀',
+  },
+  texting: {
+    label: "help me reply",
+    description: "What to text back, how to word something",
+    icon: 'phone',
+    examples: ['what should I say', 'how do I respond', 'is this too much'],
+    color: '#98D8C8',
+    emoji: '💬',
   },
 }
 

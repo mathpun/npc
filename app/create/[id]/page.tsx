@@ -9,6 +9,7 @@ import WorldChat from '@/components/world/WorldChat'
 import WorldInvite from '@/components/world/WorldInvite'
 import AddElementFlow from '@/components/world/AddElementFlow'
 import WorldCanvas from '@/components/world/WorldCanvas'
+import ElementDetailModal from '@/components/world/ElementDetailModal'
 import { useTheme } from '@/lib/ThemeContext'
 
 interface World {
@@ -81,6 +82,7 @@ export default function WorldViewPage() {
   const [filterType, setFilterType] = useState<string | null>(null)
   const [connections, setConnections] = useState<Array<{ from: number; to: number }>>([])
   const [localElements, setLocalElements] = useState<WorldElement[]>([])
+  const [selectedElement, setSelectedElement] = useState<WorldElement | null>(null)
 
   useEffect(() => {
     const savedProfile = localStorage.getItem('youthai_profile')
@@ -320,7 +322,7 @@ export default function WorldViewPage() {
               elements={elements}
               filterType={filterType}
               onFilterChange={setFilterType}
-              onElementClick={() => {}}
+              onElementClick={(el) => setSelectedElement(el as WorldElement)}
               onElementDelete={canEdit ? handleElementDeleted : undefined}
               userId={userId}
             />
@@ -353,7 +355,7 @@ export default function WorldViewPage() {
               userId={userId}
               canEdit={canEdit}
               onElementMove={handleElementMove}
-              onElementClick={(el) => console.log('clicked', el)}
+              onElementClick={(el) => setSelectedElement(el as unknown as WorldElement)}
               onConnectionAdd={handleConnectionAdd}
             />
           </>
@@ -389,6 +391,17 @@ export default function WorldViewPage() {
         onCreated={handleElementAdded}
         worldId={parseInt(id)}
         userId={userId}
+      />
+
+      {/* Element Detail Modal */}
+      <ElementDetailModal
+        element={selectedElement}
+        isOpen={selectedElement !== null}
+        onClose={() => setSelectedElement(null)}
+        worldId={parseInt(id)}
+        userId={userId}
+        canEdit={canEdit}
+        onImageGenerated={fetchWorld}
       />
     </div>
   )
