@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import Anthropic from '@anthropic-ai/sdk'
 import db from '@/lib/db'
-import { buildCheckinPrompt, buildCheckinSummaryPrompt, CheckinContext, DAYS_OF_WEEK } from '@/lib/checkin-prompts'
+import { buildCheckinSummaryPrompt, DAYS_OF_WEEK } from '@/lib/checkin-prompts'
 
 let anthropic: Anthropic | null = null
 function getAnthropicClient(): Anthropic {
@@ -43,88 +43,20 @@ export async function GET(request: NextRequest) {
       })
     }
 
-    // User hasn't checked in today - generate questions
+    // User hasn't checked in today - get simple questions (no AI call for speed)
     const user = await db.prepare(`
-      SELECT name, age, interests, goals FROM users WHERE id = ?
-    `).get(userId) as { name: string; age: number; interests: string; goals: string | null } | undefined
+      SELECT name FROM users WHERE id = ?
+    `).get(userId) as { name: string } | undefined
 
     if (!user) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 })
     }
 
-    // Get recent chat topics (last 7 days)
-    const recentMessages = await db.prepare(`
-      SELECT DISTINCT content FROM chat_messages
-      WHERE user_id = ? AND role = 'user'
-      AND created_at >= CURRENT_TIMESTAMP - INTERVAL '7 days'
-      ORDER BY created_at DESC
-      LIMIT 10
-    `).all(userId) as { content: string }[]
-
-    // Extract topics from recent messages (first few words of each)
-    const recentTopics = recentMessages
-      .map(m => m.content.split(' ').slice(0, 5).join(' '))
-      .slice(0, 5)
-
-    // Get last mood
-    const lastCheckin = await db.prepare(`
-      SELECT mood FROM daily_checkins
-      WHERE user_id = ?
-      ORDER BY checkin_date DESC
-      LIMIT 1
-    `).get(userId) as { mood: string | null } | undefined
-
-    // Build context for question generation
+    // Use simple, fast questions - AI is only used for summary after submit
     const dayOfWeek = DAYS_OF_WEEK[new Date().getDay()]
-    const context: CheckinContext = {
-      name: user.name,
-      age: user.age,
-      interests: user.interests,
-      goals: user.goals,
-      recentTopics,
-      dayOfWeek,
-      lastMood: lastCheckin?.mood || null,
-    }
-
-    // Fallback question - always have this ready
-    const fallbackQuestions = [
-      `Hey ${user.name}! What's one thing on your mind right now?`,
+    const questions = [
+      `Hey ${user.name}! What's on your mind this ${dayOfWeek}?`,
     ]
-
-    // Start with fallback questions - they'll be replaced if AI succeeds
-    let questions: string[] = [...fallbackQuestions]
-
-    // Try to generate personalized questions using Claude
-    try {
-      const prompt = buildCheckinPrompt(context)
-      const response = await getAnthropicClient().messages.create({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 500,
-        messages: [{ role: 'user', content: prompt }],
-      })
-
-      const textContent = response.content.find(block => block.type === 'text')
-      if (textContent && textContent.type === 'text') {
-        try {
-          const parsed = JSON.parse(textContent.text)
-          // Only use AI questions if we got a valid array with content
-          if (Array.isArray(parsed) && parsed.length > 0 && typeof parsed[0] === 'string') {
-            questions = parsed
-          }
-        } catch {
-          // JSON parsing failed - keep using fallback
-          console.log('Failed to parse AI questions, using fallback')
-        }
-      }
-    } catch (err) {
-      // AI call failed - keep using fallback
-      console.error('Failed to generate questions with AI:', err)
-    }
-
-    // Final safety check - ensure we always have questions
-    if (!Array.isArray(questions) || questions.length === 0) {
-      questions = fallbackQuestions
-    }
 
     return NextResponse.json({
       hasCheckedInToday: false,

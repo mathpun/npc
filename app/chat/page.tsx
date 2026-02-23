@@ -150,9 +150,16 @@ function ChatPageContent() {
 
   const checkForDailyCheckIn = async (userId: string) => {
     try {
-      // Check if we already showed the check-in modal this session
       const today = new Date().toISOString().split('T')[0]
+      const completedKey = `checkin_completed_${today}`
       const shownKey = `checkin_shown_${today}`
+
+      // Check localStorage first - if completed today, skip entirely
+      if (localStorage.getItem(completedKey)) {
+        return
+      }
+
+      // Check if we already showed the modal this session
       if (sessionStorage.getItem(shownKey)) {
         return
       }
@@ -162,6 +169,9 @@ function ChatPageContent() {
       if (!data.hasCheckedInToday) {
         sessionStorage.setItem(shownKey, 'true')
         setShowCheckIn(true)
+      } else {
+        // Mark as completed in localStorage so we don't check again
+        localStorage.setItem(completedKey, 'true')
       }
     } catch (err) {
       console.error('Failed to check check-in status:', err)
@@ -169,6 +179,8 @@ function ChatPageContent() {
   }
 
   const handleCheckInComplete = () => {
+    const today = new Date().toISOString().split('T')[0]
+    localStorage.setItem(`checkin_completed_${today}`, 'true')
     setShowCheckIn(false)
   }
 
