@@ -136,17 +136,6 @@ export default function Home() {
             >
               start chatting →
             </Link>
-            <button
-              className="px-8 py-4 text-lg font-bold hover:scale-105 transition-transform"
-              style={{
-                backgroundColor: 'white',
-                border: '3px solid black',
-                borderRadius: '20px',
-                boxShadow: '4px 4px 0 black',
-              }}
-            >
-              see how it works
-            </button>
           </div>
 
           {/* Social proof */}
