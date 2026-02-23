@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { useTheme } from '@/lib/ThemeContext'
 
-const FEEDBACK_FORM_URL = 'https://forms.gle/YOUR_FORM_ID' // Replace with actual form URL
+const FEEDBACK_FORM_URL = 'https://forms.gle/iWyp8pUumivZDMxr7'
 
 interface FeatureProposal {
   id: string
