@@ -1,8 +1,9 @@
 'use client'
 
+import { useState } from 'react'
 import { useTheme } from '@/lib/ThemeContext'
 
-import { useState } from 'react'
+const FEEDBACK_FORM_URL = 'https://forms.gle/YOUR_FORM_ID' // Replace with actual form URL
 
 interface FeatureProposal {
   id: string
@@ -67,6 +68,34 @@ export default function CoDesignPortal() {
 
   const [showIdeaForm, setShowIdeaForm] = useState(false)
   const [newIdea, setNewIdea] = useState('')
+  const [interviewEmail, setInterviewEmail] = useState('')
+  const [interviewSignedUp, setInterviewSignedUp] = useState(false)
+  const [signingUp, setSigningUp] = useState(false)
+
+  const handleInterviewSignup = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!interviewEmail) return
+
+    setSigningUp(true)
+    try {
+      const res = await fetch('/api/codesign', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: interviewEmail,
+          signupType: 'interview',
+        }),
+      })
+
+      if (res.ok) {
+        setInterviewSignedUp(true)
+        setInterviewEmail('')
+      }
+    } catch (err) {
+      console.error('Failed to sign up:', err)
+    }
+    setSigningUp(false)
+  }
 
   const handleVote = (id: string) => {
     setProposals(proposals.map(p =>
@@ -295,18 +324,113 @@ export default function CoDesignPortal() {
         </div>
       </div>
 
-      {/* Join Advisory */}
+      {/* Get Involved Section */}
       <div
-        className="p-4 text-center"
+        className="p-5 -rotate-1"
         style={{
           backgroundColor: theme.colors.accent2,
-          border: '3px solid black',
-          borderRadius: '12px',
-          boxShadow: '4px 4px 0 black',
+          border: '4px solid black',
+          borderRadius: '16px',
+          boxShadow: '6px 6px 0 black',
         }}
       >
-        <p className="font-bold mb-2">🌟 Join the Teen Advisory Council!</p>
-        <p className="text-sm">Help shape the future of youth-aligned AI</p>
+        <h2 className="text-xl font-bold mb-4 text-center">🌟 Get Involved!</h2>
+
+        <div className="grid md:grid-cols-2 gap-4">
+          {/* Interview Signup */}
+          <div
+            className="p-4"
+            style={{
+              backgroundColor: theme.colors.backgroundAlt,
+              border: '3px solid black',
+              borderRadius: '12px',
+            }}
+          >
+            <h3 className="font-bold mb-2 flex items-center gap-2">
+              <span>💬</span> Chat with us!
+            </h3>
+            <p className="text-sm mb-3">
+              Sign up for a quick 15-20 min chat to share your thoughts
+            </p>
+
+            {interviewSignedUp ? (
+              <div
+                className="p-3 text-center"
+                style={{
+                  backgroundColor: theme.colors.accent3,
+                  border: '2px solid black',
+                  borderRadius: '8px',
+                }}
+              >
+                <span className="font-bold">✅ You're on the list!</span>
+                <p className="text-xs mt-1">We'll reach out soon</p>
+              </div>
+            ) : (
+              <form onSubmit={handleInterviewSignup} className="space-y-2">
+                <input
+                  type="email"
+                  value={interviewEmail}
+                  onChange={(e) => setInterviewEmail(e.target.value)}
+                  placeholder="your email"
+                  required
+                  className="w-full px-3 py-2 text-sm"
+                  style={{
+                    border: '2px solid black',
+                    borderRadius: '8px',
+                  }}
+                />
+                <button
+                  type="submit"
+                  disabled={signingUp}
+                  className="w-full py-2 font-bold hover:scale-105 transition-transform disabled:opacity-50"
+                  style={{
+                    backgroundColor: theme.colors.accent1,
+                    border: '2px solid black',
+                    borderRadius: '8px',
+                    boxShadow: '2px 2px 0 black',
+                  }}
+                >
+                  {signingUp ? 'signing up...' : 'sign me up! 🎉'}
+                </button>
+              </form>
+            )}
+          </div>
+
+          {/* Feedback Form */}
+          <div
+            className="p-4"
+            style={{
+              backgroundColor: theme.colors.backgroundAlt,
+              border: '3px solid black',
+              borderRadius: '12px',
+            }}
+          >
+            <h3 className="font-bold mb-2 flex items-center gap-2">
+              <span>📝</span> Share feedback
+            </h3>
+            <p className="text-sm mb-3">
+              Got ideas or thoughts? Fill out our quick feedback form
+            </p>
+            <a
+              href={FEEDBACK_FORM_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="block w-full py-2 font-bold text-center hover:scale-105 transition-transform"
+              style={{
+                backgroundColor: theme.colors.accent4,
+                border: '2px solid black',
+                borderRadius: '8px',
+                boxShadow: '2px 2px 0 black',
+              }}
+            >
+              open feedback form →
+            </a>
+          </div>
+        </div>
+
+        <p className="text-xs text-center mt-4 opacity-70">
+          Your input directly shapes how this AI works for teens!
+        </p>
       </div>
     </div>
   )

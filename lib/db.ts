@@ -416,6 +416,18 @@ async function initDb() {
           ALTER TABLE world_elements ADD COLUMN image_url TEXT;
         END IF;
       END $$;
+
+      -- Interview/feedback signups for co-design
+      CREATE TABLE IF NOT EXISTS codesign_signups (
+        id SERIAL PRIMARY KEY,
+        email TEXT NOT NULL,
+        user_id TEXT,
+        signup_type TEXT NOT NULL DEFAULT 'interview',
+        name TEXT,
+        age INTEGER,
+        interests TEXT,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      );
     `)
     console.log('Database tables initialized')
   } catch (error) {
