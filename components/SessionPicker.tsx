@@ -205,7 +205,7 @@ export default function SessionPicker({ onSelect, onClose, onOpenHistory }: Sess
               cursor: selectedGoal ? 'pointer' : 'not-allowed',
             }}
           >
-            next: pick your vibe →
+            next: pick a persona →
           </button>
 
           {/* Continue past chat button */}
@@ -268,7 +268,7 @@ export default function SessionPicker({ onSelect, onClose, onOpenHistory }: Sess
               boxShadow: '6px 6px 0 black',
             }}
           >
-            create your own vibe ✨
+            create your own persona ✨
           </h2>
         </div>
 
@@ -405,7 +405,7 @@ export default function SessionPicker({ onSelect, onClose, onOpenHistory }: Sess
               </div>
               <div>
                 <h3 className="font-bold">{customName}</h3>
-                <p className="text-sm opacity-80">{customDescription || 'your custom vibe'}</p>
+                <p className="text-sm opacity-80">{customDescription || 'your custom persona'}</p>
               </div>
             </div>
           </div>
@@ -425,7 +425,7 @@ export default function SessionPicker({ onSelect, onClose, onOpenHistory }: Sess
               cursor: customName && customVibe ? 'pointer' : 'not-allowed',
             }}
           >
-            create & use this vibe ✨
+            create & use this persona ✨
           </button>
         </div>
       </div>
@@ -473,7 +473,7 @@ export default function SessionPicker({ onSelect, onClose, onOpenHistory }: Sess
         >
           who do you wanna talk to?
         </h2>
-        <p className="text-lg mt-4">pick the vibe that feels right for this convo</p>
+        <p className="text-lg mt-4">pick the personality that fits this convo</p>
       </div>
 
       {/* Persona selection */}
@@ -544,7 +544,7 @@ export default function SessionPicker({ onSelect, onClose, onOpenHistory }: Sess
               {selectedPersona === 'custom' && customName ? customName : 'Create Your Own'}
             </h3>
             <p className="text-sm opacity-80">
-              {selectedPersona === 'custom' && customDescription ? customDescription : 'design a custom vibe'}
+              {selectedPersona === 'custom' && customDescription ? customDescription : 'design a custom persona'}
             </p>
           </div>
           {selectedPersona === 'custom' && (
