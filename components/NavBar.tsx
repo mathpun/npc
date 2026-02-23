@@ -211,36 +211,36 @@ export default function NavBar({ showBack = false, backHref = '/', backLabel = '
               <span className="text-xs">theme</span>
             </button>
 
-            {isLoggedIn && (
+          </div>
+
+          {isLoggedIn && (
+            <div className="flex items-center justify-between gap-2 mt-2">
+              <div
+                className="flex-1 text-center p-2"
+                style={{
+                  backgroundColor: theme.colors.buttonSuccess,
+                  border: '2px solid black',
+                  borderRadius: '9999px',
+                }}
+              >
+                hi {userName}! 👋
+              </div>
               <button
                 onClick={() => {
                   setMobileMenuOpen(false)
                   setShowChangePassword(true)
                 }}
-                className="flex flex-col items-center gap-1 p-3 font-bold hover:scale-105 transition-transform"
+                className="flex items-center gap-1 px-3 py-2 text-xs font-bold hover:scale-105 transition-transform"
                 style={{
-                  backgroundColor: theme.colors.accent5,
-                  border: '3px solid black',
-                  borderRadius: '16px',
-                  boxShadow: '3px 3px 0 black',
+                  backgroundColor: theme.colors.backgroundAlt,
+                  border: '2px solid black',
+                  borderRadius: '9999px',
+                  boxShadow: '2px 2px 0 black',
                 }}
               >
-                <span className="text-2xl">🔐</span>
-                <span className="text-xs">password</span>
+                <span>🔐</span>
+                <span>password</span>
               </button>
-            )}
-          </div>
-
-          {isLoggedIn && (
-            <div
-              className="text-center p-2 mb-2"
-              style={{
-                backgroundColor: theme.colors.buttonSuccess,
-                border: '2px solid black',
-                borderRadius: '9999px',
-              }}
-            >
-              hi {userName}! 👋
             </div>
           )}
         </div>
