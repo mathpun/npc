@@ -37,11 +37,19 @@ export default function DailyCheckIn({ userId, userName, onComplete, onSkip }: D
   ]
 
   const fetchQuestions = useCallback(async () => {
+    // Check localStorage first - if already completed today, skip entirely
+    const today = new Date().toISOString().split('T')[0]
+    if (localStorage.getItem(`checkin_completed_${today}`)) {
+      onComplete()
+      return
+    }
+
     try {
       const res = await fetch(`/api/checkin?userId=${userId}`)
       const data = await res.json()
 
       if (data.hasCheckedInToday) {
+        localStorage.setItem(`checkin_completed_${today}`, 'true')
         onComplete()
         return
       }
@@ -103,6 +111,10 @@ export default function DailyCheckIn({ userId, userName, onComplete, onSkip }: D
       if (!res.ok) {
         throw new Error('Failed to save check-in')
       }
+
+      // Mark as completed in localStorage immediately
+      const today = new Date().toISOString().split('T')[0]
+      localStorage.setItem(`checkin_completed_${today}`, 'true')
 
       const data = await res.json()
 

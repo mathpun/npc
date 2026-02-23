@@ -126,6 +126,8 @@ export default function Dashboard() {
   }
 
   const handleCheckInSkip = () => {
+    const today = new Date().toISOString().split('T')[0]
+    sessionStorage.setItem(`checkin_shown_${today}`, 'true')
     setShowCheckIn(false)
   }
 
