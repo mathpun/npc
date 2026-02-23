@@ -256,7 +256,7 @@ export default function Home() {
       {/* Use Cases */}
       <div className="relative z-10 px-4 py-16" style={{ backgroundColor: 'white' }}>
         <div className="max-w-5xl mx-auto">
-          <h2 className="text-2xl md:text-4xl font-bold text-center mb-10 underline decoration-wavy decoration-black">
+          <h2 className="text-2xl md:text-4xl font-bold text-center mb-10">
             what people use it for
           </h2>
 

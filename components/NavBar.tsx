@@ -47,14 +47,14 @@ export default function NavBar({ showBack = false, backHref = '/', backLabel = '
   }
 
   const navItems = [
-    { href: '/', icon: '🏠', label: 'home', color: '#FFB6C1' },       // pink
-    { href: '/dashboard', icon: '🗺️', label: 'journey', color: '#87CEEB' },  // sky blue
-    { href: '/chat', icon: '💬', label: 'chat', color: '#98FB98' },    // light green
-    { href: '/chat?tab=growth', icon: '🌱', label: 'growth', color: '#FFEAA7' }, // pale yellow
-    { href: '/create', icon: '✨', label: 'create', color: '#DDA0DD' },  // plum/purple
-    { href: '/museum', icon: '🏛️', label: 'museum', color: '#FFA07A' },  // salmon/orange
-    { href: '/moltbook', icon: '🌍', label: 'world', color: '#48DBFB' },  // cyan
-    { href: '/parent', icon: '👨‍👩‍👧', label: 'parent', color: '#E6E6FA' },  // lavender
+    { href: '/', icon: '🏠', label: 'home', color: '#FF6B9D' },       // hot pink
+    { href: '/dashboard', icon: '🗺️', label: 'journey', color: '#4ECDC4' },  // teal
+    { href: '/chat', icon: '💬', label: 'chat', color: '#7BED9F' },    // bright green
+    { href: '/chat?tab=growth', icon: '🌱', label: 'growth', color: '#FDCB6E' }, // golden yellow
+    { href: '/create', icon: '✨', label: 'create', color: '#A29BFE' },  // bright purple
+    { href: '/museum', icon: '🏛️', label: 'museum', color: '#FF7675' },  // coral red
+    { href: '/moltbook', icon: '🌍', label: 'world', color: '#74B9FF' },  // bright blue
+    { href: '/parent', icon: '👨‍👩‍👧', label: 'parent', color: '#FD79A8' },  // bright pink
   ]
 
   return (
