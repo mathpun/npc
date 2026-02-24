@@ -86,33 +86,8 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ hasPassword: true })
     }
 
-    // No password set - send magic link as fallback
-    const token = crypto.randomBytes(32).toString('hex')
-    const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000)
-
-    await db.prepare(`
-      INSERT INTO parent_auth_tokens (parent_email, token, expires_at)
-      VALUES (?, ?, ?)
-    `).run(normalizedEmail, token, expiresAt.toISOString())
-
-    const loginUrl = `/parent?token=${token}`
-    const teenNames = connections.map((c) => c.nickname || c.name)
-
-    const emailResult = await sendParentLoginEmail({
-      parentEmail: normalizedEmail,
-      loginUrl,
-      teenNames,
-    })
-
-    if (!emailResult.success) {
-      console.error('Failed to send parent login email:', emailResult.error)
-    }
-
-    return NextResponse.json({
-      success: true,
-      message: 'Login link sent! Check your email.',
-      ...(process.env.NODE_ENV === 'development' && { token, loginUrl })
-    })
+    // No password set - prompt to create one
+    return NextResponse.json({ needsPassword: true })
   } catch (error) {
     console.error('Error in parent auth:', error)
     return NextResponse.json({ error: 'Failed to process login' }, { status: 500 })
