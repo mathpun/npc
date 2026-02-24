@@ -311,12 +311,22 @@ async function initDb() {
         user_id TEXT NOT NULL REFERENCES users(id),
         parent_email TEXT NOT NULL,
         parent_name TEXT,
+        password_hash TEXT,
         connection_status TEXT DEFAULT 'pending',
         verification_code TEXT,
         verified_at TIMESTAMP,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         UNIQUE(user_id, parent_email)
       );
+
+      -- Add password_hash column if it doesn't exist
+      DO $$
+      BEGIN
+        IF NOT EXISTS (SELECT 1 FROM information_schema.columns
+                       WHERE table_name = 'parent_connections' AND column_name = 'password_hash') THEN
+          ALTER TABLE parent_connections ADD COLUMN password_hash TEXT;
+        END IF;
+      END $$;
 
       -- Flagged messages (content safety alerts for admin)
       CREATE TABLE IF NOT EXISTS flagged_messages (

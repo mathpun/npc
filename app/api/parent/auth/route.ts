@@ -1,13 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server'
 import db from '@/lib/db'
 import crypto from 'crypto'
+import bcrypt from 'bcryptjs'
 import { sendParentLoginEmail } from '@/lib/email'
 
-// POST - Request magic link (generates token, stores in DB)
+// POST - Login with password or request magic link
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
-    const { email } = body
+    const { email, password, setPassword } = body
 
     if (!email) {
       return NextResponse.json({ error: 'Email is required' }, { status: 400 })
@@ -23,11 +24,11 @@ export async function POST(request: NextRequest) {
 
     // Check if this email has any connected teens
     const connections = await db.prepare(`
-      SELECT pc.id, pc.user_id, u.name, u.nickname
+      SELECT pc.id, pc.user_id, pc.password_hash, u.name, u.nickname
       FROM parent_connections pc
       JOIN users u ON pc.user_id = u.id
       WHERE pc.parent_email = ? AND pc.connection_status = 'active'
-    `).all(normalizedEmail)
+    `).all(normalizedEmail) as { id: number; user_id: string; password_hash: string | null; name: string; nickname?: string }[]
 
     if (!connections || connections.length === 0) {
       return NextResponse.json({
@@ -35,26 +36,68 @@ export async function POST(request: NextRequest) {
       }, { status: 404 })
     }
 
-    // Generate a secure token
-    const token = crypto.randomBytes(32).toString('hex')
+    const firstConnection = connections[0]
 
-    // Set expiry to 24 hours from now
+    // If setting a new password
+    if (setPassword && password) {
+      if (password.length < 4) {
+        return NextResponse.json({ error: 'Password must be at least 4 characters' }, { status: 400 })
+      }
+
+      const hashedPassword = await bcrypt.hash(password, 10)
+
+      // Update all connections for this parent email with the password
+      await db.prepare(`
+        UPDATE parent_connections
+        SET password_hash = ?
+        WHERE parent_email = ? AND connection_status = 'active'
+      `).run(hashedPassword, normalizedEmail)
+
+      return NextResponse.json({
+        success: true,
+        parentEmail: normalizedEmail,
+        connectedTeens: connections.map(c => ({ id: c.id, user_id: c.user_id, name: c.name, nickname: c.nickname }))
+      })
+    }
+
+    // If password provided, try to log in with it
+    if (password) {
+      if (!firstConnection.password_hash) {
+        // No password set yet - prompt to create one
+        return NextResponse.json({ needsPassword: true })
+      }
+
+      const isValid = await bcrypt.compare(password, firstConnection.password_hash)
+      if (!isValid) {
+        return NextResponse.json({ error: 'Incorrect password' }, { status: 401 })
+      }
+
+      // Password correct - return success
+      return NextResponse.json({
+        success: true,
+        parentEmail: normalizedEmail,
+        connectedTeens: connections.map(c => ({ id: c.id, user_id: c.user_id, name: c.name, nickname: c.nickname }))
+      })
+    }
+
+    // No password provided - check if they have one set
+    if (firstConnection.password_hash) {
+      // They have a password, prompt for it
+      return NextResponse.json({ hasPassword: true })
+    }
+
+    // No password set - send magic link as fallback
+    const token = crypto.randomBytes(32).toString('hex')
     const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000)
 
-    // Store the token
     await db.prepare(`
       INSERT INTO parent_auth_tokens (parent_email, token, expires_at)
       VALUES (?, ?, ?)
     `).run(normalizedEmail, token, expiresAt.toISOString())
 
     const loginUrl = `/parent?token=${token}`
+    const teenNames = connections.map((c) => c.nickname || c.name)
 
-    // Get teen names for the email
-    const teenNames = (connections as { name: string; nickname?: string }[]).map(
-      (c) => c.nickname || c.name
-    )
-
-    // Send the login email
     const emailResult = await sendParentLoginEmail({
       parentEmail: normalizedEmail,
       loginUrl,
@@ -63,18 +106,16 @@ export async function POST(request: NextRequest) {
 
     if (!emailResult.success) {
       console.error('Failed to send parent login email:', emailResult.error)
-      // Still return success since token was created - they can request again
     }
 
     return NextResponse.json({
       success: true,
       message: 'Login link sent! Check your email.',
-      // Include token in dev mode for testing
       ...(process.env.NODE_ENV === 'development' && { token, loginUrl })
     })
   } catch (error) {
-    console.error('Error generating auth token:', error)
-    return NextResponse.json({ error: 'Failed to send login link' }, { status: 500 })
+    console.error('Error in parent auth:', error)
+    return NextResponse.json({ error: 'Failed to process login' }, { status: 500 })
   }
 }
 

@@ -23,6 +23,10 @@ export default function LoginPage() {
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
   const [needsPassword, setNeedsPassword] = useState(false)
+  const [parentNeedsPassword, setParentNeedsPassword] = useState(false)
+  const [parentHasPassword, setParentHasPassword] = useState(false)
+  const [parentPassword, setParentPassword] = useState('')
+  const [parentConfirmPassword, setParentConfirmPassword] = useState('')
   const [parentLinkSent, setParentLinkSent] = useState(false)
   const [debugToken, setDebugToken] = useState('')
   const { theme } = useTheme()
@@ -194,18 +198,77 @@ export default function LoginPage() {
     setError('')
 
     try {
+      // If setting a new password
+      if (parentNeedsPassword) {
+        if (!parentPassword) {
+          setError('please create a password')
+          setLoading(false)
+          return
+        }
+        if (parentPassword.length < 4) {
+          setError('password must be at least 4 characters')
+          setLoading(false)
+          return
+        }
+        if (parentPassword !== parentConfirmPassword) {
+          setError('passwords don\'t match')
+          setLoading(false)
+          return
+        }
+
+        const res = await fetch('/api/parent/auth', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: email.trim(), password: parentPassword, setPassword: true }),
+        })
+        const data = await res.json()
+
+        if (res.ok && data.success) {
+          // Store parent session info and redirect
+          localStorage.setItem('parent_email', data.parentEmail)
+          localStorage.setItem('parent_teens', JSON.stringify(data.connectedTeens))
+          router.push('/parent')
+        } else {
+          setError(data.error || 'something went wrong')
+        }
+        setLoading(false)
+        return
+      }
+
+      // Normal login flow
       const res = await fetch('/api/parent/auth', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: email.trim() }),
+        body: JSON.stringify({ email: email.trim(), password: parentPassword || undefined }),
       })
       const data = await res.json()
 
+      if (data.hasPassword && !parentPassword) {
+        // They have a password set, show password field
+        setParentHasPassword(true)
+        setLoading(false)
+        return
+      }
+
+      if (data.needsPassword) {
+        // They don't have a password yet, prompt to create one
+        setParentNeedsPassword(true)
+        setLoading(false)
+        return
+      }
+
       if (res.ok && data.success) {
-        setParentLinkSent(true)
-        // For development, show the token
-        if (data.token) {
-          setDebugToken(data.token)
+        if (data.parentEmail) {
+          // Password login successful
+          localStorage.setItem('parent_email', data.parentEmail)
+          localStorage.setItem('parent_teens', JSON.stringify(data.connectedTeens))
+          router.push('/parent')
+        } else {
+          // Magic link sent
+          setParentLinkSent(true)
+          if (data.token) {
+            setDebugToken(data.token)
+          }
         }
       } else {
         setError(data.error || 'something went wrong')
@@ -301,12 +364,18 @@ export default function LoginPage() {
             }}
           >
             {userType === 'parent'
-              ? 'parent portal'
+              ? parentNeedsPassword
+                ? 'create password'
+                : 'parent portal'
               : needsPassword ? `hey ${name}!` : 'welcome back!'}
           </h1>
           <p className="text-center text-gray-600 mb-6 mt-4">
             {userType === 'parent'
-              ? 'enter your email to receive a login link'
+              ? parentNeedsPassword
+                ? 'create a password to make logging in easier!'
+                : parentHasPassword
+                ? 'enter your password to log in'
+                : 'enter your email to log in'
               : needsPassword
               ? 'we added passwords! create one to keep your account secure'
               : 'enter your name and password to log in'}
@@ -329,19 +398,94 @@ export default function LoginPage() {
             </div>
 
             <form onSubmit={handleParentLogin}>
-              <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="your email..."
-                className="w-full px-4 py-3 text-lg mb-4"
-                style={{
-                  backgroundColor: '#FFFACD',
-                  border: '3px solid black',
-                  borderRadius: '12px',
-                }}
-                autoFocus
-              />
+              {/* Email input - always shown unless we're in password entry mode */}
+              {!parentHasPassword && !parentNeedsPassword && (
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="your email..."
+                  className="w-full px-4 py-3 text-lg mb-4"
+                  style={{
+                    backgroundColor: '#FFFACD',
+                    border: '3px solid black',
+                    borderRadius: '12px',
+                  }}
+                  autoFocus
+                />
+              )}
+
+              {/* Show email as readonly when entering password */}
+              {(parentHasPassword || parentNeedsPassword) && (
+                <div
+                  className="w-full px-4 py-3 text-lg mb-4 text-gray-600"
+                  style={{
+                    backgroundColor: '#f0f0f0',
+                    border: '3px solid black',
+                    borderRadius: '12px',
+                  }}
+                >
+                  {email}
+                </div>
+              )}
+
+              {/* Password field when user has a password */}
+              {parentHasPassword && (
+                <input
+                  type="password"
+                  value={parentPassword}
+                  onChange={(e) => setParentPassword(e.target.value)}
+                  placeholder="your password..."
+                  className="w-full px-4 py-3 text-lg mb-4"
+                  style={{
+                    backgroundColor: '#FFFACD',
+                    border: '3px solid black',
+                    borderRadius: '12px',
+                  }}
+                  autoFocus
+                />
+              )}
+
+              {/* Password creation fields when user needs to set password */}
+              {parentNeedsPassword && (
+                <>
+                  <input
+                    type="password"
+                    value={parentPassword}
+                    onChange={(e) => setParentPassword(e.target.value)}
+                    placeholder="create a password..."
+                    className="w-full px-4 py-3 text-lg mb-4"
+                    style={{
+                      backgroundColor: '#FFFACD',
+                      border: '3px solid black',
+                      borderRadius: '12px',
+                    }}
+                    autoFocus
+                  />
+                  <input
+                    type="password"
+                    value={parentConfirmPassword}
+                    onChange={(e) => setParentConfirmPassword(e.target.value)}
+                    placeholder="confirm password..."
+                    className="w-full px-4 py-3 text-lg mb-4"
+                    style={{
+                      backgroundColor: '#FFFACD',
+                      border: '3px solid black',
+                      borderRadius: '12px',
+                    }}
+                  />
+                  <p
+                    className="text-sm text-center mb-4 px-3 py-2"
+                    style={{
+                      backgroundColor: theme.colors.accent3,
+                      border: '2px dashed black',
+                      borderRadius: '8px',
+                    }}
+                  >
+                    password must be at least 4 characters
+                  </p>
+                </>
+              )}
 
               {error && (
                 <div
@@ -367,8 +511,31 @@ export default function LoginPage() {
                   boxShadow: '4px 4px 0 black',
                 }}
               >
-                {loading ? 'sending...' : 'send login link'}
+                {loading
+                  ? (parentNeedsPassword ? 'saving...' : parentHasPassword ? 'logging in...' : 'checking...')
+                  : parentNeedsPassword
+                  ? 'save password & log in →'
+                  : parentHasPassword
+                  ? 'log in →'
+                  : 'continue →'}
               </button>
+
+              {/* Back button when in password mode */}
+              {(parentHasPassword || parentNeedsPassword) && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setParentHasPassword(false)
+                    setParentNeedsPassword(false)
+                    setParentPassword('')
+                    setParentConfirmPassword('')
+                    setError('')
+                  }}
+                  className="w-full mt-3 py-2 font-bold text-sm hover:underline"
+                >
+                  ← use a different email
+                </button>
+              )}
             </form>
             </>
           )}
