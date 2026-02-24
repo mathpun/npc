@@ -75,9 +75,29 @@ export default function PrivacyPolicy() {
 
             <section>
               <h2 className="text-xl font-bold mb-2">AI & Third Parties</h2>
-              <p>
-                We use Anthropic's Claude AI to power conversations. Your messages are sent to
-                their API to generate responses. Anthropic has their own{' '}
+              <p className="mb-3">
+                We use <strong>Anthropic's Claude AI</strong> to power conversations. Here's exactly what happens:
+              </p>
+              <div className="bg-yellow-50 border-2 border-black rounded-lg p-4 mb-3">
+                <h3 className="font-bold mb-2">What data is sent to Anthropic:</h3>
+                <ul className="list-disc pl-6 space-y-1 text-sm">
+                  <li>Your chat messages</li>
+                  <li>Your first name (or nickname)</li>
+                  <li>Your age range</li>
+                  <li>Your interests (that you shared during signup)</li>
+                </ul>
+              </div>
+              <div className="bg-green-50 border-2 border-black rounded-lg p-4 mb-3">
+                <h3 className="font-bold mb-2">How Anthropic protects your data:</h3>
+                <ul className="list-disc pl-6 space-y-1 text-sm">
+                  <li>They do NOT use your data to train AI models</li>
+                  <li>They do NOT sell your data</li>
+                  <li>They do NOT use your data for advertising</li>
+                  <li>Data is encrypted in transit and at rest</li>
+                </ul>
+              </div>
+              <p className="text-sm">
+                Read Anthropic's full{' '}
                 <a
                   href="https://www.anthropic.com/privacy"
                   target="_blank"
@@ -86,7 +106,16 @@ export default function PrivacyPolicy() {
                 >
                   privacy policy
                 </a>
-                . They do not use your conversations to train their models.
+                .
+              </p>
+            </section>
+
+            <section>
+              <h2 className="text-xl font-bold mb-2">Your Consent</h2>
+              <p>
+                Before using AI chat features for the first time, we ask for your explicit consent
+                to share your data with Anthropic. You can decline and still use non-AI features
+                of the app. You can withdraw consent at any time by contacting us.
               </p>
             </section>
 

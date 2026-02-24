@@ -1,5 +1,6 @@
 import NextAuth from 'next-auth'
 import Google from 'next-auth/providers/google'
+import Apple from 'next-auth/providers/apple'
 import db from './db'
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
@@ -8,6 +9,10 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       clientId: process.env.GOOGLE_CLIENT_ID!,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
     }),
+    Apple({
+      clientId: process.env.APPLE_ID!,
+      clientSecret: process.env.APPLE_SECRET!,
+    }),
   ],
   pages: {
     signIn: '/login',
@@ -15,25 +20,26 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   },
   callbacks: {
     async signIn({ user, account }) {
-      if (account?.provider !== 'google') {
+      if (account?.provider !== 'google' && account?.provider !== 'apple') {
         return true
       }
 
       const email = user.email
-      const googleId = account.providerAccountId
+      const providerId = account.providerAccountId
+      const provider = account.provider
 
       if (!email) {
         return '/login?error=NoEmail'
       }
 
       try {
-        // Check if this Google account is already linked to a user
-        const existingGoogleUser = await db.prepare(
-          'SELECT * FROM users WHERE google_id = ?'
-        ).get(googleId)
+        // Check if this OAuth account is already linked to a user
+        const existingOAuthUser = provider === 'google'
+          ? await db.prepare('SELECT * FROM users WHERE google_id = ?').get(providerId)
+          : await db.prepare('SELECT * FROM users WHERE apple_id = ?').get(providerId)
 
-        if (existingGoogleUser) {
-          // User already exists with this Google account - allow sign in
+        if (existingOAuthUser) {
+          // User already exists with this OAuth account - allow sign in
           return true
         }
 
@@ -43,10 +49,16 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         ).get(email)
 
         if (existingEmailUser) {
-          // Link Google account to existing user
-          await db.prepare(
-            'UPDATE users SET google_id = ?, auth_provider = COALESCE(auth_provider, ?) WHERE email = ?'
-          ).run(googleId, 'google', email)
+          // Link OAuth account to existing user
+          if (provider === 'google') {
+            await db.prepare(
+              'UPDATE users SET google_id = ?, auth_provider = COALESCE(auth_provider, ?) WHERE email = ?'
+            ).run(providerId, 'google', email)
+          } else {
+            await db.prepare(
+              'UPDATE users SET apple_id = ?, auth_provider = COALESCE(auth_provider, ?) WHERE email = ?'
+            ).run(providerId, 'apple', email)
+          }
           return true
         }
 
@@ -70,17 +82,23 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     },
 
     async jwt({ token, account, user }) {
-      if (account?.provider === 'google' && user) {
-        token.googleId = account.providerAccountId
+      if ((account?.provider === 'google' || account?.provider === 'apple') && user) {
+        token.providerId = account.providerAccountId
+        token.provider = account.provider
         token.email = user.email
         token.name = user.name
         token.picture = user.image
 
+        // For backwards compatibility
+        if (account.provider === 'google') {
+          token.googleId = account.providerAccountId
+        }
+
         // Check what type of user this is
         try {
-          const existingUser = await db.prepare(
-            'SELECT * FROM users WHERE google_id = ? OR email = ?'
-          ).get(account.providerAccountId, user.email)
+          const existingUser = account.provider === 'google'
+            ? await db.prepare('SELECT * FROM users WHERE google_id = ? OR email = ?').get(account.providerAccountId, user.email)
+            : await db.prepare('SELECT * FROM users WHERE apple_id = ? OR email = ?').get(account.providerAccountId, user.email)
 
           if (existingUser) {
             token.userId = existingUser.id

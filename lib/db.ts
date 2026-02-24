@@ -67,6 +67,10 @@ async function initDb() {
                        WHERE table_name = 'users' AND column_name = 'google_id') THEN
           ALTER TABLE users ADD COLUMN google_id TEXT UNIQUE;
         END IF;
+        IF NOT EXISTS (SELECT 1 FROM information_schema.columns
+                       WHERE table_name = 'users' AND column_name = 'apple_id') THEN
+          ALTER TABLE users ADD COLUMN apple_id TEXT UNIQUE;
+        END IF;
       END $$;
 
       -- Add auth_provider column to track login method

@@ -7,6 +7,7 @@ import { useSession } from 'next-auth/react'
 import NavBar from '@/components/NavBar'
 import { useTheme } from '@/lib/ThemeContext'
 import GoogleSignInButton from '@/components/GoogleSignInButton'
+import AppleSignInButton from '@/components/AppleSignInButton'
 
 type UserType = 'teen' | 'parent'
 
@@ -314,8 +315,9 @@ export default function LoginPage() {
           {/* Parent Login Form */}
           {userType === 'parent' && !parentLinkSent && (
             <>
-            {/* Google Sign In Button */}
-            <div className="mb-4">
+            {/* Social Sign In Buttons */}
+            <div className="space-y-3 mb-4">
+              <AppleSignInButton callbackUrl="/api/auth/google-callback" />
               <GoogleSignInButton callbackUrl="/api/auth/google-callback" />
             </div>
 
@@ -413,8 +415,9 @@ export default function LoginPage() {
           {/* Teen Login Form */}
           {userType === 'teen' && (
           <>
-          {/* Google Sign In Button */}
-          <div className="mb-4">
+          {/* Social Sign In Buttons */}
+          <div className="space-y-3 mb-4">
+            <AppleSignInButton callbackUrl="/api/auth/google-callback" />
             <GoogleSignInButton callbackUrl="/api/auth/google-callback" />
           </div>
 

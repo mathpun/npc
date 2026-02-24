@@ -20,6 +20,7 @@ import RealWorldChallenges from '@/components/RealWorldChallenges'
 import PeerWisdom from '@/components/PeerWisdom'
 import AILiteracy from '@/components/AILiteracy'
 import DailyCheckIn from '@/components/DailyCheckIn'
+import AIConsentModal from '@/components/AIConsentModal'
 import { SessionGoal, PersonaType, SESSION_GOALS, buildReflectionPrompt, CustomPersona } from '@/lib/prompts'
 import ChatHistory from '@/components/ChatHistory'
 
@@ -58,6 +59,8 @@ function ChatPageContent() {
   const [activeTab, setActiveTab] = useState<TabId>('chat')
   const [activeGrowthTab, setActiveGrowthTab] = useState<GrowthSubTab>('insights')
   const [showCheckIn, setShowCheckIn] = useState(false)
+  const [showAIConsent, setShowAIConsent] = useState(false)
+  const [hasAIConsent, setHasAIConsent] = useState(false)
   const [showChatHistory, setShowChatHistory] = useState(false)
   const [currentSessionId, setCurrentSessionId] = useState<number | undefined>(undefined)
   const [userStats, setUserStats] = useState({
@@ -112,6 +115,12 @@ function ChatPageContent() {
       setProfile(JSON.parse(savedProfile))
     } else {
       router.push('/onboarding')
+    }
+
+    // Check for AI consent
+    const aiConsent = localStorage.getItem('ai_data_consent')
+    if (aiConsent === 'true') {
+      setHasAIConsent(true)
     }
 
     // Track page view
@@ -190,6 +199,28 @@ function ChatPageContent() {
     setShowCheckIn(false)
   }
 
+  const handleAIConsentAccept = () => {
+    localStorage.setItem('ai_data_consent', 'true')
+    setHasAIConsent(true)
+    setShowAIConsent(false)
+
+    // Continue with pending session if any
+    if (pendingSession) {
+      setSession(pendingSession)
+      setShowSessionPicker(false)
+      // Trigger the rest of session setup
+      const { goal, topic, persona, customPersona } = pendingSession
+      trackActivity('session_start', { goal, topic, persona, customPersonaName: customPersona?.name })
+      setPendingSession(null)
+    }
+  }
+
+  const handleAIConsentDecline = () => {
+    setShowAIConsent(false)
+    setPendingSession(null)
+    // Stay on session picker
+  }
+
   const getInitialGreetingWithTopic = async (userProfile: UserProfile, topic: string) => {
     setIsLoading(true)
     setStreamingContent('')
@@ -266,7 +297,17 @@ function ChatPageContent() {
     }
   }, [messages, reflectionPrompt])
 
+  // Store pending session for after consent
+  const [pendingSession, setPendingSession] = useState<{goal: SessionGoal, topic: string, persona: PersonaType, customPersona?: CustomPersona} | null>(null)
+
   const handleSessionSelect = async (goal: SessionGoal, topic: string, persona: PersonaType, customPersona?: CustomPersona) => {
+    // Check for AI consent first
+    if (!hasAIConsent) {
+      setPendingSession({ goal, topic, persona, customPersona })
+      setShowAIConsent(true)
+      return
+    }
+
     setSession({ goal, topic, persona, customPersona })
     setShowSessionPicker(false)
 
@@ -524,6 +565,14 @@ function ChatPageContent() {
           userName={profile.name}
           onComplete={handleCheckInComplete}
           onSkip={handleCheckInSkip}
+        />
+      )}
+
+      {/* AI Data Consent Modal */}
+      {showAIConsent && (
+        <AIConsentModal
+          onAccept={handleAIConsentAccept}
+          onDecline={handleAIConsentDecline}
         />
       )}
 
