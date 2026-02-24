@@ -383,6 +383,19 @@ export default function LoginPage() {
 
           {/* Parent Login Form */}
           {userType === 'parent' && !parentLinkSent && (
+            <>
+            {/* Google Sign In */}
+            <div className="mb-4">
+              <GoogleSignInButton callbackUrl="/parent" />
+            </div>
+
+            {/* Divider */}
+            <div className="flex items-center gap-4 mb-4">
+              <div className="flex-1 h-1 bg-black rounded" style={{ opacity: 0.2 }} />
+              <span className="text-sm font-bold text-gray-500">or use email</span>
+              <div className="flex-1 h-1 bg-black rounded" style={{ opacity: 0.2 }} />
+            </div>
+
             <form onSubmit={handleParentLogin}>
               {/* Email input - always shown unless we're in password entry mode */}
               {!parentHasPassword && !parentNeedsPassword && (
@@ -523,6 +536,7 @@ export default function LoginPage() {
                 </button>
               )}
             </form>
+            </>
           )}
 
           {/* Parent Link Sent Confirmation */}
