@@ -15,7 +15,7 @@ export default function AIConsentModal({ onAccept, onDecline }: AIConsentModalPr
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 text-black">
       <div className="absolute inset-0 bg-black/50" />
-      
+
       <div
         className="relative w-full max-w-lg p-6 max-h-[90vh] overflow-y-auto"
         style={{
@@ -27,7 +27,7 @@ export default function AIConsentModal({ onAccept, onDecline }: AIConsentModalPr
       >
         {/* Header */}
         <div className="text-center mb-6">
-          <div className="text-5xl mb-3">🤖</div>
+          <div className="text-5xl mb-3">🔐</div>
           <h2
             className="text-xl font-bold inline-block px-4 py-2"
             style={{
@@ -36,7 +36,7 @@ export default function AIConsentModal({ onAccept, onDecline }: AIConsentModalPr
               borderRadius: '12px',
             }}
           >
-            Before You Chat
+            Data Sharing Permission
           </h2>
         </div>
 
@@ -49,25 +49,50 @@ export default function AIConsentModal({ onAccept, onDecline }: AIConsentModalPr
             borderRadius: '12px',
           }}
         >
-          <p className="font-bold mb-3">This app uses AI to chat with you!</p>
-          <p className="text-sm mb-3">
-            When you send messages, they go to <strong>Anthropic</strong> (the company that makes Claude AI) 
-            to generate responses.
+          <p className="font-bold mb-3 text-lg">We need your permission to use AI chat</p>
+          <p className="text-sm mb-4">
+            To provide AI-powered conversations, we need to send some of your data to a third-party service.
+            Please review what data is shared and with whom before continuing.
           </p>
-          
-          <div className="space-y-2 text-sm">
-            <div className="flex items-start gap-2">
-              <span>📤</span>
-              <span><strong>What we send:</strong> Your messages, name, age, and interests</span>
-            </div>
-            <div className="flex items-start gap-2">
-              <span>🏢</span>
-              <span><strong>Who receives it:</strong> Anthropic (AI provider)</span>
-            </div>
-            <div className="flex items-start gap-2">
-              <span>🔒</span>
-              <span><strong>How it's protected:</strong> Encrypted, not used for ads, not sold</span>
-            </div>
+
+          <div
+            className="p-3 mb-3"
+            style={{
+              backgroundColor: '#FFF9C4',
+              border: '2px solid black',
+              borderRadius: '8px',
+            }}
+          >
+            <p className="font-bold text-sm mb-2">📤 DATA WE WILL SEND:</p>
+            <ul className="text-sm list-disc pl-5 space-y-1">
+              <li>Your chat messages</li>
+              <li>Your first name or nickname</li>
+              <li>Your age</li>
+              <li>Your interests (from your profile)</li>
+            </ul>
+          </div>
+
+          <div
+            className="p-3"
+            style={{
+              backgroundColor: '#E3F2FD',
+              border: '2px solid black',
+              borderRadius: '8px',
+            }}
+          >
+            <p className="font-bold text-sm mb-2">🏢 WHO RECEIVES THIS DATA:</p>
+            <p className="text-sm">
+              <strong>Anthropic, PBC</strong> - a US-based AI safety company that provides the Claude AI
+              which powers our chat feature.
+            </p>
+            <a
+              href="https://www.anthropic.com/privacy"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-sm text-blue-600 underline"
+            >
+              View Anthropic's Privacy Policy →
+            </a>
           </div>
         </div>
 
@@ -81,7 +106,7 @@ export default function AIConsentModal({ onAccept, onDecline }: AIConsentModalPr
             borderRadius: '8px',
           }}
         >
-          <span>📋 See more details</span>
+          <span>📋 How is my data protected?</span>
           <span>{expanded ? '▲' : '▼'}</span>
         </button>
 
@@ -95,22 +120,37 @@ export default function AIConsentModal({ onAccept, onDecline }: AIConsentModalPr
             }}
           >
             <p>
-              <strong>Why we need this:</strong> The AI needs context about you to give helpful, 
-              personalized responses. We send your first name, age range, and interests so it can 
-              talk to you appropriately.
+              <strong>Encryption:</strong> All data is encrypted when sent to Anthropic using
+              industry-standard HTTPS/TLS encryption.
             </p>
             <p>
-              <strong>What Anthropic does:</strong> They process your messages to generate responses. 
-              They don't use your data for advertising or sell it to third parties. 
-              See their <a href="https://www.anthropic.com/privacy" target="_blank" rel="noopener noreferrer" className="underline text-blue-600">privacy policy</a>.
+              <strong>No advertising:</strong> Anthropic does not use your data for advertising
+              purposes and does not sell your data to third parties.
             </p>
             <p>
-              <strong>Your rights:</strong> You can stop using the AI chat anytime. 
-              See our <a href="/privacy" className="underline text-blue-600">privacy policy</a> for 
-              how to request data deletion.
+              <strong>No AI training:</strong> Your conversations are not used to train AI models.
+            </p>
+            <p>
+              <strong>Your rights:</strong> You can stop using AI chat anytime and request deletion
+              of your data. See our <a href="/privacy" className="underline text-blue-600">privacy policy</a>.
             </p>
           </div>
         )}
+
+        {/* Consent confirmation */}
+        <div
+          className="p-3 mb-4 text-sm"
+          style={{
+            backgroundColor: '#E8F5E9',
+            border: '2px solid black',
+            borderRadius: '8px',
+          }}
+        >
+          <p>
+            By tapping "I Agree", you consent to sharing the data listed above with Anthropic
+            for the purpose of providing AI chat responses.
+          </p>
+        </div>
 
         {/* Action buttons */}
         <div className="flex gap-3">
@@ -124,7 +164,7 @@ export default function AIConsentModal({ onAccept, onDecline }: AIConsentModalPr
               boxShadow: '3px 3px 0 black',
             }}
           >
-            No thanks
+            Don't Allow
           </button>
           <button
             onClick={onAccept}
@@ -136,12 +176,12 @@ export default function AIConsentModal({ onAccept, onDecline }: AIConsentModalPr
               boxShadow: '3px 3px 0 black',
             }}
           >
-            I understand, let's go!
+            I Agree
           </button>
         </div>
 
         <p className="text-xs text-center mt-4 opacity-70">
-          You can review this anytime in Settings
+          You can withdraw consent anytime in Settings or by contacting us
         </p>
       </div>
     </div>
