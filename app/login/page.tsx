@@ -384,8 +384,9 @@ export default function LoginPage() {
           {/* Parent Login Form */}
           {userType === 'parent' && !parentLinkSent && (
             <>
-            {/* Google Sign In */}
-            <div className="mb-4">
+            {/* Social Sign In */}
+            <div className="space-y-3 mb-4">
+              <AppleSignInButton callbackUrl="/parent" />
               <GoogleSignInButton callbackUrl="/parent" />
             </div>
 
