@@ -158,39 +158,6 @@ export default function SessionPicker({ onSelect, onClose, onOpenHistory }: Sess
           })}
         </div>
 
-        {/* Topic input */}
-        {selectedGoal && (
-          <div
-            className="mb-6 p-4 rotate-1"
-            style={{
-              backgroundColor: '#FFFACD',
-              border: '3px solid black',
-              borderRadius: '12px',
-              boxShadow: '4px 4px 0 black',
-            }}
-          >
-            <label className="block text-lg font-bold mb-2">
-              what specifically? (optional)
-            </label>
-            <input
-              type="text"
-              value={topic}
-              onChange={(e) => setTopic(e.target.value)}
-              placeholder={SESSION_GOALS[selectedGoal].examples.join(', ')}
-              className="w-full px-4 py-3 text-lg"
-              style={{
-                backgroundColor: 'white',
-                border: '3px solid black',
-                borderRadius: '12px',
-              }}
-              autoFocus
-            />
-            <p className="text-sm mt-2 opacity-70">
-              e.g., {SESSION_GOALS[selectedGoal].examples.join(' • ')}
-            </p>
-          </div>
-        )}
-
         {/* Continue button */}
         <div className="flex flex-col items-center gap-4">
           <button
@@ -582,7 +549,6 @@ export default function SessionPicker({ onSelect, onClose, onOpenHistory }: Sess
           }}
         >
           <span className="font-bold">{SESSION_GOALS[selectedGoal].emoji} {SESSION_GOALS[selectedGoal].label}</span>
-          {topic && <span className="opacity-70"> · "{topic}"</span>}
         </div>
       )}
     </div>
