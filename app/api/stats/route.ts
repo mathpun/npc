@@ -88,7 +88,9 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({
       user: {
         id: user.id,
-        name: user.name,
+        name: user.nickname || user.name,
+        fullName: user.name,
+        nickname: user.nickname,
         age: user.age,
         interests: user.interests,
         goals: user.goals,

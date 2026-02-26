@@ -45,23 +45,25 @@ export async function GET(request: NextRequest) {
 
     // User hasn't checked in today - get simple questions (no AI call for speed)
     const user = await db.prepare(`
-      SELECT name FROM users WHERE id = ?
-    `).get(userId) as { name: string } | undefined
+      SELECT name, nickname FROM users WHERE id = ?
+    `).get(userId) as { name: string; nickname?: string } | undefined
 
     if (!user) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 })
     }
 
+    const displayName = user.nickname || user.name
+
     // Use simple, fast questions - AI is only used for summary after submit
     const dayOfWeek = DAYS_OF_WEEK[new Date().getDay()]
     const questions = [
-      `Hey ${user.name}! What's on your mind this ${dayOfWeek}?`,
+      `Hey ${displayName}! What's on your mind this ${dayOfWeek}?`,
     ]
 
     return NextResponse.json({
       hasCheckedInToday: false,
       questions,
-      userName: user.name,
+      userName: displayName,
     })
   } catch (error) {
     console.error('Error checking check-in status:', error)
@@ -83,14 +85,16 @@ export async function POST(request: NextRequest) {
 
     // Get user name for summary
     const user = await db.prepare(`
-      SELECT name FROM users WHERE id = ?
-    `).get(userId) as { name: string } | undefined
+      SELECT name, nickname FROM users WHERE id = ?
+    `).get(userId) as { name: string; nickname?: string } | undefined
+
+    const displayName = user?.nickname || user?.name || 'User'
 
     // Generate AI summary of the check-in
     let aiSummary = ''
     try {
       const summaryPrompt = buildCheckinSummaryPrompt(
-        user?.name || 'User',
+        displayName,
         questions,
         responses,
         mood
