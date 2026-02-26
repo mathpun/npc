@@ -168,15 +168,14 @@ function ChatPageContent() {
         return
       }
 
-      // Check if we already showed the modal this session
-      if (sessionStorage.getItem(shownKey)) {
+      // Check if user already skipped today
+      if (localStorage.getItem(shownKey)) {
         return
       }
 
       const res = await fetch(`/api/checkin?userId=${userId}`)
       const data = await res.json()
       if (!data.hasCheckedInToday) {
-        sessionStorage.setItem(shownKey, 'true')
         setShowCheckIn(true)
       } else {
         // Mark as completed in localStorage so we don't check again
@@ -195,7 +194,7 @@ function ChatPageContent() {
 
   const handleCheckInSkip = () => {
     const today = new Date().toISOString().split('T')[0]
-    sessionStorage.setItem(`checkin_shown_${today}`, 'true')
+    localStorage.setItem(`checkin_shown_${today}`, 'true')
     setShowCheckIn(false)
   }
 

@@ -226,7 +226,7 @@ export const themes: Record<string, Theme> = {
 
   forest: {
     id: 'forest',
-    name: 'Forest Fairy',
+    name: 'Forest Vibes',
     emoji: '🌲',
     description: 'nature core aesthetic',
     colors: {

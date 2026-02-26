@@ -1293,7 +1293,7 @@ export default function AdminDashboard() {
                         ocean: { label: 'Ocean Wave', emoji: '🌊', color: '#87CEEB' },
                         sunset: { label: 'Sunset Glow', emoji: '🌅', color: '#FFD700' },
                         galaxy: { label: 'Galaxy Quest', emoji: '🌌', color: '#8A2BE2' },
-                        forest: { label: 'Forest Fairy', emoji: '🌲', color: '#90EE90' },
+                        forest: { label: 'Forest Vibes', emoji: '🌲', color: '#90EE90' },
                         candy: { label: 'Candy Crush', emoji: '🍭', color: '#FF69B4' },
                         minimal: { label: 'Minimal', emoji: '⬜', color: '#E0E0E0' },
                         dark: { label: 'Dark Mode', emoji: '🌙', color: '#1a1a2e' },
