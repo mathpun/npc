@@ -54,7 +54,6 @@ export default function NavBar({ showBack = false, backHref = '/', backLabel = '
     { href: '/chat?tab=growth', icon: '🌀', label: 'mind wrapped', color: '#FDCB6E' },
     { href: '/profile', icon: '👤', label: 'me', color: '#87CEEB' },
     { href: '/parent', icon: '👨‍👩‍👧', label: 'parent', color: '#FD79A8' },
-    { href: '/chat?tab=growth&subtab=co-design', icon: '🎨', label: 'co-design', color: '#74B9FF' },
   ]
 
   return (
