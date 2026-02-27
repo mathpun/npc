@@ -4,7 +4,6 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import NavBar from '@/components/NavBar'
 import WorldCard from '@/components/world/WorldCard'
-import CreateWorldModal from '@/components/world/CreateWorldModal'
 import { useTheme } from '@/lib/ThemeContext'
 
 interface World {
@@ -30,7 +29,6 @@ export default function CreatePage() {
   const [ownedWorlds, setOwnedWorlds] = useState<World[]>([])
   const [collaboratingWorlds, setCollaboratingWorlds] = useState<World[]>([])
   const [loading, setLoading] = useState(true)
-  const [showCreateModal, setShowCreateModal] = useState(false)
 
   useEffect(() => {
     const savedUserId = localStorage.getItem('npc_user_id')
@@ -62,11 +60,6 @@ export default function CreatePage() {
       console.error('Failed to fetch worlds:', err)
     }
     setLoading(false)
-  }
-
-  const handleWorldCreated = () => {
-    fetchWorlds()
-    setShowCreateModal(false)
   }
 
   if (!userId) {
@@ -135,7 +128,7 @@ export default function CreatePage() {
         {/* Create World Button */}
         <div className="flex justify-center mb-6 sm:mb-8">
           <button
-            onClick={() => setShowCreateModal(true)}
+            onClick={() => router.push('/create/new')}
             className="px-6 sm:px-8 py-3 sm:py-4 text-base sm:text-xl font-bold hover:scale-105 transition-transform"
             style={{
               backgroundColor: theme.colors.buttonPrimary,
@@ -206,7 +199,7 @@ export default function CreatePage() {
                   Create your first world and start building your universe
                 </p>
                 <button
-                  onClick={() => setShowCreateModal(true)}
+                  onClick={() => router.push('/create/new')}
                   className="px-6 py-3 font-bold hover:scale-105 transition-transform"
                   style={{
                     backgroundColor: theme.colors.buttonSuccess,
@@ -222,14 +215,6 @@ export default function CreatePage() {
           </>
         )}
       </main>
-
-      {/* Create World Modal */}
-      <CreateWorldModal
-        isOpen={showCreateModal}
-        onClose={() => setShowCreateModal(false)}
-        onCreated={handleWorldCreated}
-        userId={userId}
-      />
     </div>
   )
 }

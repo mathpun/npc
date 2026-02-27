@@ -431,6 +431,15 @@ async function initDb() {
         END IF;
       END $$;
 
+      -- Add cover_image_url column to worlds table if it doesn't exist
+      DO $$
+      BEGIN
+        IF NOT EXISTS (SELECT 1 FROM information_schema.columns
+                       WHERE table_name = 'worlds' AND column_name = 'cover_image_url') THEN
+          ALTER TABLE worlds ADD COLUMN cover_image_url TEXT;
+        END IF;
+      END $$;
+
       -- Interview/feedback signups for co-design
       CREATE TABLE IF NOT EXISTS codesign_signups (
         id SERIAL PRIMARY KEY,
@@ -441,6 +450,15 @@ async function initDb() {
         age INTEGER,
         interests TEXT,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      );
+
+      -- Image generation usage tracking (for rate limiting)
+      CREATE TABLE IF NOT EXISTS image_generation_usage (
+        id SERIAL PRIMARY KEY,
+        user_id TEXT NOT NULL REFERENCES users(id),
+        generation_date DATE NOT NULL,
+        generation_count INTEGER DEFAULT 0,
+        UNIQUE(user_id, generation_date)
       );
     `)
     console.log('Database tables initialized')
