@@ -46,15 +46,13 @@ export default function NavBar({ showBack = false, backHref = '/', backLabel = '
     router.push('/')
   }
 
+  // Simplified nav - 5 core tabs only
   const navItems = [
-    { href: '/', icon: '🏠', label: 'home', color: '#FF6B9D' },       // hot pink
-    { href: '/dashboard', icon: '🗺️', label: 'journey', color: '#4ECDC4' },  // teal
-    { href: '/chat', icon: '💬', label: 'chat', color: '#7BED9F' },    // bright green
-    { href: '/chat?tab=growth', icon: '🌱', label: 'growth', color: '#FDCB6E' }, // golden yellow
-    { href: '/museum', icon: '🏛️', label: 'museum', color: '#FF7675' },  // coral red
-    { href: '/moltbook', icon: '🌍', label: 'world', color: '#74B9FF' },  // bright blue
-    { href: '/profile', icon: '👤', label: 'profile', color: '#DDA0DD' },  // plum
-    { href: '/parent', icon: '👨‍👩‍👧', label: 'parent', color: '#FD79A8' },  // bright pink
+    { href: '/', icon: '🏠', label: 'home', color: '#FF6B9D' },
+    { href: '/dashboard', icon: '🗺️', label: 'journey', color: '#4ECDC4' },
+    { href: '/chat', icon: '💬', label: 'chat', color: '#7BED9F' },
+    { href: '/chat?tab=growth', icon: '🌱', label: 'growth', color: '#FDCB6E' },
+    { href: '/profile', icon: '👤', label: 'profile', color: '#DDA0DD' },
   ]
 
   return (

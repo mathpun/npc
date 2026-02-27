@@ -3,7 +3,10 @@
 import { useTheme } from '@/lib/ThemeContext'
 
 export type TabId = 'chat' | 'growth'
+// Keep original types for backwards compatibility, but simplify display
 export type GrowthSubTab = 'insights' | 'progress' | 'challenges' | 'epistemic' | 'peers' | 'literacy' | 'anti-engagement' | 'co-design' | 'parent'
+// Simplified grouped tabs
+export type GrowthGroup = 'insights' | 'progress' | 'learn' | 'connect'
 
 interface TabNavProps {
   activeTab: TabId
@@ -17,17 +20,21 @@ const MAIN_TABS = [
   { id: 'growth' as TabId, label: 'growth', emoji: '🌱' },
 ]
 
-const GROWTH_SUBTABS = [
-  { id: 'insights' as GrowthSubTab, label: 'insights', emoji: '💡' },
-  { id: 'progress' as GrowthSubTab, label: 'progress', emoji: '📈' },
-  { id: 'challenges' as GrowthSubTab, label: 'challenges', emoji: '🎯' },
-  { id: 'epistemic' as GrowthSubTab, label: 'thinking', emoji: '🧠' },
-  { id: 'peers' as GrowthSubTab, label: 'peers', emoji: '👥' },
-  { id: 'literacy' as GrowthSubTab, label: 'AI info', emoji: '🤖' },
-  { id: 'anti-engagement' as GrowthSubTab, label: 'independence', emoji: '🦋' },
-  { id: 'co-design' as GrowthSubTab, label: 'co-design', emoji: '🎨' },
-  { id: 'parent' as GrowthSubTab, label: 'parent', emoji: '👨‍👩‍👧' },
+// Simplified to 4 tabs - grouped from 9
+const GROWTH_GROUPS = [
+  { id: 'insights' as GrowthGroup, label: 'insights', emoji: '💡', subTab: 'insights' as GrowthSubTab },
+  { id: 'progress' as GrowthGroup, label: 'goals', emoji: '🎯', subTab: 'challenges' as GrowthSubTab },
+  { id: 'learn' as GrowthGroup, label: 'learn', emoji: '🧠', subTab: 'epistemic' as GrowthSubTab },
+  { id: 'connect' as GrowthGroup, label: 'connect', emoji: '👥', subTab: 'peers' as GrowthSubTab },
 ]
+
+// Map groups to their subtabs for active state
+const GROUP_SUBTABS: Record<GrowthGroup, GrowthSubTab[]> = {
+  'insights': ['insights'],
+  'progress': ['progress', 'challenges'],
+  'learn': ['epistemic', 'literacy', 'anti-engagement'],
+  'connect': ['peers', 'co-design', 'parent'],
+}
 
 export default function TabNav({
   activeTab,
@@ -71,10 +78,10 @@ export default function TabNav({
         })}
       </div>
 
-      {/* Growth Subtabs - only show when on growth tab */}
+      {/* Growth Subtabs - simplified to 4 groups */}
       {activeTab === 'growth' && (
         <nav
-          className="flex flex-wrap items-center justify-center gap-2 p-2 max-w-full"
+          className="flex items-center justify-center gap-2 p-2"
           style={{
             backgroundColor: theme.colors.backgroundAlt,
             border: '3px solid black',
@@ -82,22 +89,23 @@ export default function TabNav({
             boxShadow: '4px 4px 0 black',
           }}
         >
-          {GROWTH_SUBTABS.map((tab, i) => {
-            const isActive = activeGrowthTab === tab.id
+          {GROWTH_GROUPS.map((group, i) => {
+            // Check if current subtab belongs to this group
+            const isActive = GROUP_SUBTABS[group.id].includes(activeGrowthTab)
 
             return (
               <button
-                key={tab.id}
-                onClick={() => onGrowthTabChange?.(tab.id)}
-                className="flex items-center gap-1 px-3 py-1.5 text-xs font-bold transition-all duration-200 whitespace-nowrap hover:scale-105"
+                key={group.id}
+                onClick={() => onGrowthTabChange?.(group.subTab)}
+                className="flex items-center gap-1.5 px-4 py-2 text-sm font-bold transition-all duration-200 whitespace-nowrap hover:scale-105"
                 style={{
                   backgroundColor: isActive ? TAB_COLORS[i % TAB_COLORS.length] : 'transparent',
                   borderRadius: '9999px',
                   border: isActive ? '2px solid black' : 'none',
                 }}
               >
-                <span>{tab.emoji}</span>
-                <span>{tab.label}</span>
+                <span className="text-lg">{group.emoji}</span>
+                <span>{group.label}</span>
               </button>
             )
           })}

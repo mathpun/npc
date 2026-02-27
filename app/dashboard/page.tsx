@@ -53,11 +53,14 @@ export default function Dashboard() {
   const router = useRouter()
   const [loading, setLoading] = useState(true)
   const [data, setData] = useState<UserStats | null>(null)
-  const [showPrompts, setShowPrompts] = useState(true)
+  const [showPrompts, setShowPrompts] = useState(false) // Start false, enable only if needed
   const [showCheckIn, setShowCheckIn] = useState(false)
   const [checkedInToday, setCheckedInToday] = useState(false)
   const [showDeleteAccount, setShowDeleteAccount] = useState(false)
   const { theme } = useTheme()
+
+  // Track if any modal is open - prevents stacking
+  const anyModalOpen = showCheckIn || showPrompts || showDeleteAccount
 
   useEffect(() => {
     const userId = localStorage.getItem('npc_user_id')
@@ -91,15 +94,26 @@ export default function Dashboard() {
       const today = new Date().toISOString().split('T')[0]
       const completedKey = `checkin_completed_${today}`
       const shownKey = `checkin_shown_${today}`
+      const promptsShownKey = `prompts_shown_${today}`
 
       // Check localStorage first - if completed today, skip entirely
       if (localStorage.getItem(completedKey)) {
         setCheckedInToday(true)
+        // Show prompts only if not already shown today
+        if (!localStorage.getItem(promptsShownKey)) {
+          setShowPrompts(true)
+          localStorage.setItem(promptsShownKey, 'true')
+        }
         return
       }
 
       // Check if user already skipped today
       if (localStorage.getItem(shownKey)) {
+        // Show prompts only if not already shown today
+        if (!localStorage.getItem(promptsShownKey)) {
+          setShowPrompts(true)
+          localStorage.setItem(promptsShownKey, 'true')
+        }
         return
       }
 
@@ -107,10 +121,16 @@ export default function Dashboard() {
       const data = await res.json()
       if (!data.hasCheckedInToday) {
         setShowCheckIn(true)
+        // Prompts will show after check-in is handled
       } else {
         // Mark as completed in localStorage so we don't check again
         localStorage.setItem(completedKey, 'true')
         setCheckedInToday(true)
+        // Show prompts only if not already shown today
+        if (!localStorage.getItem(promptsShownKey)) {
+          setShowPrompts(true)
+          localStorage.setItem(promptsShownKey, 'true')
+        }
       }
     } catch (err) {
       console.error('Failed to check check-in status:', err)
@@ -122,12 +142,24 @@ export default function Dashboard() {
     localStorage.setItem(`checkin_completed_${today}`, 'true')
     setShowCheckIn(false)
     setCheckedInToday(true)
+    // Show prompts after check-in (only once per day)
+    const promptsShownKey = `prompts_shown_${today}`
+    if (!localStorage.getItem(promptsShownKey)) {
+      setShowPrompts(true)
+      localStorage.setItem(promptsShownKey, 'true')
+    }
   }
 
   const handleCheckInSkip = () => {
     const today = new Date().toISOString().split('T')[0]
     localStorage.setItem(`checkin_shown_${today}`, 'true')
     setShowCheckIn(false)
+    // Show prompts after check-in skip (only once per day)
+    const promptsShownKey = `prompts_shown_${today}`
+    if (!localStorage.getItem(promptsShownKey)) {
+      setShowPrompts(true)
+      localStorage.setItem(promptsShownKey, 'true')
+    }
   }
 
   if (loading) {
@@ -581,8 +613,8 @@ export default function Dashboard() {
         </div>
       </nav>
 
-      {/* PWA Install Prompt */}
-      <InstallPrompt />
+      {/* PWA Install Prompt - only show when no other modal is open */}
+      {!anyModalOpen && <InstallPrompt />}
     </div>
   )
 }

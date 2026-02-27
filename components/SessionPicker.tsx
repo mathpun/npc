@@ -75,6 +75,11 @@ export default function SessionPicker({ onSelect, onClose, onOpenHistory }: Sess
     }
   }
 
+  // Quick start handler
+  const handleQuickStart = () => {
+    onSelect('stuck', '', 'chill_mentor')
+  }
+
   // Step 1: Goal Selection
   if (step === 'goal') {
     return (
@@ -94,100 +99,78 @@ export default function SessionPicker({ onSelect, onClose, onOpenHistory }: Sess
           </button>
         )}
 
-        <div className="text-center mb-6 sm:mb-8">
-          {/* Curious blob */}
-          <div className="flex justify-center mb-3 sm:mb-4">
-            <svg className="w-16 h-[72px] sm:w-20 sm:h-[90px]" viewBox="0 0 60 70">
-              <ellipse cx="30" cy="45" rx="20" ry="25" fill="#FFD700" stroke="black" strokeWidth="3"/>
-              <circle cx="30" cy="20" r="18" fill="white" stroke="black" strokeWidth="3"/>
-              <circle cx="24" cy="16" r="5" fill="black"/>
-              <circle cx="36" cy="16" r="5" fill="black"/>
-              <circle cx="25" cy="15" r="2" fill="white"/>
-              <circle cx="37" cy="15" r="2" fill="white"/>
-              <ellipse cx="30" cy="28" rx="4" ry="3" fill="black"/>
-              <text x="50" y="10" fontSize="16">?</text>
-            </svg>
-          </div>
-          <h2
-            className="text-xl sm:text-2xl font-bold inline-block px-4 sm:px-6 py-2 sm:py-3 -rotate-1"
+        <div className="text-center mb-6">
+          {/* Just Chat quick start - big prominent button */}
+          <button
+            onClick={handleQuickStart}
+            className="w-full max-w-md mx-auto mb-6 px-8 py-5 text-xl font-bold transition-all duration-200 hover:scale-105 flex items-center justify-center gap-3"
             style={{
-              backgroundColor: '#FF69B4',
-              border: '3px solid black',
-              boxShadow: '4px 4px 0 black',
+              backgroundColor: '#90EE90',
+              border: '4px solid black',
+              borderRadius: '20px',
+              boxShadow: '6px 6px 0 black',
             }}
           >
-            what's on your mind?
-          </h2>
+            <span className="text-3xl">💬</span>
+            <span>just chat</span>
+          </button>
+
+          <p className="text-sm text-gray-600 mb-4">or pick a specific vibe below</p>
         </div>
 
-        {/* Goal selection */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 mb-6 sm:mb-8">
-          {(Object.entries(SESSION_GOALS) as [SessionGoal, typeof SESSION_GOALS.stuck][]).map(([key, goal], i) => {
+        {/* Goal selection - simplified */}
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-3 mb-6">
+          {(Object.entries(SESSION_GOALS) as [SessionGoal, typeof SESSION_GOALS.stuck][]).map(([key, goal]) => {
             const isSelected = selectedGoal === key
 
             return (
               <button
                 key={key}
                 onClick={() => handleGoalSelect(key)}
-                className="p-3 sm:p-5 text-left transition-all duration-200 hover:scale-105"
+                className="p-3 text-center transition-all duration-200 hover:scale-105"
                 style={{
                   backgroundColor: isSelected ? goal.color : 'white',
                   border: '2px solid black',
-                  borderRadius: '16px',
-                  boxShadow: isSelected ? '4px 4px 0 black' : '3px 3px 0 black',
-                  transform: `rotate(${(i % 2 === 0 ? -1 : 1)}deg)`,
+                  borderRadius: '12px',
+                  boxShadow: isSelected ? '3px 3px 0 black' : '2px 2px 0 black',
                 }}
               >
-                <div className="flex items-start gap-3 sm:gap-4">
-                  <div
-                    className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl flex items-center justify-center text-xl sm:text-2xl flex-shrink-0"
-                    style={{
-                      backgroundColor: isSelected ? 'white' : goal.color,
-                      border: '2px solid black',
-                    }}
-                  >
-                    {goal.emoji}
-                  </div>
-                  <div className="flex-1">
-                    <h3 className="font-bold text-lg mb-1">{goal.label}</h3>
-                    <p className="text-sm">{goal.description}</p>
-                  </div>
-                </div>
+                <div className="text-2xl mb-1">{goal.emoji}</div>
+                <div className="font-bold text-sm">{goal.label}</div>
               </button>
             )
           })}
         </div>
 
-        {/* Continue button */}
-        <div className="flex flex-col items-center gap-4">
+        {/* Continue button - smaller since Just Chat is primary */}
+        <div className="flex items-center justify-center gap-3 flex-wrap">
           <button
             onClick={handleGoalContinue}
             disabled={!selectedGoal}
-            className="px-10 py-4 text-xl font-bold transition-all duration-300 hover:scale-105"
+            className="px-6 py-3 font-bold transition-all duration-200 hover:scale-105"
             style={{
-              backgroundColor: selectedGoal ? '#90EE90' : '#ccc',
-              border: '4px solid black',
+              backgroundColor: selectedGoal ? '#FFD700' : '#ccc',
+              border: '3px solid black',
               borderRadius: '9999px',
-              boxShadow: selectedGoal ? '5px 5px 0 black' : 'none',
+              boxShadow: selectedGoal ? '3px 3px 0 black' : 'none',
               cursor: selectedGoal ? 'pointer' : 'not-allowed',
             }}
           >
-            next: pick a persona →
+            customize →
           </button>
 
-          {/* Continue past chat button */}
           {onOpenHistory && (
             <button
               onClick={onOpenHistory}
-              className="px-6 py-3 font-bold text-sm transition-all duration-200 hover:scale-105"
+              className="px-6 py-3 font-bold transition-all duration-200 hover:scale-105"
               style={{
-                backgroundColor: '#FFD700',
+                backgroundColor: 'white',
                 border: '3px solid black',
                 borderRadius: '9999px',
                 boxShadow: '3px 3px 0 black',
               }}
             >
-              📋 continue a past chat
+              📋 history
             </button>
           )}
         </div>
