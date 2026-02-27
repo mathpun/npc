@@ -108,6 +108,15 @@ async function initDb() {
         END IF;
       END $$;
 
+      -- Add image_url column for museum items
+      DO $$
+      BEGIN
+        IF NOT EXISTS (SELECT 1 FROM information_schema.columns
+                       WHERE table_name = 'museum_items' AND column_name = 'image_url') THEN
+          ALTER TABLE museum_items ADD COLUMN image_url TEXT;
+        END IF;
+      END $$;
+
       -- Parent auth tokens (for magic link authentication)
       CREATE TABLE IF NOT EXISTS parent_auth_tokens (
         id SERIAL PRIMARY KEY,

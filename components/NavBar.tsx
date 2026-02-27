@@ -51,7 +51,6 @@ export default function NavBar({ showBack = false, backHref = '/', backLabel = '
     { href: '/dashboard', icon: '🗺️', label: 'journey', color: '#4ECDC4' },  // teal
     { href: '/chat', icon: '💬', label: 'chat', color: '#7BED9F' },    // bright green
     { href: '/chat?tab=growth', icon: '🌱', label: 'growth', color: '#FDCB6E' }, // golden yellow
-    { href: '/create', icon: '✨', label: 'create', color: '#A29BFE' },  // bright purple
     { href: '/museum', icon: '🏛️', label: 'museum', color: '#FF7675' },  // coral red
     { href: '/moltbook', icon: '🌍', label: 'world', color: '#74B9FF' },  // bright blue
     { href: '/profile', icon: '👤', label: 'profile', color: '#DDA0DD' },  // plum

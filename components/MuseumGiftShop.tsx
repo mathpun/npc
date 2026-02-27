@@ -9,6 +9,7 @@ interface MuseumItem {
   name: string
   description: string
   origin_story: string | null
+  image_url?: string | null
   created_at: string
 }
 
@@ -136,7 +137,9 @@ export default function MuseumGiftShop({ userId, items, onItemsChange, isPublicV
                 <MuseumItemCard
                   key={item.id}
                   item={item}
+                  userId={isPublicView ? undefined : userId}
                   onDelete={isPublicView ? undefined : handleDelete}
+                  onImageGenerated={onItemsChange}
                   isPublicView={isPublicView}
                   isExpanded={expandedItem === item.id}
                   onToggleExpand={() => setExpandedItem(expandedItem === item.id ? null : item.id)}

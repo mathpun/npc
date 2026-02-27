@@ -10,6 +10,37 @@ interface RouteParams {
   params: Promise<{ id: string }>
 }
 
+const DAILY_GENERATION_LIMIT = 10
+
+// Check and increment usage, returns { allowed: boolean, remaining: number }
+async function checkAndIncrementUsage(userId: string): Promise<{ allowed: boolean; remaining: number; used: number }> {
+  // Get current usage for today
+  const usage = await db.prepare(`
+    SELECT generation_count FROM image_generation_usage
+    WHERE user_id = ? AND generation_date = CURRENT_DATE
+  `).get(userId) as { generation_count: number } | undefined
+
+  const currentCount = usage?.generation_count || 0
+
+  if (currentCount >= DAILY_GENERATION_LIMIT) {
+    return { allowed: false, remaining: 0, used: currentCount }
+  }
+
+  // Increment or insert usage record
+  await db.prepare(`
+    INSERT INTO image_generation_usage (user_id, generation_date, generation_count)
+    VALUES (?, CURRENT_DATE, 1)
+    ON CONFLICT (user_id, generation_date)
+    DO UPDATE SET generation_count = image_generation_usage.generation_count + 1
+  `).run(userId)
+
+  return {
+    allowed: true,
+    remaining: DAILY_GENERATION_LIMIT - currentCount - 1,
+    used: currentCount + 1
+  }
+}
+
 // Style presets for different element types
 const STYLE_PRESETS: Record<string, string> = {
   character: 'digital art portrait, stylized, vibrant colors, fantasy character design',
@@ -148,6 +179,19 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       return NextResponse.json({ error: 'Access denied' }, { status: 403 })
     }
 
+    // Check rate limit for AI generation
+    let usageResult: { allowed: boolean; remaining: number; used: number } | null = null
+    if (generateAI) {
+      usageResult = await checkAndIncrementUsage(userId)
+      if (!usageResult.allowed) {
+        return NextResponse.json({
+          error: 'Daily generation limit reached',
+          remaining: 0,
+          dailyLimit: DAILY_GENERATION_LIMIT,
+        }, { status: 429 })
+      }
+    }
+
     // Get element
     const element = await db.prepare(`
       SELECT * FROM world_elements WHERE id = ? AND world_id = ?
@@ -225,6 +269,8 @@ Output ONLY the image prompt, nothing else.`
       imageUrl,
       imagePrompt,
       isAIGenerated: imageUrl !== generatePlaceholderImage(element),
+      remaining: usageResult?.remaining ?? DAILY_GENERATION_LIMIT,
+      dailyLimit: DAILY_GENERATION_LIMIT,
     })
   } catch (error) {
     console.error('Error generating image:', error)

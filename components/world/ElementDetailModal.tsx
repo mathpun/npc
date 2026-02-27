@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useTheme } from '@/lib/ThemeContext'
 import { ELEMENT_TYPES } from './WorldElementCard'
 
@@ -45,6 +45,21 @@ export default function ElementDetailModal({
   const [generating, setGenerating] = useState(false)
   const [generatedImage, setGeneratedImage] = useState<string | null>(null)
   const [imagePrompt, setImagePrompt] = useState<string | null>(null)
+  const [remaining, setRemaining] = useState<number | null>(null)
+  const [dailyLimit, setDailyLimit] = useState(10)
+
+  // Fetch usage when modal opens
+  useEffect(() => {
+    if (isOpen && userId) {
+      fetch(`/api/world/image-usage?userId=${userId}`)
+        .then(res => res.json())
+        .then(data => {
+          setRemaining(data.remaining)
+          setDailyLimit(data.dailyLimit)
+        })
+        .catch(err => console.error('Failed to fetch usage:', err))
+    }
+  }, [isOpen, userId])
 
   if (!isOpen || !element) return null
 
@@ -70,7 +85,12 @@ export default function ElementDetailModal({
       if (data.success) {
         setGeneratedImage(data.imageUrl)
         setImagePrompt(data.imagePrompt)
+        if (typeof data.remaining === 'number') {
+          setRemaining(data.remaining)
+        }
         onImageGenerated()
+      } else if (res.status === 429) {
+        setRemaining(0)
       }
     } catch (err) {
       console.error('Failed to generate image:', err)
@@ -186,28 +206,48 @@ export default function ElementDetailModal({
 
         {/* Generate button */}
         {canEdit && (
-          <button
-            onClick={handleGenerateImage}
-            disabled={generating}
-            className="w-full py-3 font-bold rounded-xl hover:scale-[1.02] transition-transform disabled:opacity-50 disabled:cursor-not-allowed"
-            style={{
-              backgroundColor: generating ? theme.colors.backgroundAlt : theme.colors.buttonSuccess,
-              border: '3px solid black',
-              boxShadow: generating ? 'none' : '4px 4px 0 black',
-              color: theme.colors.text,
-            }}
-          >
-            {generating ? (
-              <span className="flex items-center justify-center gap-2">
-                <span className="animate-spin">🎨</span>
-                Generating vision...
-              </span>
-            ) : displayImage ? (
-              '🔄 Regenerate Image'
-            ) : (
-              '🎨 Generate AI Image'
+          <div className="space-y-2">
+            {/* Usage indicator */}
+            {remaining !== null && (
+              <div
+                className="text-center text-sm py-2 rounded-lg"
+                style={{
+                  backgroundColor: remaining === 0 ? theme.colors.background : 'transparent',
+                  color: remaining === 0 ? theme.colors.textMuted : theme.colors.textMuted,
+                }}
+              >
+                {remaining === 0 ? (
+                  <span>No generations left today</span>
+                ) : (
+                  <span>{remaining} generation{remaining !== 1 ? 's' : ''} left today</span>
+                )}
+              </div>
             )}
-          </button>
+            <button
+              onClick={handleGenerateImage}
+              disabled={generating || remaining === 0}
+              className="w-full py-3 font-bold rounded-xl hover:scale-[1.02] transition-transform disabled:opacity-50 disabled:cursor-not-allowed"
+              style={{
+                backgroundColor: generating || remaining === 0 ? theme.colors.backgroundAlt : theme.colors.buttonSuccess,
+                border: '3px solid black',
+                boxShadow: generating || remaining === 0 ? 'none' : '4px 4px 0 black',
+                color: theme.colors.text,
+              }}
+            >
+              {generating ? (
+                <span className="flex items-center justify-center gap-2">
+                  <span className="animate-spin">🎨</span>
+                  Generating vision...
+                </span>
+              ) : remaining === 0 ? (
+                '🎨 Limit reached'
+              ) : displayImage ? (
+                '🔄 Regenerate Image'
+              ) : (
+                '🎨 Generate AI Image'
+              )}
+            </button>
+          </div>
         )}
 
         {/* Creator info */}
