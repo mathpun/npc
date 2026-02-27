@@ -51,7 +51,7 @@ export default function NavBar({ showBack = false, backHref = '/', backLabel = '
     { href: '/', icon: '🏠', label: 'home', color: '#FF6B9D' },
     { href: '/chat', icon: '💬', label: 'chat', color: '#7BED9F' },
     { href: '/create', icon: '✨', label: 'create', color: '#DDA0DD' },
-    { href: '/chat?tab=growth', icon: '🎁', label: 'mnd wrapped', color: '#FDCB6E' },
+    { href: '/chat?tab=growth', icon: '🌀', label: 'mind wrapped', color: '#FDCB6E' },
     { href: '/profile', icon: '👤', label: 'me', color: '#87CEEB' },
     { href: '/parent', icon: '👨‍👩‍👧', label: 'parent', color: '#FD79A8' },
   ]
