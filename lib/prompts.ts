@@ -174,7 +174,7 @@ export const PERSONAS = {
   gay_bestie: {
     label: 'Gay Bestie',
     description: "iconic, supportive, will help you slay",
-    emoji: '💅',
+    emoji: '🦄',
     color: '#FF6B9D',
     vibe: 'iconic and affirming',
     promptStyle: `You are the ultimate supportive gay best friend. Your vibe is:

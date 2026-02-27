@@ -636,53 +636,54 @@ function ChatPageContent() {
               </div>
             ) : (
               <div className="h-full flex flex-col">
-                {/* Chat Header */}
+                {/* Chat Header - mobile optimized */}
                 <div
-                  className="px-4 py-3 border-b-4 border-black border-dashed"
+                  className="px-2 sm:px-4 py-2 sm:py-3 border-b-2 sm:border-b-4 border-black border-dashed"
                   style={{ backgroundColor: theme.colors.backgroundAccent }}
                 >
                   <div className="max-w-3xl mx-auto flex items-center justify-between">
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-2 sm:gap-3">
                       <button
                         onClick={() => setShowChatHistory(true)}
-                        className="px-3 h-10 flex items-center gap-1.5 font-bold text-sm hover:scale-105 transition-transform"
+                        className="w-9 h-9 sm:w-auto sm:h-10 sm:px-3 flex items-center justify-center gap-1.5 font-bold text-sm hover:scale-105 transition-transform"
                         style={{
                           backgroundColor: theme.colors.accent2,
-                          border: '3px solid black',
+                          border: '2px solid black',
                           borderRadius: '10px',
                           boxShadow: '2px 2px 0 black',
                         }}
                         title="Chat history"
                       >
                         <span>📋</span>
-                        <span>history</span>
+                        <span className="hidden sm:inline">history</span>
                       </button>
-                      <div className="text-3xl">👻</div>
+                      <div className="text-2xl sm:text-3xl">👻</div>
                       <div>
-                        <h1 className="font-bold text-lg">npc</h1>
+                        <h1 className="font-bold text-base sm:text-lg">npc</h1>
                         {session && (
-                          <p className="text-sm">{SESSION_GOALS[session.goal].label}</p>
+                          <p className="text-xs sm:text-sm">{SESSION_GOALS[session.goal].label}</p>
                         )}
                       </div>
                     </div>
                     <button
                       onClick={startNewSession}
-                      className="px-4 py-2 font-bold hover:scale-105 transition-transform"
+                      className="px-3 sm:px-4 py-1.5 sm:py-2 font-bold text-sm sm:text-base hover:scale-105 transition-transform"
                       style={{
                         backgroundColor: theme.colors.backgroundAlt,
-                        border: '3px solid black',
+                        border: '2px solid black',
                         borderRadius: '9999px',
-                        boxShadow: '3px 3px 0 black',
+                        boxShadow: '2px 2px 0 black',
                       }}
                     >
-                      🔄 new chat
+                      <span className="sm:hidden">🔄</span>
+                      <span className="hidden sm:inline">🔄 new chat</span>
                     </button>
                   </div>
                 </div>
 
-                {/* Messages */}
-                <div className="flex-1 overflow-y-auto px-4 py-6">
-                  <div className="max-w-3xl mx-auto space-y-4">
+                {/* Messages - mobile optimized */}
+                <div className="flex-1 overflow-y-auto px-2 sm:px-4 py-4 sm:py-6">
+                  <div className="max-w-3xl mx-auto space-y-3 sm:space-y-4">
                     {messages.map((message, index) => (
                       <div key={message.id}>
                         <ChatMessage
@@ -741,16 +742,16 @@ function ChatPageContent() {
                   </div>
                 </div>
 
-                {/* Input */}
+                {/* Input - mobile optimized */}
                 <div
-                  className="px-4 py-4 border-t-4 border-black border-dashed"
+                  className="px-2 sm:px-4 py-2 sm:py-4 border-t-2 sm:border-t-4 border-black border-dashed safe-area-bottom"
                   style={{ backgroundColor: theme.colors.backgroundAlt }}
                 >
                   <div className="max-w-3xl mx-auto">
                     <ChatInput
                       onSend={sendMessage}
                       disabled={isLoading}
-                      placeholder={session?.goal === 'texting' ? 'paste the text or upload a screenshot...' : "what's on your mind?"}
+                      placeholder={session?.goal === 'texting' ? 'paste text or screenshot...' : "what's on your mind?"}
                       allowImages={session?.goal === 'texting'}
                     />
                   </div>
