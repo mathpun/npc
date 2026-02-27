@@ -17,7 +17,7 @@ interface TabNavProps {
 
 const MAIN_TABS = [
   { id: 'chat' as TabId, label: 'chat', emoji: '💬' },
-  { id: 'growth' as TabId, label: 'growth', emoji: '🌱' },
+  { id: 'growth' as TabId, label: 'wrapped', emoji: '🎁' },  // Mind Wrapped like Spotify
 ]
 
 // Simplified to 4 tabs - grouped from 9

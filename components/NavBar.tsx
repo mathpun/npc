@@ -46,13 +46,13 @@ export default function NavBar({ showBack = false, backHref = '/', backLabel = '
     router.push('/')
   }
 
-  // Simplified nav - 5 core tabs only
+  // Simplified nav - 5 core tabs
   const navItems = [
     { href: '/', icon: '🏠', label: 'home', color: '#FF6B9D' },
-    { href: '/dashboard', icon: '🗺️', label: 'journey', color: '#4ECDC4' },
     { href: '/chat', icon: '💬', label: 'chat', color: '#7BED9F' },
-    { href: '/chat?tab=growth', icon: '🌱', label: 'growth', color: '#FDCB6E' },
-    { href: '/profile', icon: '👤', label: 'profile', color: '#DDA0DD' },
+    { href: '/create', icon: '✨', label: 'create', color: '#DDA0DD' },  // Museum + Create combined
+    { href: '/chat?tab=growth', icon: '🎁', label: 'wrapped', color: '#FDCB6E' },  // Mind Wrapped
+    { href: '/profile', icon: '👤', label: 'me', color: '#87CEEB' },
   ]
 
   return (

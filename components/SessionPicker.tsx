@@ -99,64 +99,100 @@ export default function SessionPicker({ onSelect, onClose, onOpenHistory }: Sess
           </button>
         )}
 
+        {/* Fun animated header */}
         <div className="text-center mb-6">
-          {/* Just Chat quick start - big prominent button */}
-          <button
-            onClick={handleQuickStart}
-            className="w-full max-w-md mx-auto mb-6 px-8 py-5 text-xl font-bold transition-all duration-200 hover:scale-105 flex items-center justify-center gap-3"
+          <div className="flex justify-center mb-4">
+            <div className="relative">
+              <svg className="w-24 h-28 animate-bounce" style={{ animationDuration: '2s' }} viewBox="0 0 60 70">
+                <ellipse cx="30" cy="45" rx="20" ry="25" fill="#FFD700" stroke="black" strokeWidth="3"/>
+                <circle cx="30" cy="20" r="18" fill="white" stroke="black" strokeWidth="3"/>
+                <circle cx="24" cy="16" r="5" fill="black"/>
+                <circle cx="36" cy="16" r="5" fill="black"/>
+                <circle cx="25" cy="15" r="2" fill="white"/>
+                <circle cx="37" cy="15" r="2" fill="white"/>
+                <ellipse cx="30" cy="28" rx="4" ry="3" fill="black"/>
+              </svg>
+              <span className="absolute -top-2 -right-4 text-2xl animate-pulse">✨</span>
+              <span className="absolute -bottom-2 -left-4 text-2xl animate-pulse" style={{ animationDelay: '0.5s' }}>💭</span>
+            </div>
+          </div>
+          <h2
+            className="text-2xl sm:text-3xl font-bold inline-block px-6 py-3 -rotate-2"
             style={{
-              backgroundColor: '#90EE90',
+              background: 'linear-gradient(135deg, #FF69B4 0%, #FFD700 50%, #87CEEB 100%)',
               border: '4px solid black',
-              borderRadius: '20px',
+              borderRadius: '16px',
               boxShadow: '6px 6px 0 black',
             }}
           >
-            <span className="text-3xl">💬</span>
-            <span>just chat</span>
-          </button>
-
-          <p className="text-sm text-gray-600 mb-4">or pick a specific vibe below</p>
+            what&apos;s on your mind? 🌟
+          </h2>
         </div>
 
-        {/* Goal selection - simplified */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-3 mb-6">
-          {(Object.entries(SESSION_GOALS) as [SessionGoal, typeof SESSION_GOALS.stuck][]).map(([key, goal]) => {
+        {/* Just Chat - big fun button */}
+        <button
+          onClick={handleQuickStart}
+          className="w-full max-w-sm mx-auto mb-6 px-8 py-6 text-xl font-bold transition-all duration-300 hover:scale-105 hover:-rotate-1 flex items-center justify-center gap-4 group"
+          style={{
+            background: 'linear-gradient(135deg, #90EE90 0%, #7BED9F 100%)',
+            border: '4px solid black',
+            borderRadius: '24px',
+            boxShadow: '8px 8px 0 black',
+          }}
+        >
+          <span className="text-4xl group-hover:animate-bounce">👻</span>
+          <span>just chat!</span>
+          <span className="text-2xl group-hover:animate-pulse">→</span>
+        </button>
+
+        {/* Divider */}
+        <div className="flex items-center gap-4 mb-6">
+          <div className="flex-1 border-t-2 border-dashed border-black/30" />
+          <span className="text-sm font-bold text-gray-500">or pick a vibe</span>
+          <div className="flex-1 border-t-2 border-dashed border-black/30" />
+        </div>
+
+        {/* Goal selection - colorful cards */}
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
+          {(Object.entries(SESSION_GOALS) as [SessionGoal, typeof SESSION_GOALS.stuck][]).map(([key, goal], i) => {
             const isSelected = selectedGoal === key
 
             return (
               <button
                 key={key}
                 onClick={() => handleGoalSelect(key)}
-                className="p-3 text-center transition-all duration-200 hover:scale-105"
+                className="p-4 text-center transition-all duration-200 hover:scale-110 hover:-rotate-2"
                 style={{
-                  backgroundColor: isSelected ? goal.color : 'white',
-                  border: '2px solid black',
-                  borderRadius: '12px',
-                  boxShadow: isSelected ? '3px 3px 0 black' : '2px 2px 0 black',
+                  backgroundColor: goal.color,
+                  border: '3px solid black',
+                  borderRadius: '16px',
+                  boxShadow: isSelected ? '6px 6px 0 black' : '4px 4px 0 black',
+                  transform: isSelected ? 'scale(1.05) rotate(-2deg)' : `rotate(${i % 2 === 0 ? -1 : 1}deg)`,
                 }}
               >
-                <div className="text-2xl mb-1">{goal.emoji}</div>
+                <div className="text-3xl mb-2">{goal.emoji}</div>
                 <div className="font-bold text-sm">{goal.label}</div>
+                {isSelected && <div className="text-lg mt-1">✓</div>}
               </button>
             )
           })}
         </div>
 
-        {/* Continue button - smaller since Just Chat is primary */}
+        {/* Action buttons */}
         <div className="flex items-center justify-center gap-3 flex-wrap">
           <button
             onClick={handleGoalContinue}
             disabled={!selectedGoal}
-            className="px-6 py-3 font-bold transition-all duration-200 hover:scale-105"
+            className="px-8 py-3 font-bold transition-all duration-200 hover:scale-105"
             style={{
-              backgroundColor: selectedGoal ? '#FFD700' : '#ccc',
+              backgroundColor: selectedGoal ? '#FFD700' : '#ddd',
               border: '3px solid black',
               borderRadius: '9999px',
-              boxShadow: selectedGoal ? '3px 3px 0 black' : 'none',
+              boxShadow: selectedGoal ? '4px 4px 0 black' : 'none',
               cursor: selectedGoal ? 'pointer' : 'not-allowed',
             }}
           >
-            customize →
+            {selectedGoal ? 'pick who to talk to →' : 'select a vibe first'}
           </button>
 
           {onOpenHistory && (
@@ -164,13 +200,13 @@ export default function SessionPicker({ onSelect, onClose, onOpenHistory }: Sess
               onClick={onOpenHistory}
               className="px-6 py-3 font-bold transition-all duration-200 hover:scale-105"
               style={{
-                backgroundColor: 'white',
+                backgroundColor: '#E6E6FA',
                 border: '3px solid black',
                 borderRadius: '9999px',
-                boxShadow: '3px 3px 0 black',
+                boxShadow: '4px 4px 0 black',
               }}
             >
-              📋 history
+              📋 past chats
             </button>
           )}
         </div>
