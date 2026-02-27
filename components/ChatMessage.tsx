@@ -10,6 +10,7 @@ interface ChatMessageProps {
   imageData?: string
   isStreaming?: boolean
   transparencyNote?: string
+  userAvatarUrl?: string
 }
 
 export default function ChatMessage({
@@ -18,6 +19,7 @@ export default function ChatMessage({
   imageData,
   isStreaming = false,
   transparencyNote,
+  userAvatarUrl,
 }: ChatMessageProps) {
   const [showTransparency, setShowTransparency] = useState(false)
   const { theme } = useTheme()
@@ -119,13 +121,24 @@ export default function ChatMessage({
       {/* Avatar for user */}
       {!isAssistant && (
         <div
-          className="flex-shrink-0 w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center text-lg sm:text-xl"
+          className="flex-shrink-0 w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center text-lg sm:text-xl overflow-hidden"
           style={{
             backgroundColor: theme.colors.userAvatar,
             border: '2px solid black',
           }}
         >
-          😊
+          {userAvatarUrl ? (
+            <Image
+              src={userAvatarUrl}
+              alt="You"
+              width={40}
+              height={40}
+              className="w-full h-full object-cover"
+              unoptimized
+            />
+          ) : (
+            '😊'
+          )}
         </div>
       )}
     </div>

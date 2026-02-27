@@ -76,6 +76,7 @@ function ChatPageContent() {
     reflectiveThinkingScore: 0,
     completedChallengeIds: [] as string[],
   })
+  const [userAvatarUrl, setUserAvatarUrl] = useState<string | null>(null)
   const messagesEndRef = useRef<HTMLDivElement>(null)
 
   // Track activity helper
@@ -107,6 +108,21 @@ function ChatPageContent() {
       }
     } catch (err) {
       console.error('Failed to fetch user stats:', err)
+    }
+  }
+
+  // Fetch user avatar
+  const fetchUserAvatar = async (uid: string) => {
+    try {
+      const res = await fetch(`/api/user/avatar?userId=${uid}`)
+      if (res.ok) {
+        const data = await res.json()
+        if (data.avatarUrl) {
+          setUserAvatarUrl(data.avatarUrl)
+        }
+      }
+    } catch (err) {
+      console.error('Failed to fetch avatar:', err)
     }
   }
 
@@ -144,6 +160,8 @@ function ChatPageContent() {
       if (!topicFromUrl) {
         checkForDailyCheckIn(storedUserId)
       }
+      // Fetch user avatar
+      fetchUserAvatar(storedUserId)
     }
 
     // Fetch user stats
@@ -671,6 +689,7 @@ function ChatPageContent() {
                           role={message.role}
                           content={message.content}
                           imageData={message.imageData}
+                          userAvatarUrl={userAvatarUrl || undefined}
                         />
 
                         {index === messages.length - 1 && reflectionPrompt && message.role === 'assistant' && (
