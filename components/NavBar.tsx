@@ -54,6 +54,7 @@ export default function NavBar({ showBack = false, backHref = '/', backLabel = '
     { href: '/create', icon: '✨', label: 'create', color: '#A29BFE' },  // bright purple
     { href: '/museum', icon: '🏛️', label: 'museum', color: '#FF7675' },  // coral red
     { href: '/moltbook', icon: '🌍', label: 'world', color: '#74B9FF' },  // bright blue
+    { href: '/profile', icon: '👤', label: 'profile', color: '#DDA0DD' },  // plum
     { href: '/parent', icon: '👨‍👩‍👧', label: 'parent', color: '#FD79A8' },  // bright pink
   ]
 
@@ -130,8 +131,9 @@ export default function NavBar({ showBack = false, backHref = '/', backLabel = '
         <div className="flex items-center gap-2">
           {isLoggedIn ? (
             <>
-              <span
-                className="hidden md:inline px-3 py-1 text-sm"
+              <Link
+                href="/profile"
+                className="hidden md:inline px-3 py-1 text-sm hover:scale-105 transition-transform"
                 style={{
                   backgroundColor: theme.colors.buttonSuccess,
                   border: '2px solid black',
@@ -139,7 +141,7 @@ export default function NavBar({ showBack = false, backHref = '/', backLabel = '
                 }}
               >
                 hi {userName}!
-              </span>
+              </Link>
               <button
                 onClick={handleLogout}
                 className="px-2 py-1 sm:px-4 sm:py-2 font-bold hover:scale-105 transition-transform text-xs sm:text-base"
@@ -216,8 +218,10 @@ export default function NavBar({ showBack = false, backHref = '/', backLabel = '
 
           {isLoggedIn && (
             <div className="flex items-center justify-between gap-2 mt-2">
-              <div
-                className="flex-1 text-center p-2"
+              <Link
+                href="/profile"
+                onClick={() => setMobileMenuOpen(false)}
+                className="flex-1 text-center p-2 hover:scale-105 transition-transform"
                 style={{
                   backgroundColor: theme.colors.buttonSuccess,
                   border: '2px solid black',
@@ -225,7 +229,7 @@ export default function NavBar({ showBack = false, backHref = '/', backLabel = '
                 }}
               >
                 hi {userName}! 👋
-              </div>
+              </Link>
               <button
                 onClick={() => {
                   setMobileMenuOpen(false)
