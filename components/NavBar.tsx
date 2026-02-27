@@ -46,13 +46,14 @@ export default function NavBar({ showBack = false, backHref = '/', backLabel = '
     router.push('/')
   }
 
-  // Simplified nav - 5 core tabs
+  // Core nav tabs
   const navItems = [
     { href: '/', icon: '🏠', label: 'home', color: '#FF6B9D' },
     { href: '/chat', icon: '💬', label: 'chat', color: '#7BED9F' },
-    { href: '/create', icon: '✨', label: 'create', color: '#DDA0DD' },  // Museum + Create combined
-    { href: '/chat?tab=growth', icon: '🎁', label: 'wrapped', color: '#FDCB6E' },  // Mind Wrapped
+    { href: '/create', icon: '✨', label: 'create', color: '#DDA0DD' },
+    { href: '/chat?tab=growth', icon: '🎁', label: 'mnd wrapped', color: '#FDCB6E' },
     { href: '/profile', icon: '👤', label: 'me', color: '#87CEEB' },
+    { href: '/parent', icon: '👨‍👩‍👧', label: 'parent', color: '#FD79A8' },
   ]
 
   return (
@@ -81,22 +82,22 @@ export default function NavBar({ showBack = false, backHref = '/', backLabel = '
           </Link>
         </div>
 
-        {/* Desktop: Full nav items */}
-        <div className="hidden sm:flex items-center gap-2">
+        {/* Desktop: Full nav items - responsive sizing */}
+        <div className="hidden sm:flex items-center gap-1 md:gap-2">
           {navItems.map((item) => (
             <Link
               key={item.href}
               href={item.href}
-              className="flex items-center gap-2 px-3 py-2 font-bold hover:scale-105 transition-transform"
+              className="flex items-center gap-1 md:gap-2 px-2 md:px-3 py-1 md:py-2 font-bold hover:scale-105 transition-transform text-sm md:text-base"
               style={{
                 backgroundColor: item.color,
-                border: '3px solid black',
+                border: '2px solid black',
                 borderRadius: '9999px',
-                boxShadow: '3px 3px 0 black',
+                boxShadow: '2px 2px 0 black',
               }}
             >
-              <span className="text-xl">{item.icon}</span>
-              <span className="hidden md:inline">{item.label}</span>
+              <span className="text-lg md:text-xl">{item.icon}</span>
+              <span className="hidden lg:inline text-xs md:text-sm">{item.label}</span>
             </Link>
           ))}
 
