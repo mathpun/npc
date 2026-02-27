@@ -1,11 +1,13 @@
 'use client'
 
 import { useState } from 'react'
+import Image from 'next/image'
 import { useTheme } from '@/lib/ThemeContext'
 
 interface ChatMessageProps {
   role: 'user' | 'assistant'
   content: string
+  imageData?: string
   isStreaming?: boolean
   transparencyNote?: string
 }
@@ -13,6 +15,7 @@ interface ChatMessageProps {
 export default function ChatMessage({
   role,
   content,
+  imageData,
   isStreaming = false,
   transparencyNote,
 }: ChatMessageProps) {
@@ -52,6 +55,25 @@ export default function ChatMessage({
             boxShadow: '2px 2px 0 black',
           }}
         >
+          {/* Image if present */}
+          {imageData && (
+            <div className="mb-2">
+              <div
+                className="relative w-48 h-48 rounded-lg overflow-hidden"
+                style={{
+                  border: '2px solid black',
+                }}
+              >
+                <Image
+                  src={imageData}
+                  alt="Screenshot"
+                  fill
+                  className="object-cover"
+                  unoptimized
+                />
+              </div>
+            </div>
+          )}
           {/* Message content */}
           <div className={`text-sm leading-relaxed whitespace-pre-wrap ${isStreaming ? 'typing-cursor' : ''}`}>
             {content}

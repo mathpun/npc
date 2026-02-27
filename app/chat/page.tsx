@@ -28,6 +28,7 @@ interface Message {
   id: string
   role: 'user' | 'assistant'
   content: string
+  imageData?: string
 }
 
 interface UserProfile {
@@ -438,13 +439,14 @@ function ChatPageContent() {
     }
   }
 
-  const sendMessage = async (content: string) => {
+  const sendMessage = async (content: string, imageData?: string) => {
     if (!profile || isLoading) return
 
     const userMessage: Message = {
       id: Date.now().toString(),
       role: 'user',
-      content,
+      content: imageData ? (content || 'Here\'s a screenshot of the conversation') : content,
+      imageData,
     }
 
     setMessages((prev) => [...prev, userMessage])
@@ -462,6 +464,7 @@ function ChatPageContent() {
           messages: [...messages, userMessage].map((m) => ({
             role: m.role,
             content: m.content,
+            imageData: m.imageData,
           })),
           profile,
           session,
@@ -667,6 +670,7 @@ function ChatPageContent() {
                         <ChatMessage
                           role={message.role}
                           content={message.content}
+                          imageData={message.imageData}
                         />
 
                         {index === messages.length - 1 && reflectionPrompt && message.role === 'assistant' && (
@@ -727,7 +731,8 @@ function ChatPageContent() {
                     <ChatInput
                       onSend={sendMessage}
                       disabled={isLoading}
-                      placeholder="what's on your mind?"
+                      placeholder={session?.goal === 'texting' ? 'paste the text or upload a screenshot...' : "what's on your mind?"}
+                      allowImages={session?.goal === 'texting'}
                     />
                   </div>
                 </div>

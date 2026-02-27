@@ -79,15 +79,49 @@ export async function POST(request: NextRequest) {
       }
     }
 
+    // Format messages for Claude API, handling images if present
+    const formattedMessages = messages.map((msg: { role: string; content: string; imageData?: string }) => {
+      // If message has image data, format as content blocks
+      if (msg.imageData && msg.role === 'user') {
+        // Extract base64 data and media type from data URL
+        const matches = msg.imageData.match(/^data:([^;]+);base64,(.+)$/)
+        if (matches) {
+          const mediaType = matches[1] as 'image/jpeg' | 'image/png' | 'image/gif' | 'image/webp'
+          const base64Data = matches[2]
+
+          return {
+            role: msg.role as 'user' | 'assistant',
+            content: [
+              {
+                type: 'image' as const,
+                source: {
+                  type: 'base64' as const,
+                  media_type: mediaType,
+                  data: base64Data,
+                },
+              },
+              {
+                type: 'text' as const,
+                text: msg.content || 'Here\'s a screenshot of the conversation. What should I reply?',
+              },
+            ],
+          }
+        }
+      }
+
+      // Regular text message
+      return {
+        role: msg.role as 'user' | 'assistant',
+        content: msg.content,
+      }
+    })
+
     // Create a streaming response
     const stream = await getAnthropicClient().messages.stream({
       model: 'claude-sonnet-4-20250514',
       max_tokens: 150,
       system: systemPrompt,
-      messages: messages.map((msg: { role: string; content: string }) => ({
-        role: msg.role as 'user' | 'assistant',
-        content: msg.content,
-      })),
+      messages: formattedMessages,
     })
 
     // Create a ReadableStream for the response
