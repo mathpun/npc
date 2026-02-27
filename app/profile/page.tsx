@@ -6,26 +6,101 @@ import Image from 'next/image'
 import NavBar from '@/components/NavBar'
 import { useTheme } from '@/lib/ThemeContext'
 
-// DiceBear avatar options
+// Avatar style options
 const AVATAR_STYLES = [
   { id: 'adventurer', label: 'Adventurer', emoji: '🧙' },
   { id: 'avataaars', label: 'Cartoon', emoji: '😊' },
-  { id: 'bottts', label: 'Robot', emoji: '🤖' },
-  { id: 'fun-emoji', label: 'Emoji', emoji: '😎' },
   { id: 'lorelei', label: 'Artistic', emoji: '🎨' },
   { id: 'notionists', label: 'Minimal', emoji: '✨' },
-  { id: 'personas', label: 'Persona', emoji: '👤' },
+  { id: 'big-ears', label: 'Big Ears', emoji: '👂' },
+  { id: 'thumbs', label: 'Thumbs', emoji: '👍' },
+  { id: 'bottts', label: 'Robot', emoji: '🤖' },
   { id: 'pixel-art', label: 'Pixel', emoji: '👾' },
 ]
 
-const BACKGROUND_COLORS = [
-  'b6e3f4', 'c0aede', 'd1d4f9', 'ffd5dc', 'ffdfbf',
-  'a3e4d7', 'f9e79f', 'fadbd8', 'aed6f1', 'e8daef',
+// Skin tones
+const SKIN_COLORS = [
+  { id: 'f8d9c4', label: 'Light' },
+  { id: 'eac4a8', label: 'Light-Med' },
+  { id: 'd4a886', label: 'Medium' },
+  { id: 'c68c53', label: 'Med-Tan' },
+  { id: 'a56c43', label: 'Tan' },
+  { id: '8d5524', label: 'Brown' },
+  { id: '6b4423', label: 'Dark' },
+  { id: '4a3120', label: 'Deep' },
 ]
 
-const SEED_OPTIONS = [
-  'happy', 'cool', 'wild', 'chill', 'epic', 'magic',
-  'star', 'moon', 'sun', 'cosmic', 'dream', 'spark',
+// Hair colors
+const HAIR_COLORS = [
+  { id: '090806', label: 'Black', color: '#090806' },
+  { id: '4a3728', label: 'Dark Brown', color: '#4a3728' },
+  { id: '6a4e35', label: 'Brown', color: '#6a4e35' },
+  { id: 'b58143', label: 'Light Brown', color: '#b58143' },
+  { id: 'd6b370', label: 'Blonde', color: '#d6b370' },
+  { id: 'f5e1b4', label: 'Platinum', color: '#f5e1b4' },
+  { id: 'b83f3f', label: 'Red', color: '#b83f3f' },
+  { id: 'e35b04', label: 'Ginger', color: '#e35b04' },
+  { id: 'ff69b4', label: 'Pink', color: '#ff69b4' },
+  { id: '9b59b6', label: 'Purple', color: '#9b59b6' },
+  { id: '3498db', label: 'Blue', color: '#3498db' },
+  { id: '2ecc71', label: 'Green', color: '#2ecc71' },
+]
+
+// Hair styles (for adventurer)
+const HAIR_STYLES_ADVENTURER = [
+  'short01', 'short02', 'short03', 'short04', 'short05',
+  'long01', 'long02', 'long03', 'long04', 'long05',
+  'long06', 'long07', 'long08', 'long09', 'long10',
+  'long11', 'long12', 'long13', 'long14', 'long15',
+  'long16', 'long17', 'long18', 'long19', 'long20',
+]
+
+// Hair styles (for avataaars)
+const HAIR_STYLES_AVATAAARS = [
+  'bigHair', 'bob', 'bun', 'curly', 'curvy', 'dreads',
+  'frida', 'fro', 'froAndBand', 'longButNotTooLong', 'miaWallace',
+  'shavedSides', 'straight01', 'straight02', 'straightAndStrand',
+  'shortCurly', 'shortFlat', 'shortRound', 'shortWaved', 'sides',
+  'theCaesar', 'theCaesarAndSidePart', 'dreads01', 'dreads02',
+  'frizzle', 'shaggy', 'shaggyMullet', 'hat', 'winterHat01',
+]
+
+// Eyes options
+const EYES_OPTIONS = [
+  'default', 'close', 'cry', 'dizzy', 'eyeRoll', 'happy',
+  'hearts', 'side', 'squint', 'surprised', 'wink', 'winkWacky',
+]
+
+// Mouth options
+const MOUTH_OPTIONS = [
+  'default', 'concerned', 'disbelief', 'eating', 'grimace',
+  'sad', 'screamOpen', 'serious', 'smile', 'tongue', 'twinkle', 'vomit',
+]
+
+// Accessories
+const ACCESSORIES_OPTIONS = [
+  { id: '', label: 'None' },
+  { id: 'kurt', label: 'Round Glasses' },
+  { id: 'prescription01', label: 'Glasses' },
+  { id: 'prescription02', label: 'Square Glasses' },
+  { id: 'sunglasses', label: 'Sunglasses' },
+  { id: 'wayfarers', label: 'Wayfarers' },
+]
+
+// Background colors
+const BACKGROUND_COLORS = [
+  { id: 'b6e3f4', label: 'Sky' },
+  { id: 'c0aede', label: 'Lavender' },
+  { id: 'd1d4f9', label: 'Periwinkle' },
+  { id: 'ffd5dc', label: 'Pink' },
+  { id: 'ffdfbf', label: 'Peach' },
+  { id: 'a3e4d7', label: 'Mint' },
+  { id: 'f9e79f', label: 'Yellow' },
+  { id: 'fadbd8', label: 'Rose' },
+  { id: 'aed6f1', label: 'Blue' },
+  { id: 'e8daef', label: 'Purple' },
+  { id: 'ffffff', label: 'White' },
+  { id: 'transparent', label: 'None' },
 ]
 
 interface UserProfile {
@@ -47,8 +122,13 @@ export default function ProfilePage() {
   const [avatarMode, setAvatarMode] = useState<'picker' | 'ai'>('picker')
   const [selectedStyle, setSelectedStyle] = useState('adventurer')
   const [selectedBg, setSelectedBg] = useState('b6e3f4')
-  const [selectedSeed, setSelectedSeed] = useState('happy')
-  const [customSeed, setCustomSeed] = useState('')
+  const [selectedSkin, setSelectedSkin] = useState('eac4a8')
+  const [selectedHairColor, setSelectedHairColor] = useState('4a3728')
+  const [selectedHairStyle, setSelectedHairStyle] = useState('short01')
+  const [selectedEyes, setSelectedEyes] = useState('default')
+  const [selectedMouth, setSelectedMouth] = useState('smile')
+  const [selectedAccessories, setSelectedAccessories] = useState('')
+  const [randomSeed, setRandomSeed] = useState('avatar1')
 
   // AI avatar state
   const [aiPrompt, setAiPrompt] = useState('')
@@ -88,8 +168,58 @@ export default function ProfilePage() {
   }
 
   const getDiceBearUrl = () => {
-    const seed = customSeed || selectedSeed
-    return `https://api.dicebear.com/7.x/${selectedStyle}/svg?seed=${encodeURIComponent(seed)}&backgroundColor=${selectedBg}&size=200`
+    const baseUrl = `https://api.dicebear.com/7.x/${selectedStyle}/svg`
+    const params = new URLSearchParams()
+
+    params.set('size', '200')
+
+    if (selectedBg !== 'transparent') {
+      params.set('backgroundColor', selectedBg)
+    }
+
+    // Style-specific options
+    if (selectedStyle === 'adventurer') {
+      params.set('skinColor', selectedSkin)
+      params.set('hairColor', selectedHairColor)
+      params.set('hair', selectedHairStyle)
+      params.set('seed', randomSeed)
+    } else if (selectedStyle === 'avataaars') {
+      params.set('skinColor', selectedSkin)
+      params.set('hairColor', selectedHairColor)
+      params.set('top', selectedHairStyle)
+      params.set('eyes', selectedEyes)
+      params.set('mouth', selectedMouth)
+      if (selectedAccessories) {
+        params.set('accessories', selectedAccessories)
+        params.set('accessoriesProbability', '100')
+      }
+    } else if (selectedStyle === 'lorelei' || selectedStyle === 'notionists') {
+      params.set('skinColor', selectedSkin)
+      params.set('hairColor', selectedHairColor)
+      params.set('seed', randomSeed)
+    } else if (selectedStyle === 'big-ears') {
+      params.set('skinColor', selectedSkin)
+      params.set('hairColor', selectedHairColor)
+      params.set('hair', selectedHairStyle)
+      params.set('seed', randomSeed)
+    } else {
+      // For styles without detailed customization, use seed
+      params.set('seed', randomSeed)
+    }
+
+    return `${baseUrl}?${params.toString()}`
+  }
+
+  const handleRandomize = () => {
+    setRandomSeed(`random_${Date.now()}`)
+    // Randomize other options
+    setSelectedHairStyle(
+      selectedStyle === 'avataaars'
+        ? HAIR_STYLES_AVATAAARS[Math.floor(Math.random() * HAIR_STYLES_AVATAAARS.length)]
+        : HAIR_STYLES_ADVENTURER[Math.floor(Math.random() * HAIR_STYLES_ADVENTURER.length)]
+    )
+    setSelectedEyes(EYES_OPTIONS[Math.floor(Math.random() * EYES_OPTIONS.length)])
+    setSelectedMouth(MOUTH_OPTIONS[Math.floor(Math.random() * MOUTH_OPTIONS.length)])
   }
 
   const handleGenerateAiAvatar = async () => {
@@ -151,6 +281,11 @@ export default function ProfilePage() {
     }
     setIsSaving(false)
   }
+
+  // Check if current style supports detailed customization
+  const supportsDetailedCustomization = ['adventurer', 'avataaars', 'lorelei', 'notionists', 'big-ears'].includes(selectedStyle)
+  const supportsAccessories = selectedStyle === 'avataaars'
+  const supportsExpressions = selectedStyle === 'avataaars'
 
   if (!userId || !profile) {
     return (
@@ -233,7 +368,7 @@ export default function ProfilePage() {
                 boxShadow: avatarMode === 'picker' ? '3px 3px 0 black' : 'none',
               }}
             >
-              🎨 Style Picker
+              🎨 Style Builder
             </button>
             <button
               onClick={() => setAvatarMode('ai')}
@@ -255,7 +390,7 @@ export default function ProfilePage() {
               style={{
                 border: '3px solid black',
                 boxShadow: '4px 4px 0 black',
-                backgroundColor: `#${selectedBg}`,
+                backgroundColor: selectedBg === 'transparent' ? theme.colors.background : `#${selectedBg}`,
               }}
             >
               {previewUrl ? (
@@ -279,7 +414,7 @@ export default function ProfilePage() {
             </div>
           </div>
 
-          {/* DiceBear Picker */}
+          {/* DiceBear Builder */}
           {avatarMode === 'picker' && (
             <>
               {/* Style Selection */}
@@ -291,7 +426,15 @@ export default function ProfilePage() {
                   {AVATAR_STYLES.map((style) => (
                     <button
                       key={style.id}
-                      onClick={() => setSelectedStyle(style.id)}
+                      onClick={() => {
+                        setSelectedStyle(style.id)
+                        // Reset hair style when changing avatar style
+                        if (style.id === 'avataaars') {
+                          setSelectedHairStyle('shortFlat')
+                        } else {
+                          setSelectedHairStyle('short01')
+                        }
+                      }}
                       className="p-2 rounded-xl text-center transition-transform hover:scale-105"
                       style={{
                         backgroundColor: selectedStyle === style.id ? theme.colors.accent1 : theme.colors.background,
@@ -305,77 +448,197 @@ export default function ProfilePage() {
                 </div>
               </div>
 
+              {/* Skin Tone - only for styles that support it */}
+              {supportsDetailedCustomization && (
+                <div className="mb-4">
+                  <label className="block font-bold mb-2" style={{ color: theme.colors.text }}>
+                    Skin Tone
+                  </label>
+                  <div className="flex flex-wrap gap-2">
+                    {SKIN_COLORS.map((skin) => (
+                      <button
+                        key={skin.id}
+                        onClick={() => setSelectedSkin(skin.id)}
+                        className="w-8 h-8 rounded-full transition-transform hover:scale-110"
+                        title={skin.label}
+                        style={{
+                          backgroundColor: `#${skin.id}`,
+                          border: selectedSkin === skin.id ? '3px solid black' : '2px solid rgba(0,0,0,0.3)',
+                          boxShadow: selectedSkin === skin.id ? '2px 2px 0 black' : 'none',
+                        }}
+                      />
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Hair Color */}
+              {supportsDetailedCustomization && (
+                <div className="mb-4">
+                  <label className="block font-bold mb-2" style={{ color: theme.colors.text }}>
+                    Hair Color
+                  </label>
+                  <div className="flex flex-wrap gap-2">
+                    {HAIR_COLORS.map((hair) => (
+                      <button
+                        key={hair.id}
+                        onClick={() => setSelectedHairColor(hair.id)}
+                        className="w-8 h-8 rounded-full transition-transform hover:scale-110"
+                        title={hair.label}
+                        style={{
+                          backgroundColor: hair.color,
+                          border: selectedHairColor === hair.id ? '3px solid black' : '2px solid rgba(0,0,0,0.3)',
+                          boxShadow: selectedHairColor === hair.id ? '2px 2px 0 black' : 'none',
+                        }}
+                      />
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Hair Style */}
+              {supportsDetailedCustomization && (
+                <div className="mb-4">
+                  <label className="block font-bold mb-2" style={{ color: theme.colors.text }}>
+                    Hair Style
+                  </label>
+                  <div className="flex flex-wrap gap-2 max-h-24 overflow-y-auto">
+                    {(selectedStyle === 'avataaars' ? HAIR_STYLES_AVATAAARS : HAIR_STYLES_ADVENTURER).map((style) => (
+                      <button
+                        key={style}
+                        onClick={() => setSelectedHairStyle(style)}
+                        className="px-3 py-1 rounded-full text-xs font-medium transition-transform hover:scale-105"
+                        style={{
+                          backgroundColor: selectedHairStyle === style ? theme.colors.accent2 : theme.colors.background,
+                          border: selectedHairStyle === style ? '2px solid black' : '2px solid transparent',
+                        }}
+                      >
+                        {style.replace(/([A-Z])/g, ' $1').replace(/(\d+)/, ' $1').trim()}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Eyes & Mouth (avataaars only) */}
+              {supportsExpressions && (
+                <div className="grid grid-cols-2 gap-4 mb-4">
+                  <div>
+                    <label className="block font-bold mb-2" style={{ color: theme.colors.text }}>
+                      Eyes
+                    </label>
+                    <select
+                      value={selectedEyes}
+                      onChange={(e) => setSelectedEyes(e.target.value)}
+                      className="w-full p-2 rounded-xl"
+                      style={{
+                        backgroundColor: theme.colors.background,
+                        border: '2px solid black',
+                        color: theme.colors.text,
+                      }}
+                    >
+                      {EYES_OPTIONS.map((eye) => (
+                        <option key={eye} value={eye}>{eye}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block font-bold mb-2" style={{ color: theme.colors.text }}>
+                      Mouth
+                    </label>
+                    <select
+                      value={selectedMouth}
+                      onChange={(e) => setSelectedMouth(e.target.value)}
+                      className="w-full p-2 rounded-xl"
+                      style={{
+                        backgroundColor: theme.colors.background,
+                        border: '2px solid black',
+                        color: theme.colors.text,
+                      }}
+                    >
+                      {MOUTH_OPTIONS.map((mouth) => (
+                        <option key={mouth} value={mouth}>{mouth}</option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+              )}
+
+              {/* Accessories (avataaars only) */}
+              {supportsAccessories && (
+                <div className="mb-4">
+                  <label className="block font-bold mb-2" style={{ color: theme.colors.text }}>
+                    Accessories
+                  </label>
+                  <div className="flex flex-wrap gap-2">
+                    {ACCESSORIES_OPTIONS.map((acc) => (
+                      <button
+                        key={acc.id}
+                        onClick={() => setSelectedAccessories(acc.id)}
+                        className="px-3 py-1 rounded-full text-sm font-medium transition-transform hover:scale-105"
+                        style={{
+                          backgroundColor: selectedAccessories === acc.id ? theme.colors.accent2 : theme.colors.background,
+                          border: selectedAccessories === acc.id ? '2px solid black' : '2px solid transparent',
+                        }}
+                      >
+                        {acc.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
               {/* Background Color */}
               <div className="mb-4">
                 <label className="block font-bold mb-2" style={{ color: theme.colors.text }}>
                   Background
                 </label>
                 <div className="flex flex-wrap gap-2">
-                  {BACKGROUND_COLORS.map((color) => (
+                  {BACKGROUND_COLORS.map((bg) => (
                     <button
-                      key={color}
-                      onClick={() => setSelectedBg(color)}
+                      key={bg.id}
+                      onClick={() => setSelectedBg(bg.id)}
                       className="w-8 h-8 rounded-full transition-transform hover:scale-110"
+                      title={bg.label}
                       style={{
-                        backgroundColor: `#${color}`,
-                        border: selectedBg === color ? '3px solid black' : '2px solid rgba(0,0,0,0.2)',
-                        boxShadow: selectedBg === color ? '2px 2px 0 black' : 'none',
+                        backgroundColor: bg.id === 'transparent' ? theme.colors.background : `#${bg.id}`,
+                        border: selectedBg === bg.id ? '3px solid black' : '2px solid rgba(0,0,0,0.2)',
+                        boxShadow: selectedBg === bg.id ? '2px 2px 0 black' : 'none',
+                        backgroundImage: bg.id === 'transparent' ? 'linear-gradient(45deg, #ccc 25%, transparent 25%, transparent 75%, #ccc 75%, #ccc), linear-gradient(45deg, #ccc 25%, transparent 25%, transparent 75%, #ccc 75%, #ccc)' : 'none',
+                        backgroundSize: '8px 8px',
+                        backgroundPosition: '0 0, 4px 4px',
                       }}
                     />
                   ))}
                 </div>
               </div>
 
-              {/* Seed Selection */}
-              <div className="mb-4">
-                <label className="block font-bold mb-2" style={{ color: theme.colors.text }}>
-                  Vibe
-                </label>
-                <div className="flex flex-wrap gap-2 mb-2">
-                  {SEED_OPTIONS.map((seed) => (
-                    <button
-                      key={seed}
-                      onClick={() => {
-                        setSelectedSeed(seed)
-                        setCustomSeed('')
-                      }}
-                      className="px-3 py-1 rounded-full text-sm font-medium transition-transform hover:scale-105"
-                      style={{
-                        backgroundColor: selectedSeed === seed && !customSeed ? theme.colors.accent2 : theme.colors.background,
-                        border: selectedSeed === seed && !customSeed ? '2px solid black' : '2px solid transparent',
-                      }}
-                    >
-                      {seed}
-                    </button>
-                  ))}
-                </div>
-                <input
-                  type="text"
-                  value={customSeed}
-                  onChange={(e) => setCustomSeed(e.target.value)}
-                  placeholder="Or type your own..."
-                  className="w-full p-2 rounded-xl text-sm"
+              {/* Randomize & Save buttons */}
+              <div className="flex gap-3">
+                <button
+                  onClick={handleRandomize}
+                  className="flex-1 py-3 font-bold rounded-xl transition-transform hover:scale-105"
                   style={{
-                    backgroundColor: theme.colors.background,
-                    border: '2px solid black',
-                    color: theme.colors.text,
+                    backgroundColor: theme.colors.accent3,
+                    border: '3px solid black',
+                    boxShadow: '3px 3px 0 black',
                   }}
-                />
+                >
+                  🎲 Randomize
+                </button>
+                <button
+                  onClick={() => handleSaveAvatar(getDiceBearUrl())}
+                  disabled={isSaving}
+                  className="flex-1 py-3 font-bold rounded-xl transition-transform hover:scale-105 disabled:opacity-50"
+                  style={{
+                    backgroundColor: theme.colors.buttonSuccess,
+                    border: '3px solid black',
+                    boxShadow: '3px 3px 0 black',
+                  }}
+                >
+                  {isSaving ? 'Saving...' : 'Save Avatar'}
+                </button>
               </div>
-
-              {/* Save DiceBear */}
-              <button
-                onClick={() => handleSaveAvatar(getDiceBearUrl())}
-                disabled={isSaving}
-                className="w-full py-3 font-bold rounded-xl transition-transform hover:scale-105 disabled:opacity-50"
-                style={{
-                  backgroundColor: theme.colors.buttonSuccess,
-                  border: '3px solid black',
-                  boxShadow: '3px 3px 0 black',
-                }}
-              >
-                {isSaving ? 'Saving...' : 'Save This Avatar'}
-              </button>
             </>
           )}
 
