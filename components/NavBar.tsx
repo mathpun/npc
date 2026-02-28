@@ -7,6 +7,7 @@ import { signOut } from 'next-auth/react'
 import { useTheme } from '@/lib/ThemeContext'
 import ThemePicker, { ThemePickerButton } from './ThemePicker'
 import ChangePassword from './ChangePassword'
+import DeleteAccount from './DeleteAccount'
 
 interface NavBarProps {
   showBack?: boolean
@@ -21,6 +22,7 @@ export default function NavBar({ showBack = false, backHref = '/', backLabel = '
   const [userName, setUserName] = useState('')
   const [showThemePicker, setShowThemePicker] = useState(false)
   const [showChangePassword, setShowChangePassword] = useState(false)
+  const [showDeleteAccount, setShowDeleteAccount] = useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const { theme } = useTheme()
 
@@ -291,7 +293,7 @@ export default function NavBar({ showBack = false, backHref = '/', backLabel = '
           )}
 
           {/* Footer links */}
-          <div className="mt-4 pt-3 border-t-2 border-dashed border-black/20 flex justify-center gap-4">
+          <div className="mt-4 pt-3 border-t-2 border-dashed border-black/20 flex flex-wrap justify-center gap-3">
             <Link
               href="/about"
               onClick={() => setMobileMenuOpen(false)}
@@ -310,6 +312,18 @@ export default function NavBar({ showBack = false, backHref = '/', backLabel = '
             >
               💬 feedback
             </a>
+            {isLoggedIn && (
+              <button
+                onClick={() => {
+                  setMobileMenuOpen(false)
+                  setShowDeleteAccount(true)
+                }}
+                className="text-xs font-bold hover:scale-105 transition-transform"
+                style={{ color: '#e74c3c' }}
+              >
+                🗑️ delete account
+              </button>
+            )}
           </div>
         </div>
       )}
@@ -327,6 +341,9 @@ export default function NavBar({ showBack = false, backHref = '/', backLabel = '
 
       {/* Change Password Modal */}
       <ChangePassword isOpen={showChangePassword} onClose={() => setShowChangePassword(false)} />
+
+      {/* Delete Account Modal */}
+      <DeleteAccount isOpen={showDeleteAccount} onClose={() => setShowDeleteAccount(false)} />
     </>
   )
 }
