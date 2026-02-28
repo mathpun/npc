@@ -5,7 +5,7 @@ export interface UserProfile {
   currentGoals: string
 }
 
-export type SessionGoal = 'stuck' | 'future' | 'identity' | 'people' | 'venting' | 'creating' | 'texting'
+export type SessionGoal = 'stuck' | 'future' | 'identity' | 'people' | 'venting' | 'creating' | 'texting' | 'latenight'
 export type PersonaType = 'chill_mentor' | 'hype_friend' | 'wise_elder' | 'real_talk' | 'creative_chaos' | 'potato' | 'gay_bestie' | 'custom'
 
 export interface CustomPersona {
@@ -78,6 +78,14 @@ export const SESSION_GOALS = {
     examples: ['what should I say', 'how do I respond', 'is this too much'],
     color: '#98D8C8',
     emoji: '💬',
+  },
+  latenight: {
+    label: "3am thoughts",
+    description: "When your brain won't shut up",
+    icon: 'moon',
+    examples: ['deep thoughts', 'existential vibes', 'random realizations'],
+    color: '#9B59B6',
+    emoji: '🌙',
   },
 }
 
