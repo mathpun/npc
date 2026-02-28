@@ -169,7 +169,7 @@ export default function SessionPicker({ onSelect, onClose, onOpenHistory }: Sess
               opacity: selectedGoal ? 1 : 0.6,
             }}
           >
-            {selectedGoal ? 'customize →' : 'tap a vibe'}
+            {selectedGoal ? 'pick a character →' : 'tap a vibe'}
           </button>
 
           {onOpenHistory && (
