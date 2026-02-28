@@ -56,7 +56,7 @@ export default function NavBar({ showBack = false, backHref = '/', backLabel = '
 
   // Extra items for mobile menu
   const mobileExtraItems = [
-    { href: '/parent', icon: '👨‍👩‍👧', label: 'parent', color: '#FD79A8' },
+    { href: '/parent', icon: '👨‍👩‍👧', label: 'parent dash', color: '#FD79A8' },
   ]
 
   const isActive = (href: string) => {
@@ -125,7 +125,7 @@ export default function NavBar({ showBack = false, backHref = '/', backLabel = '
               }}
             >
               <span className="text-lg">👨‍👩‍👧</span>
-              <span>parent</span>
+              <span>parent dash</span>
             </Link>
 
             <ThemePickerButton onClick={() => setShowThemePicker(true)} />
@@ -197,7 +197,7 @@ export default function NavBar({ showBack = false, backHref = '/', backLabel = '
 
           {/* Main nav - 2x3 grid with bigger cards */}
           <div className="grid grid-cols-3 gap-3 mb-4">
-            {[...navItems, { href: '/parent', icon: '👨‍👩‍👧', label: 'parent', color: '#FD79A8' }].map((item) => {
+            {[...navItems, { href: '/parent', icon: '👨‍👩‍👧', label: 'parent dash', color: '#FD79A8' }].map((item) => {
               const active = isActive(item.href)
               return (
                 <Link
