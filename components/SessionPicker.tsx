@@ -83,7 +83,7 @@ export default function SessionPicker({ onSelect, onClose, onOpenHistory }: Sess
   // Step 1: Goal Selection
   if (step === 'goal') {
     return (
-      <div className="w-full max-w-2xl mx-auto text-black">
+      <div className="w-full max-w-md mx-auto text-black px-4">
         {onClose && (
           <button
             onClick={onClose}
@@ -99,106 +99,107 @@ export default function SessionPicker({ onSelect, onClose, onOpenHistory }: Sess
           </button>
         )}
 
-        {/* Fun animated header - responsive */}
-        <div className="text-center mb-4 sm:mb-6">
-          <div className="flex justify-center mb-2 sm:mb-4">
-            <div className="relative">
-              <svg className="w-16 h-20 sm:w-24 sm:h-28 animate-bounce" style={{ animationDuration: '2s' }} viewBox="0 0 60 70">
-                <ellipse cx="30" cy="45" rx="20" ry="25" fill="#FFD700" stroke="black" strokeWidth="3"/>
-                <circle cx="30" cy="20" r="18" fill="white" stroke="black" strokeWidth="3"/>
-                <circle cx="24" cy="16" r="5" fill="black"/>
-                <circle cx="36" cy="16" r="5" fill="black"/>
-                <circle cx="25" cy="15" r="2" fill="white"/>
-                <circle cx="37" cy="15" r="2" fill="white"/>
-                <ellipse cx="30" cy="28" rx="4" ry="3" fill="black"/>
-              </svg>
-              <span className="absolute -top-1 -right-2 sm:-top-2 sm:-right-4 text-lg sm:text-2xl animate-pulse">✨</span>
-              <span className="absolute -bottom-1 -left-2 sm:-bottom-2 sm:-left-4 text-lg sm:text-2xl animate-pulse" style={{ animationDelay: '0.5s' }}>💭</span>
+        {/* Centered animated character */}
+        <div className="flex flex-col items-center mb-6">
+          <div className="relative mb-4">
+            <div
+              className="w-20 h-20 sm:w-24 sm:h-24 rounded-full flex items-center justify-center text-4xl sm:text-5xl animate-bounce"
+              style={{
+                animationDuration: '2s',
+                background: 'linear-gradient(135deg, #FFD700 0%, #FFA500 100%)',
+                border: '4px solid black',
+                boxShadow: '4px 4px 0 black',
+              }}
+            >
+              👻
             </div>
+            <span className="absolute -top-1 -right-1 text-xl animate-pulse">✨</span>
+            <span className="absolute -bottom-1 -left-1 text-xl animate-pulse" style={{ animationDelay: '0.5s' }}>💫</span>
           </div>
+
           <h2
-            className="text-xl sm:text-2xl md:text-3xl font-bold inline-block px-4 sm:px-6 py-2 sm:py-3 -rotate-2"
+            className="text-xl sm:text-2xl font-bold text-center px-6 py-3"
             style={{
               background: 'linear-gradient(135deg, #FF69B4 0%, #FFD700 50%, #87CEEB 100%)',
               border: '4px solid black',
               borderRadius: '16px',
-              boxShadow: '6px 6px 0 black',
+              boxShadow: '4px 4px 0 black',
             }}
           >
-            what&apos;s on your mind? 🌟
+            what&apos;s up? 🌟
           </h2>
         </div>
 
-        {/* Just Chat - big fun button - responsive */}
-        <button
-          onClick={handleQuickStart}
-          className="w-full max-w-xs sm:max-w-sm mx-auto mb-4 sm:mb-6 px-6 sm:px-8 py-4 sm:py-6 text-lg sm:text-xl font-bold transition-all duration-300 hover:scale-105 hover:-rotate-1 flex items-center justify-center gap-3 sm:gap-4 group"
-          style={{
-            background: 'linear-gradient(135deg, #90EE90 0%, #7BED9F 100%)',
-            border: '3px solid black',
-            borderRadius: '20px',
-            boxShadow: '6px 6px 0 black',
-          }}
-        >
-          <span className="text-3xl sm:text-4xl group-hover:animate-bounce">👻</span>
-          <span>just chat!</span>
-          <span className="text-xl sm:text-2xl group-hover:animate-pulse">→</span>
-        </button>
+        {/* Just Chat - centered big button */}
+        <div className="flex justify-center mb-5">
+          <button
+            onClick={handleQuickStart}
+            className="px-8 py-4 text-lg sm:text-xl font-bold transition-all duration-300 hover:scale-105 flex items-center gap-3 group"
+            style={{
+              background: 'linear-gradient(135deg, #90EE90 0%, #7BED9F 100%)',
+              border: '3px solid black',
+              borderRadius: '9999px',
+              boxShadow: '4px 4px 0 black',
+            }}
+          >
+            <span className="text-2xl group-hover:animate-bounce">💬</span>
+            <span>just chat!</span>
+          </button>
+        </div>
 
         {/* Divider */}
-        <div className="flex items-center gap-3 sm:gap-4 mb-4 sm:mb-6">
+        <div className="flex items-center gap-4 mb-5">
           <div className="flex-1 border-t-2 border-dashed border-black/30" />
-          <span className="text-xs sm:text-sm font-bold text-gray-500">or pick a vibe</span>
+          <span className="text-xs font-bold text-gray-500 whitespace-nowrap">or pick a vibe</span>
           <div className="flex-1 border-t-2 border-dashed border-black/30" />
         </div>
 
-        {/* Goal selection - colorful cards - responsive grid */}
-        <div className="grid grid-cols-3 sm:grid-cols-4 gap-2 sm:gap-3 mb-4 sm:mb-6">
-          {(Object.entries(SESSION_GOALS) as [SessionGoal, typeof SESSION_GOALS.stuck][]).map(([key, goal], i) => {
+        {/* Goal selection - 2x4 grid on mobile, centered */}
+        <div className="grid grid-cols-4 gap-2 mb-5">
+          {(Object.entries(SESSION_GOALS) as [SessionGoal, typeof SESSION_GOALS.stuck][]).map(([key, goal]) => {
             const isSelected = selectedGoal === key
 
             return (
               <button
                 key={key}
                 onClick={() => handleGoalSelect(key)}
-                className="p-2 sm:p-4 text-center transition-all duration-200 hover:scale-105"
+                className="p-2 sm:p-3 text-center transition-all duration-200 hover:scale-105 aspect-square flex flex-col items-center justify-center"
                 style={{
-                  backgroundColor: goal.color,
-                  border: '2px solid black',
+                  backgroundColor: isSelected ? goal.color : 'white',
+                  border: isSelected ? '3px solid black' : '2px solid black',
                   borderRadius: '12px',
-                  boxShadow: isSelected ? '4px 4px 0 black' : '2px 2px 0 black',
-                  transform: isSelected ? 'scale(1.05)' : 'none',
+                  boxShadow: isSelected ? '3px 3px 0 black' : '2px 2px 0 black',
                 }}
               >
-                <div className="text-xl sm:text-3xl mb-1">{goal.emoji}</div>
-                <div className="font-bold text-xs sm:text-sm leading-tight">{goal.label}</div>
-                {isSelected && <div className="text-sm sm:text-lg mt-0.5">✓</div>}
+                <div className="text-xl sm:text-2xl">{goal.emoji}</div>
+                <div className="font-bold text-[10px] sm:text-xs leading-tight mt-1">{goal.label}</div>
               </button>
             )
           })}
         </div>
 
-        {/* Action buttons - responsive */}
-        <div className="flex items-center justify-center gap-2 sm:gap-3 flex-wrap">
+        {/* Action buttons - centered row */}
+        <div className="flex justify-center gap-3">
           <button
             onClick={handleGoalContinue}
             disabled={!selectedGoal}
-            className="px-4 sm:px-8 py-2 sm:py-3 font-bold text-sm sm:text-base transition-all duration-200 hover:scale-105"
+            className="px-6 py-2.5 font-bold text-sm transition-all duration-200 hover:scale-105"
             style={{
-              backgroundColor: selectedGoal ? '#FFD700' : '#ddd',
+              backgroundColor: selectedGoal ? '#FFD700' : '#e0e0e0',
               border: '2px solid black',
               borderRadius: '9999px',
               boxShadow: selectedGoal ? '3px 3px 0 black' : 'none',
               cursor: selectedGoal ? 'pointer' : 'not-allowed',
+              opacity: selectedGoal ? 1 : 0.7,
             }}
           >
-            {selectedGoal ? 'customize →' : 'select a vibe'}
+            {selectedGoal ? 'customize →' : 'pick a vibe first'}
           </button>
 
           {onOpenHistory && (
             <button
               onClick={onOpenHistory}
-              className="px-4 sm:px-6 py-2 sm:py-3 font-bold text-sm sm:text-base transition-all duration-200 hover:scale-105"
+              className="px-5 py-2.5 font-bold text-sm transition-all duration-200 hover:scale-105"
               style={{
                 backgroundColor: '#E6E6FA',
                 border: '2px solid black',
@@ -206,7 +207,7 @@ export default function SessionPicker({ onSelect, onClose, onOpenHistory }: Sess
                 boxShadow: '3px 3px 0 black',
               }}
             >
-              📋 history
+              📋
             </button>
           )}
         </div>

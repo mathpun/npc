@@ -248,7 +248,7 @@ export default function ChatHistory({
 
       {/* Sidebar */}
       <div
-        className="fixed left-0 top-0 bottom-0 w-80 max-w-[85vw] z-50 flex flex-col overflow-hidden"
+        className="fixed left-0 top-0 bottom-0 w-80 max-w-[85vw] z-50 flex flex-col"
         style={{
           backgroundColor: 'white',
           borderRight: '4px solid black',
@@ -465,7 +465,10 @@ export default function ChatHistory({
         </div>
 
         {/* Sessions List */}
-        <div className="flex-1 overflow-y-auto p-4 space-y-3">
+        <div
+          className="flex-1 overflow-y-auto overscroll-contain p-4 space-y-3"
+          style={{ WebkitOverflowScrolling: 'touch' }}
+        >
           {loading ? (
             <div className="text-center py-8">
               <div className="text-3xl animate-bounce mb-2">💬</div>
