@@ -421,50 +421,51 @@ export default function SessionPicker({ onSelect, onClose, onOpenHistory }: Sess
 
   // Step 2: Persona Selection
   return (
-    <div className="w-full max-w-2xl mx-auto text-black">
+    <div className="w-full max-w-md mx-auto text-black px-4">
       {onClose && (
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 w-10 h-10 flex items-center justify-center font-bold text-xl hover:scale-110 transition-transform"
+          className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center font-bold text-lg hover:scale-110 transition-transform"
           style={{
             backgroundColor: 'white',
-            border: '3px solid black',
+            border: '2px solid black',
             borderRadius: '9999px',
-            boxShadow: '3px 3px 0 black',
+            boxShadow: '2px 2px 0 black',
           }}
         >
           ✕
         </button>
       )}
 
-      <div className="text-center mb-6">
+      {/* Header */}
+      <div className="flex items-center justify-center gap-3 mb-4">
         <button
           onClick={handleBack}
-          className="mb-4 px-4 py-2 font-bold hover:scale-105 transition-transform"
+          className="px-3 py-1.5 font-bold text-sm hover:scale-105 transition-transform"
           style={{
             backgroundColor: 'white',
             border: '2px solid black',
             borderRadius: '9999px',
           }}
         >
-          ← back
+          ←
         </button>
 
         <h2
-          className="text-2xl font-bold inline-block px-6 py-3 rotate-1"
+          className="text-lg font-bold px-4 py-2"
           style={{
             backgroundColor: '#87CEEB',
-            border: '4px solid black',
-            boxShadow: '6px 6px 0 black',
+            border: '3px solid black',
+            borderRadius: '12px',
+            boxShadow: '3px 3px 0 black',
           }}
         >
-          who do you wanna talk to?
+          pick a character
         </h2>
-        <p className="text-lg mt-4">pick the personality that fits this convo</p>
       </div>
 
-      {/* Persona selection */}
-      <div className="space-y-3 mb-4">
+      {/* Persona grid - 2x4 layout */}
+      <div className="grid grid-cols-2 gap-2 mb-4">
         {(Object.entries(PERSONAS) as [PersonaType, typeof PERSONAS.chill_mentor][])
           .filter(([key]) => key !== 'custom')
           .map(([key, persona]) => {
@@ -474,31 +475,21 @@ export default function SessionPicker({ onSelect, onClose, onOpenHistory }: Sess
               <button
                 key={key}
                 onClick={() => handlePersonaSelect(key)}
-                className="w-full p-4 text-left transition-all duration-200 hover:scale-[1.02]"
+                className="p-3 text-left transition-all duration-200 hover:scale-105"
                 style={{
-                  backgroundColor: isSelected ? persona.color : 'white',
-                  border: '3px solid black',
-                  borderRadius: '16px',
-                  boxShadow: isSelected ? '6px 6px 0 black' : '3px 3px 0 black',
+                  backgroundColor: persona.color,
+                  border: isSelected ? '3px solid black' : '2px solid black',
+                  borderRadius: '12px',
+                  boxShadow: isSelected ? '4px 4px 0 black' : '2px 2px 0 black',
+                  transform: isSelected ? 'scale(1.02)' : 'none',
                 }}
               >
-                <div className="flex items-center gap-4">
-                  <div
-                    className="w-14 h-14 rounded-full flex items-center justify-center text-3xl"
-                    style={{
-                      backgroundColor: isSelected ? 'white' : persona.color,
-                      border: '3px solid black',
-                    }}
-                  >
-                    {persona.emoji}
+                <div className="flex items-center gap-2">
+                  <span className="text-2xl">{persona.emoji}</span>
+                  <div className="flex-1 min-w-0">
+                    <h3 className="font-bold text-sm truncate">{persona.label}</h3>
+                    <p className="text-[10px] opacity-70 truncate">{persona.description}</p>
                   </div>
-                  <div className="flex-1">
-                    <h3 className="font-bold text-lg">{persona.label}</h3>
-                    <p className="text-sm opacity-80">{persona.description}</p>
-                  </div>
-                  {isSelected && (
-                    <div className="text-2xl">✓</div>
-                  )}
                 </div>
               </button>
             )
@@ -508,35 +499,22 @@ export default function SessionPicker({ onSelect, onClose, onOpenHistory }: Sess
       {/* Custom persona button */}
       <button
         onClick={() => handlePersonaSelect('custom')}
-        className="w-full p-4 text-left transition-all duration-200 hover:scale-[1.02] mb-8"
+        className="w-full p-3 text-left transition-all duration-200 hover:scale-[1.02] mb-4"
         style={{
-          backgroundColor: selectedPersona === 'custom' ? '#FF69B4' : 'white',
-          border: '3px dashed black',
-          borderRadius: '16px',
-          boxShadow: '3px 3px 0 black',
+          backgroundColor: selectedPersona === 'custom' ? '#FF69B4' : '#FFE4EC',
+          border: '2px dashed black',
+          borderRadius: '12px',
+          boxShadow: '2px 2px 0 black',
         }}
       >
-        <div className="flex items-center gap-4">
-          <div
-            className="w-14 h-14 rounded-full flex items-center justify-center text-3xl"
-            style={{
-              backgroundColor: selectedPersona === 'custom' ? 'white' : '#FF69B4',
-              border: '3px solid black',
-            }}
-          >
-            {selectedPersona === 'custom' && customEmoji ? customEmoji : '➕'}
-          </div>
+        <div className="flex items-center gap-2">
+          <span className="text-2xl">{selectedPersona === 'custom' && customEmoji ? customEmoji : '➕'}</span>
           <div className="flex-1">
-            <h3 className="font-bold text-lg">
-              {selectedPersona === 'custom' && customName ? customName : 'Create Your Own'}
+            <h3 className="font-bold text-sm">
+              {selectedPersona === 'custom' && customName ? customName : 'create your own'}
             </h3>
-            <p className="text-sm opacity-80">
-              {selectedPersona === 'custom' && customDescription ? customDescription : 'design a custom persona'}
-            </p>
+            <p className="text-[10px] opacity-70">design a custom character</p>
           </div>
-          {selectedPersona === 'custom' && (
-            <div className="text-2xl">✓</div>
-          )}
         </div>
       </button>
 
@@ -545,23 +523,24 @@ export default function SessionPicker({ onSelect, onClose, onOpenHistory }: Sess
         <button
           onClick={handleStart}
           disabled={!selectedPersona}
-          className="px-10 py-4 text-xl font-bold transition-all duration-300 hover:scale-105"
+          className="px-6 py-2.5 text-base font-bold transition-all duration-300 hover:scale-105"
           style={{
-            backgroundColor: selectedPersona ? '#FF69B4' : '#ccc',
-            border: '4px solid black',
+            backgroundColor: selectedPersona ? '#90EE90' : '#e0e0e0',
+            border: '3px solid black',
             borderRadius: '9999px',
-            boxShadow: selectedPersona ? '5px 5px 0 black' : 'none',
+            boxShadow: selectedPersona ? '3px 3px 0 black' : 'none',
             cursor: selectedPersona ? 'pointer' : 'not-allowed',
+            opacity: selectedPersona ? 1 : 0.6,
           }}
         >
-          let's go! 🚀
+          let&apos;s go! 🚀
         </button>
       </div>
 
-      {/* Selected session summary */}
+      {/* Selected vibe indicator */}
       {selectedGoal && (
         <div
-          className="mt-6 p-3 text-center text-sm"
+          className="mt-4 p-2 text-center text-xs"
           style={{
             backgroundColor: SESSION_GOALS[selectedGoal].color,
             border: '2px dashed black',

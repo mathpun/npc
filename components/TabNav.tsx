@@ -46,15 +46,15 @@ export default function TabNav({
   const TAB_COLORS = theme.colors.primary
 
   return (
-    <div className="flex flex-col items-center gap-3">
+    <div className="flex flex-col items-center gap-2">
       {/* Main Tab Toggle - Chat / Growth */}
       <div
-        className="flex items-center gap-1 p-1"
+        className="flex items-center gap-0.5 p-0.5"
         style={{
           backgroundColor: theme.colors.backgroundAlt,
-          border: '3px solid black',
+          border: '2px solid black',
           borderRadius: '9999px',
-          boxShadow: '4px 4px 0 black',
+          boxShadow: '2px 2px 0 black',
         }}
       >
         {MAIN_TABS.map((tab) => {
@@ -63,7 +63,7 @@ export default function TabNav({
             <button
               key={tab.id}
               onClick={() => onTabChange?.(tab.id)}
-              className="flex items-center gap-2 px-4 sm:px-6 py-2 font-bold transition-all duration-200 hover:scale-105"
+              className="flex items-center gap-1.5 px-3 sm:px-5 py-1.5 font-bold transition-all duration-200 hover:scale-105"
               style={{
                 backgroundColor: isActive ? (tab.id === 'chat' ? theme.colors.accent1 : theme.colors.accent3) : 'transparent',
                 borderRadius: '9999px',
@@ -71,8 +71,8 @@ export default function TabNav({
                 color: theme.colors.text,
               }}
             >
-              <span className="text-lg">{tab.emoji}</span>
-              <span className="text-sm sm:text-base">{tab.label}</span>
+              <span className="text-base">{tab.emoji}</span>
+              <span className="text-xs sm:text-sm">{tab.label}</span>
             </button>
           )
         })}
@@ -81,12 +81,12 @@ export default function TabNav({
       {/* Growth Subtabs - simplified to 4 groups */}
       {activeTab === 'growth' && (
         <nav
-          className="flex items-center justify-center gap-2 p-2"
+          className="flex items-center justify-center gap-1 p-1"
           style={{
             backgroundColor: theme.colors.backgroundAlt,
-            border: '3px solid black',
-            borderRadius: '16px',
-            boxShadow: '4px 4px 0 black',
+            border: '2px solid black',
+            borderRadius: '12px',
+            boxShadow: '2px 2px 0 black',
           }}
         >
           {GROWTH_GROUPS.map((group, i) => {
@@ -97,15 +97,15 @@ export default function TabNav({
               <button
                 key={group.id}
                 onClick={() => onGrowthTabChange?.(group.subTab)}
-                className="flex items-center gap-1.5 px-4 py-2 text-sm font-bold transition-all duration-200 whitespace-nowrap hover:scale-105"
+                className="flex items-center gap-1 px-2 sm:px-3 py-1.5 text-xs sm:text-sm font-bold transition-all duration-200 whitespace-nowrap hover:scale-105"
                 style={{
                   backgroundColor: isActive ? TAB_COLORS[i % TAB_COLORS.length] : 'transparent',
                   borderRadius: '9999px',
                   border: isActive ? '2px solid black' : 'none',
                 }}
               >
-                <span className="text-lg">{group.emoji}</span>
-                <span>{group.label}</span>
+                <span className="text-sm sm:text-base">{group.emoji}</span>
+                <span className="hidden sm:inline">{group.label}</span>
               </button>
             )
           })}
