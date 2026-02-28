@@ -289,6 +289,28 @@ export default function NavBar({ showBack = false, backHref = '/', backLabel = '
               </div>
             </div>
           )}
+
+          {/* Footer links */}
+          <div className="mt-4 pt-3 border-t-2 border-dashed border-black/20 flex justify-center gap-4">
+            <Link
+              href="/about"
+              onClick={() => setMobileMenuOpen(false)}
+              className="text-xs font-bold hover:scale-105 transition-transform"
+              style={{ color: '#666' }}
+            >
+              ✨ about us
+            </Link>
+            <a
+              href="https://forms.gle/iWyp8pUumivZDMxr7"
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={() => setMobileMenuOpen(false)}
+              className="text-xs font-bold hover:scale-105 transition-transform"
+              style={{ color: '#666' }}
+            >
+              💬 feedback
+            </a>
+          </div>
         </div>
       )}
 

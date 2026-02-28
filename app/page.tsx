@@ -165,6 +165,17 @@ export default function Home() {
               <span className="font-bold">10k+ convos this week!</span>
             </div>
           </div>
+
+          {/* About us teaser */}
+          <div className="mt-6">
+            <Link
+              href="/about"
+              className="text-sm font-bold hover:scale-105 transition-transform inline-flex items-center gap-2"
+              style={{ color: '#666' }}
+            >
+              learn what makes us different →
+            </Link>
+          </div>
         </div>
       </div>
 
@@ -331,22 +342,78 @@ export default function Home() {
         className="relative z-10 px-4 py-8 border-t-4 border-black border-dashed"
         style={{ backgroundColor: theme.colors.accent5 }}
       >
-        <div className="max-w-5xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-3">
-            <span className="text-3xl">👻</span>
-            <span className="text-xl font-bold">npc</span>
-            <span>|</span>
-            <span className="text-sm">AI that gets it</span>
+        <div className="max-w-5xl mx-auto">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-4 mb-4">
+            <div className="flex items-center gap-3">
+              <span className="text-3xl">👻</span>
+              <span className="text-xl font-bold">npc</span>
+              <span>|</span>
+              <span className="text-sm">AI that gets it</span>
+            </div>
+            <p
+              className="text-sm text-center px-4 py-2"
+              style={{
+                backgroundColor: 'white',
+                border: '2px solid black',
+                borderRadius: '8px',
+              }}
+            >
+              not a therapist. not a replacement for real friends. just a thinking buddy.
+            </p>
           </div>
-          <p
-            className="text-sm text-center px-4 py-2"
-            style={{
-              backgroundColor: 'white',
-              border: '2px solid black',
-              borderRadius: '8px',
-            }}
-          >
-            not a therapist. not a replacement for real friends. just a thinking buddy.
+
+          {/* Footer links */}
+          <div className="flex flex-wrap justify-center gap-4 pt-4 border-t-2 border-dashed border-black/30">
+            <Link
+              href="/about"
+              className="text-sm font-bold hover:scale-105 transition-transform px-3 py-1"
+              style={{
+                backgroundColor: 'white',
+                border: '2px solid black',
+                borderRadius: '8px',
+              }}
+            >
+              ✨ about us
+            </Link>
+            <a
+              href="https://forms.gle/iWyp8pUumivZDMxr7"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-sm font-bold hover:scale-105 transition-transform px-3 py-1"
+              style={{
+                backgroundColor: 'white',
+                border: '2px solid black',
+                borderRadius: '8px',
+              }}
+            >
+              💬 feedback
+            </a>
+            <Link
+              href="/privacy"
+              className="text-sm font-bold hover:scale-105 transition-transform px-3 py-1"
+              style={{
+                backgroundColor: 'white',
+                border: '2px solid black',
+                borderRadius: '8px',
+              }}
+            >
+              🔒 privacy
+            </Link>
+            <Link
+              href="/chat?tab=growth&subtab=co-design"
+              className="text-sm font-bold hover:scale-105 transition-transform px-3 py-1"
+              style={{
+                backgroundColor: 'white',
+                border: '2px solid black',
+                borderRadius: '8px',
+              }}
+            >
+              🎨 co-design
+            </Link>
+          </div>
+
+          <p className="text-center text-xs mt-4 opacity-60">
+            made with 💚 for teens, by teens
           </p>
         </div>
       </footer>
