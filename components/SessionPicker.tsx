@@ -125,7 +125,7 @@ export default function SessionPicker({ onSelect, onClose, onOpenHistory }: Sess
               boxShadow: '3px 3px 0 black',
             }}
           >
-            what&apos;s the vibe? 🌟
+            mood?
           </h2>
         </div>
 
