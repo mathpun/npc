@@ -182,106 +182,110 @@ export default function NavBar({ showBack = false, backHref = '/', backLabel = '
         <div
           className="fixed inset-x-0 top-[58px] z-50 p-4 md:hidden mobile-nav-enter safe-area-left safe-area-right"
           style={{
-            background: 'linear-gradient(180deg, #fff9f0 0%, #ffffff 100%)',
+            background: 'linear-gradient(135deg, #FFF5F5 0%, #F0F9FF 50%, #F5F0FF 100%)',
             borderBottom: '3px solid black',
-            boxShadow: '0 4px 20px rgba(0,0,0,0.1)',
+            boxShadow: '0 8px 30px rgba(0,0,0,0.15)',
           }}
         >
-          {/* Main nav - 2x3 grid */}
-          <div className="grid grid-cols-3 gap-2.5 mb-3">
-            {navItems.map((item) => {
+          {/* Fun header */}
+          <div className="flex items-center justify-center gap-2 mb-4">
+            <span className="text-2xl">✨</span>
+            <span className="font-black text-lg">where to?</span>
+            <span className="text-2xl">✨</span>
+          </div>
+
+          {/* Main nav - 2x3 grid with bigger cards */}
+          <div className="grid grid-cols-3 gap-3 mb-4">
+            {[...navItems, { href: '/parent', icon: '👨‍👩‍👧', label: 'parent', color: '#FD79A8' }].map((item) => {
               const active = isActive(item.href)
               return (
                 <Link
                   key={item.href}
                   href={item.href}
                   onClick={() => setMobileMenuOpen(false)}
-                  className="flex flex-col items-center gap-1 p-3 font-bold hover:scale-105 transition-transform"
+                  className="flex flex-col items-center justify-center gap-1.5 p-4 font-bold hover:scale-105 transition-all active:scale-95"
                   style={{
                     backgroundColor: item.color,
-                    border: active ? '3px solid black' : '2px solid black',
-                    borderRadius: '14px',
-                    boxShadow: active ? '4px 4px 0 black' : '2px 2px 0 black',
-                    opacity: active ? 1 : 0.9,
+                    border: '3px solid black',
+                    borderRadius: '16px',
+                    boxShadow: active ? '4px 4px 0 black' : '3px 3px 0 black',
+                    transform: active ? 'translateY(-2px)' : 'none',
                   }}
                 >
-                  <span className="text-2xl">{item.icon}</span>
-                  <span className="text-xs">{item.label}</span>
+                  <span className="text-3xl">{item.icon}</span>
+                  <span className="text-xs font-bold">{item.label}</span>
                 </Link>
               )
             })}
-
-            {/* Parent in mobile menu */}
-            <Link
-              href="/parent"
-              onClick={() => setMobileMenuOpen(false)}
-              className="flex flex-col items-center gap-1 p-3 font-bold hover:scale-105 transition-transform"
-              style={{
-                backgroundColor: '#FD79A8',
-                border: pathname === '/parent' ? '3px solid black' : '2px solid black',
-                borderRadius: '14px',
-                boxShadow: '2px 2px 0 black',
-              }}
-            >
-              <span className="text-2xl">👨‍👩‍👧</span>
-              <span className="text-xs">parent</span>
-            </Link>
           </div>
 
-          {/* Bottom row: theme + password */}
-          <div className="flex gap-2">
+          {/* Settings row */}
+          <div className="flex gap-3">
             <button
               onClick={() => {
                 setMobileMenuOpen(false)
                 setShowThemePicker(true)
               }}
-              className="flex-1 flex items-center justify-center gap-2 p-2.5 font-bold hover:scale-105 transition-transform"
+              className="flex-1 flex items-center justify-center gap-2 p-3 font-bold hover:scale-105 transition-all active:scale-95"
               style={{
                 backgroundColor: '#E6E6FA',
-                border: '2px solid black',
-                borderRadius: '10px',
-                boxShadow: '2px 2px 0 black',
+                border: '3px solid black',
+                borderRadius: '12px',
+                boxShadow: '3px 3px 0 black',
               }}
             >
-              <span className="text-lg">🎨</span>
-              <span className="text-sm">theme</span>
+              <span className="text-xl">🎨</span>
+              <span className="text-sm font-bold">theme</span>
             </button>
 
-            {isLoggedIn && (
+            {isLoggedIn ? (
               <button
                 onClick={() => {
                   setMobileMenuOpen(false)
                   setShowChangePassword(true)
                 }}
-                className="flex-1 flex items-center justify-center gap-2 p-2.5 font-bold hover:scale-105 transition-transform"
+                className="flex-1 flex items-center justify-center gap-2 p-3 font-bold hover:scale-105 transition-all active:scale-95"
                 style={{
-                  backgroundColor: '#F0F0F0',
-                  border: '2px solid black',
-                  borderRadius: '10px',
-                  boxShadow: '2px 2px 0 black',
+                  backgroundColor: '#FFE4B5',
+                  border: '3px solid black',
+                  borderRadius: '12px',
+                  boxShadow: '3px 3px 0 black',
                 }}
               >
-                <span className="text-lg">🔐</span>
-                <span className="text-sm">password</span>
+                <span className="text-xl">🔐</span>
+                <span className="text-sm font-bold">settings</span>
               </button>
+            ) : (
+              <Link
+                href="/login"
+                onClick={() => setMobileMenuOpen(false)}
+                className="flex-1 flex items-center justify-center gap-2 p-3 font-bold hover:scale-105 transition-all active:scale-95"
+                style={{
+                  backgroundColor: '#90EE90',
+                  border: '3px solid black',
+                  borderRadius: '12px',
+                  boxShadow: '3px 3px 0 black',
+                }}
+              >
+                <span className="text-xl">👋</span>
+                <span className="text-sm font-bold">log in</span>
+              </Link>
             )}
           </div>
 
           {isLoggedIn && (
-            <div className="mt-3 text-center">
-              <Link
-                href="/profile"
-                onClick={() => setMobileMenuOpen(false)}
-                className="inline-block px-4 py-2 font-bold text-sm hover:scale-105 transition-transform"
+            <div className="mt-4 text-center">
+              <div
+                className="inline-flex items-center gap-2 px-4 py-2 font-bold text-sm"
                 style={{
-                  backgroundColor: '#90EE90',
-                  border: '2px solid black',
+                  backgroundColor: 'white',
+                  border: '2px dashed black',
                   borderRadius: '9999px',
-                  boxShadow: '2px 2px 0 black',
                 }}
               >
-                hi {userName}! 👋
-              </Link>
+                <span>👻</span>
+                <span>hi {userName}!</span>
+              </div>
             </div>
           )}
         </div>
