@@ -183,22 +183,20 @@ export default function NavBar({ showBack = false, backHref = '/', backLabel = '
       {/* Mobile Menu Dropdown */}
       {mobileMenuOpen && (
         <div
-          className="fixed inset-x-0 top-[58px] z-50 p-4 md:hidden mobile-nav-enter safe-area-left safe-area-right"
+          className="fixed inset-x-0 top-[58px] bottom-0 z-50 p-4 md:hidden mobile-nav-enter safe-area-left safe-area-right overflow-y-auto"
           style={{
             background: 'linear-gradient(135deg, #FFF5F5 0%, #F0F9FF 50%, #F5F0FF 100%)',
-            borderBottom: '3px solid black',
-            boxShadow: '0 8px 30px rgba(0,0,0,0.15)',
           }}
         >
           {/* Fun header */}
-          <div className="flex items-center justify-center gap-2 mb-4">
-            <span className="text-2xl">✨</span>
-            <span className="font-black text-lg">where to?</span>
-            <span className="text-2xl">✨</span>
+          <div className="flex items-center justify-center gap-2 mb-3">
+            <span className="text-xl">✨</span>
+            <span className="font-black text-base">where to?</span>
+            <span className="text-xl">✨</span>
           </div>
 
-          {/* Main nav - 2x3 grid with bigger cards */}
-          <div className="grid grid-cols-3 gap-3 mb-4">
+          {/* Main nav - 2x3 grid */}
+          <div className="grid grid-cols-3 gap-2 mb-3">
             {[...navItems, { href: '/parent', icon: '👨‍👩‍👧', label: 'parent dash', color: '#FD79A8' }].map((item) => {
               const active = isActive(item.href)
               return (
@@ -206,39 +204,38 @@ export default function NavBar({ showBack = false, backHref = '/', backLabel = '
                   key={item.href}
                   href={item.href}
                   onClick={() => setMobileMenuOpen(false)}
-                  className="flex flex-col items-center justify-center gap-1.5 p-4 font-bold hover:scale-105 transition-all active:scale-95"
+                  className="flex flex-col items-center justify-center gap-1 p-3 font-bold hover:scale-105 transition-all active:scale-95"
                   style={{
                     backgroundColor: item.color,
-                    border: '3px solid black',
-                    borderRadius: '16px',
-                    boxShadow: active ? '4px 4px 0 black' : '3px 3px 0 black',
-                    transform: active ? 'translateY(-2px)' : 'none',
+                    border: '2px solid black',
+                    borderRadius: '14px',
+                    boxShadow: active ? '3px 3px 0 black' : '2px 2px 0 black',
                   }}
                 >
-                  <span className="text-3xl">{item.icon}</span>
-                  <span className="text-xs font-bold">{item.label}</span>
+                  <span className="text-2xl">{item.icon}</span>
+                  <span className="text-[10px] font-bold text-center leading-tight">{item.label}</span>
                 </Link>
               )
             })}
           </div>
 
           {/* Settings row */}
-          <div className="flex gap-3">
+          <div className="flex gap-2 mb-3">
             <button
               onClick={() => {
                 setMobileMenuOpen(false)
                 setShowThemePicker(true)
               }}
-              className="flex-1 flex items-center justify-center gap-2 p-3 font-bold hover:scale-105 transition-all active:scale-95"
+              className="flex-1 flex items-center justify-center gap-2 p-2.5 font-bold hover:scale-105 transition-all active:scale-95"
               style={{
                 backgroundColor: '#E6E6FA',
-                border: '3px solid black',
-                borderRadius: '12px',
-                boxShadow: '3px 3px 0 black',
+                border: '2px solid black',
+                borderRadius: '10px',
+                boxShadow: '2px 2px 0 black',
               }}
             >
-              <span className="text-xl">🎨</span>
-              <span className="text-sm font-bold">theme</span>
+              <span className="text-base">🎨</span>
+              <span className="text-xs font-bold">theme</span>
             </button>
 
             {isLoggedIn ? (
@@ -247,39 +244,39 @@ export default function NavBar({ showBack = false, backHref = '/', backLabel = '
                   setMobileMenuOpen(false)
                   setShowChangePassword(true)
                 }}
-                className="flex-1 flex items-center justify-center gap-2 p-3 font-bold hover:scale-105 transition-all active:scale-95"
+                className="flex-1 flex items-center justify-center gap-2 p-2.5 font-bold hover:scale-105 transition-all active:scale-95"
                 style={{
                   backgroundColor: '#FFE4B5',
-                  border: '3px solid black',
-                  borderRadius: '12px',
-                  boxShadow: '3px 3px 0 black',
+                  border: '2px solid black',
+                  borderRadius: '10px',
+                  boxShadow: '2px 2px 0 black',
                 }}
               >
-                <span className="text-xl">🔐</span>
-                <span className="text-sm font-bold">settings</span>
+                <span className="text-base">🔐</span>
+                <span className="text-xs font-bold">settings</span>
               </button>
             ) : (
               <Link
                 href="/login"
                 onClick={() => setMobileMenuOpen(false)}
-                className="flex-1 flex items-center justify-center gap-2 p-3 font-bold hover:scale-105 transition-all active:scale-95"
+                className="flex-1 flex items-center justify-center gap-2 p-2.5 font-bold hover:scale-105 transition-all active:scale-95"
                 style={{
                   backgroundColor: '#90EE90',
-                  border: '3px solid black',
-                  borderRadius: '12px',
-                  boxShadow: '3px 3px 0 black',
+                  border: '2px solid black',
+                  borderRadius: '10px',
+                  boxShadow: '2px 2px 0 black',
                 }}
               >
-                <span className="text-xl">👋</span>
-                <span className="text-sm font-bold">log in</span>
+                <span className="text-base">👋</span>
+                <span className="text-xs font-bold">log in</span>
               </Link>
             )}
           </div>
 
           {isLoggedIn && (
-            <div className="mt-4 text-center">
+            <div className="text-center">
               <div
-                className="inline-flex items-center gap-2 px-4 py-2 font-bold text-sm"
+                className="inline-flex items-center gap-2 px-3 py-1.5 font-bold text-xs"
                 style={{
                   backgroundColor: 'white',
                   border: '2px dashed black',
@@ -293,37 +290,39 @@ export default function NavBar({ showBack = false, backHref = '/', backLabel = '
           )}
 
           {/* Footer links */}
-          <div className="mt-4 pt-3 border-t-2 border-dashed border-black/20 flex flex-wrap justify-center gap-3">
-            <Link
-              href="/about"
-              onClick={() => setMobileMenuOpen(false)}
-              className="text-xs font-bold hover:scale-105 transition-transform"
-              style={{ color: '#666' }}
-            >
-              ✨ about us
-            </Link>
-            <a
-              href="https://forms.gle/iWyp8pUumivZDMxr7"
-              target="_blank"
-              rel="noopener noreferrer"
-              onClick={() => setMobileMenuOpen(false)}
-              className="text-xs font-bold hover:scale-105 transition-transform"
-              style={{ color: '#666' }}
-            >
-              💬 feedback
-            </a>
-            {isLoggedIn && (
-              <button
-                onClick={() => {
-                  setMobileMenuOpen(false)
-                  setShowDeleteAccount(true)
-                }}
+          <div className="mt-3 pt-3 border-t-2 border-dashed border-black/20">
+            <div className="flex justify-center gap-4">
+              <Link
+                href="/about"
+                onClick={() => setMobileMenuOpen(false)}
                 className="text-xs font-bold hover:scale-105 transition-transform"
-                style={{ color: '#e74c3c' }}
+                style={{ color: '#666' }}
               >
-                🗑️ delete account
-              </button>
-            )}
+                ✨ about
+              </Link>
+              <a
+                href="https://forms.gle/iWyp8pUumivZDMxr7"
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={() => setMobileMenuOpen(false)}
+                className="text-xs font-bold hover:scale-105 transition-transform"
+                style={{ color: '#666' }}
+              >
+                💬 feedback
+              </a>
+              {isLoggedIn && (
+                <button
+                  onClick={() => {
+                    setMobileMenuOpen(false)
+                    setShowDeleteAccount(true)
+                  }}
+                  className="text-xs font-bold hover:scale-105 transition-transform"
+                  style={{ color: '#e74c3c' }}
+                >
+                  🗑️ delete
+                </button>
+              )}
+            </div>
           </div>
         </div>
       )}
