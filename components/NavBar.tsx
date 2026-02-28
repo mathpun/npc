@@ -100,10 +100,10 @@ export default function NavBar({ showBack = false, backHref = '/', backLabel = '
                   href={item.href}
                   className="flex items-center gap-1.5 px-3 lg:px-4 py-2 font-bold text-sm hover:scale-105 transition-all"
                   style={{
-                    backgroundColor: active ? item.color : 'white',
-                    border: '2px solid black',
+                    backgroundColor: item.color,
+                    border: active ? '3px solid black' : '2px solid black',
                     borderRadius: '12px',
-                    boxShadow: active ? '3px 3px 0 black' : '2px 2px 0 black',
+                    boxShadow: active ? '4px 4px 0 black' : '2px 2px 0 black',
                     transform: active ? 'translateY(-2px)' : 'none',
                   }}
                 >
@@ -117,10 +117,11 @@ export default function NavBar({ showBack = false, backHref = '/', backLabel = '
               href="/parent"
               className="flex items-center gap-1.5 px-3 lg:px-4 py-2 font-bold text-sm hover:scale-105 transition-all"
               style={{
-                backgroundColor: pathname === '/parent' ? '#FD79A8' : 'white',
-                border: '2px solid black',
+                backgroundColor: '#FD79A8',
+                border: pathname === '/parent' ? '3px solid black' : '2px solid black',
                 borderRadius: '12px',
-                boxShadow: pathname === '/parent' ? '3px 3px 0 black' : '2px 2px 0 black',
+                boxShadow: pathname === '/parent' ? '4px 4px 0 black' : '2px 2px 0 black',
+                transform: pathname === '/parent' ? 'translateY(-2px)' : 'none',
               }}
             >
               <span className="text-lg">👨‍👩‍👧</span>
