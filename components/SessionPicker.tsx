@@ -475,20 +475,19 @@ export default function SessionPicker({ onSelect, onClose, onOpenHistory }: Sess
               <button
                 key={key}
                 onClick={() => handlePersonaSelect(key)}
-                className="p-3 text-left transition-all duration-200 hover:scale-105"
+                className="p-2.5 text-left transition-all duration-200 hover:scale-105"
                 style={{
                   backgroundColor: persona.color,
                   border: isSelected ? '3px solid black' : '2px solid black',
                   borderRadius: '12px',
                   boxShadow: isSelected ? '4px 4px 0 black' : '2px 2px 0 black',
-                  transform: isSelected ? 'scale(1.02)' : 'none',
                 }}
               >
-                <div className="flex items-center gap-2">
-                  <span className="text-2xl">{persona.emoji}</span>
+                <div className="flex items-start gap-2">
+                  <span className="text-xl flex-shrink-0">{persona.emoji}</span>
                   <div className="flex-1 min-w-0">
-                    <h3 className="font-bold text-sm truncate">{persona.label}</h3>
-                    <p className="text-[10px] opacity-70 truncate">{persona.description}</p>
+                    <h3 className="font-bold text-xs leading-tight">{persona.label}</h3>
+                    <p className="text-[9px] opacity-70 leading-tight mt-0.5">{persona.description}</p>
                   </div>
                 </div>
               </button>
