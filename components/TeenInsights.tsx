@@ -250,11 +250,11 @@ export default function TeenInsights({ profile }: TeenInsightsProps) {
         <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
           🗺️ Topics You Explore
         </h2>
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-2 gap-2">
           {themes.map((themeItem, index) => (
             <div
               key={index}
-              className="p-3 flex items-center gap-3"
+              className="p-2.5 text-center"
               style={{
                 backgroundColor: theme.colors.backgroundAlt,
                 border: '3px solid black',
@@ -263,10 +263,10 @@ export default function TeenInsights({ profile }: TeenInsightsProps) {
                 transform: `rotate(${index % 2 === 0 ? 1 : -1}deg)`,
               }}
             >
-              <span className="text-2xl">{themeItem.emoji}</span>
-              <div>
-                <div className="font-bold">{themeItem.name}</div>
-                <div className="text-sm">{themeItem.count} sessions {themeItem.trend === 'up' && '📈'}</div>
+              <span className="text-2xl block mb-1">{themeItem.emoji}</span>
+              <div className="font-bold text-sm leading-tight">{themeItem.name}</div>
+              <div className="text-xs opacity-70 mt-0.5">
+                {themeItem.count} sessions {themeItem.trend === 'up' && '📈'}
               </div>
             </div>
           ))}
