@@ -4,7 +4,7 @@ import { useTheme } from '@/lib/ThemeContext'
 
 export type TabId = 'chat' | 'growth'
 // Keep original types for backwards compatibility, but simplify display
-export type GrowthSubTab = 'insights' | 'progress' | 'challenges' | 'epistemic' | 'peers' | 'literacy' | 'anti-engagement' | 'co-design' | 'parent'
+export type GrowthSubTab = 'insights' | 'islands' | 'progress' | 'challenges' | 'epistemic' | 'peers' | 'literacy' | 'anti-engagement' | 'co-design' | 'parent'
 // Simplified grouped tabs
 export type GrowthGroup = 'insights' | 'progress' | 'learn' | 'connect'
 
@@ -30,7 +30,7 @@ const GROWTH_GROUPS = [
 
 // Map groups to their subtabs for active state
 const GROUP_SUBTABS: Record<GrowthGroup, GrowthSubTab[]> = {
-  'insights': ['insights'],
+  'insights': ['insights', 'islands'],
   'progress': ['progress', 'challenges'],
   'learn': ['epistemic', 'literacy', 'anti-engagement'],
   'connect': ['peers', 'co-design', 'parent'],

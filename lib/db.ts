@@ -478,6 +478,41 @@ async function initDb() {
         generation_count INTEGER DEFAULT 0,
         UNIQUE(user_id, generation_date)
       );
+
+      -- Daily insights (personalized horoscope-style messages)
+      CREATE TABLE IF NOT EXISTS daily_insights (
+        id SERIAL PRIMARY KEY,
+        user_id TEXT NOT NULL REFERENCES users(id),
+        insight_date DATE NOT NULL,
+        insight_text TEXT NOT NULL,
+        insight_emoji TEXT DEFAULT '✨',
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        UNIQUE(user_id, insight_date)
+      );
+
+      -- Personality islands (core themes from chat history)
+      CREATE TABLE IF NOT EXISTS personality_islands (
+        id SERIAL PRIMARY KEY,
+        user_id TEXT NOT NULL REFERENCES users(id),
+        theme_name TEXT NOT NULL,
+        theme_emoji TEXT NOT NULL,
+        theme_description TEXT,
+        image_url TEXT,
+        strength REAL DEFAULT 0.0,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        UNIQUE(user_id, theme_name)
+      );
+
+      -- Theme analysis cache (daily analysis of user themes)
+      CREATE TABLE IF NOT EXISTS theme_analysis (
+        id SERIAL PRIMARY KEY,
+        user_id TEXT NOT NULL REFERENCES users(id),
+        analysis_date DATE NOT NULL,
+        themes_json TEXT NOT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        UNIQUE(user_id, analysis_date)
+      );
     `)
     console.log('Database tables initialized')
   } catch (error) {

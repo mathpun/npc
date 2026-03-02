@@ -12,9 +12,10 @@ interface UserProfile {
 
 interface TeenInsightsProps {
   profile: UserProfile
+  onViewIslands?: () => void
 }
 
-export default function TeenInsights({ profile }: TeenInsightsProps) {
+export default function TeenInsights({ profile, onViewIslands }: TeenInsightsProps) {
   const [expandedSection, setExpandedSection] = useState<string | null>('digest')
   const { theme } = useTheme()
 
@@ -77,6 +78,31 @@ export default function TeenInsights({ profile }: TeenInsightsProps) {
         </h1>
         <p className="text-lg mt-4">Patterns in how you think and what you explore</p>
       </div>
+
+      {/* Islands of Personality Link */}
+      {onViewIslands && (
+        <button
+          onClick={onViewIslands}
+          className="w-full p-4 -rotate-1 text-left hover:scale-[1.02] transition-transform"
+          style={{
+            backgroundColor: theme.colors.accent4,
+            border: '3px solid black',
+            borderRadius: '16px',
+            boxShadow: '5px 5px 0 black',
+          }}
+        >
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <span className="text-3xl">🏝️</span>
+              <div>
+                <h3 className="font-bold text-lg">Islands of You</h3>
+                <p className="text-sm opacity-80">Discover the core themes that make you who you are</p>
+              </div>
+            </div>
+            <span className="text-2xl">→</span>
+          </div>
+        </button>
+      )}
 
       {/* Weekly Stats Grid */}
       <div
