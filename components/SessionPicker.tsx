@@ -138,21 +138,15 @@ export default function SessionPicker({ onSelect, onClose, onOpenHistory }: Sess
               <button
                 key={key}
                 onClick={() => handleGoalSelect(key)}
-                className="p-2 sm:p-3 text-center transition-all duration-200 hover:scale-105 aspect-square flex flex-col items-center justify-center relative"
+                className="p-2 sm:p-3 text-center transition-all duration-200 hover:scale-105 aspect-square flex flex-col items-center justify-center"
                 style={{
-                  backgroundColor: isSelected ? '#4A90D9' : goal.color,
-                  color: isSelected ? '#fff' : '#000',
-                  border: '3px solid black',
+                  background: isSelected ? 'linear-gradient(135deg, #FF6B9D 0%, #FFD93D 50%, #7BED9F 100%)' : goal.color,
+                  border: isSelected ? '4px solid black' : '2px solid black',
                   borderRadius: '12px',
-                  boxShadow: isSelected ? '4px 4px 0 #2563EB' : '2px 2px 0 black',
-                  transform: isSelected ? 'scale(1.05)' : 'none',
+                  boxShadow: isSelected ? '4px 4px 0 black' : '2px 2px 0 black',
+                  transform: isSelected ? 'scale(1.08)' : 'none',
                 }}
               >
-                {isSelected && (
-                  <div className="absolute -top-1 -right-1 w-5 h-5 bg-green-400 rounded-full flex items-center justify-center text-black text-xs font-bold border-2 border-black">
-                    ✓
-                  </div>
-                )}
                 <div className="text-xl sm:text-2xl">{goal.emoji}</div>
                 <div className="font-bold text-[9px] sm:text-[11px] leading-tight mt-1">{goal.label}</div>
               </button>
@@ -481,25 +475,20 @@ export default function SessionPicker({ onSelect, onClose, onOpenHistory }: Sess
               <button
                 key={key}
                 onClick={() => handlePersonaSelect(key)}
-                className="p-2.5 text-left transition-all duration-200 hover:scale-105 relative"
+                className="p-2.5 text-left transition-all duration-200 hover:scale-105"
                 style={{
-                  backgroundColor: isSelected ? '#4A90D9' : persona.color,
-                  color: isSelected ? '#fff' : '#000',
-                  border: '3px solid black',
+                  background: isSelected ? 'linear-gradient(135deg, #FF6B9D 0%, #FFD93D 50%, #7BED9F 100%)' : persona.color,
+                  border: isSelected ? '4px solid black' : '2px solid black',
                   borderRadius: '12px',
-                  boxShadow: isSelected ? '4px 4px 0 #2563EB' : '2px 2px 0 black',
+                  boxShadow: isSelected ? '4px 4px 0 black' : '2px 2px 0 black',
+                  transform: isSelected ? 'scale(1.05)' : 'none',
                 }}
               >
-                {isSelected && (
-                  <div className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-green-400 rounded-full flex items-center justify-center text-black text-xs font-bold border-2 border-black">
-                    ✓
-                  </div>
-                )}
                 <div className="flex items-start gap-2">
                   <span className="text-xl flex-shrink-0">{persona.emoji}</span>
                   <div className="flex-1 min-w-0">
                     <h3 className="font-bold text-xs leading-tight">{persona.label}</h3>
-                    <p className={`text-[9px] leading-tight mt-0.5 ${isSelected ? 'opacity-80' : 'opacity-70'}`}>{persona.description}</p>
+                    <p className="text-[9px] leading-tight mt-0.5 opacity-70">{persona.description}</p>
                   </div>
                 </div>
               </button>
