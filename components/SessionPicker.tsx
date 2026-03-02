@@ -140,11 +140,11 @@ export default function SessionPicker({ onSelect, onClose, onOpenHistory }: Sess
                 onClick={() => handleGoalSelect(key)}
                 className="p-2 sm:p-3 text-center transition-all duration-200 hover:scale-105 aspect-square flex flex-col items-center justify-center relative"
                 style={{
-                  backgroundColor: isSelected ? '#000' : goal.color,
+                  backgroundColor: isSelected ? '#4A90D9' : goal.color,
                   color: isSelected ? '#fff' : '#000',
                   border: '3px solid black',
                   borderRadius: '12px',
-                  boxShadow: isSelected ? '4px 4px 0 #666' : '2px 2px 0 black',
+                  boxShadow: isSelected ? '4px 4px 0 #2563EB' : '2px 2px 0 black',
                   transform: isSelected ? 'scale(1.05)' : 'none',
                 }}
               >
@@ -483,11 +483,11 @@ export default function SessionPicker({ onSelect, onClose, onOpenHistory }: Sess
                 onClick={() => handlePersonaSelect(key)}
                 className="p-2.5 text-left transition-all duration-200 hover:scale-105 relative"
                 style={{
-                  backgroundColor: isSelected ? '#000' : persona.color,
+                  backgroundColor: isSelected ? '#4A90D9' : persona.color,
                   color: isSelected ? '#fff' : '#000',
                   border: '3px solid black',
                   borderRadius: '12px',
-                  boxShadow: isSelected ? '4px 4px 0 #666' : '2px 2px 0 black',
+                  boxShadow: isSelected ? '4px 4px 0 #2563EB' : '2px 2px 0 black',
                 }}
               >
                 {isSelected && (
