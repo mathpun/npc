@@ -32,6 +32,14 @@ export default function ChatInput({
     }
   }, [message])
 
+  // Keep input visible when mobile keyboard opens
+  const handleFocus = () => {
+    // Small delay to let the keyboard fully appear
+    setTimeout(() => {
+      textareaRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+    }, 300)
+  }
+
   const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (!file) return
@@ -163,6 +171,7 @@ export default function ChatInput({
           value={message}
           onChange={(e) => setMessage(e.target.value)}
           onKeyDown={handleKeyDown}
+          onFocus={handleFocus}
           placeholder={placeholder}
           disabled={disabled}
           rows={1}
