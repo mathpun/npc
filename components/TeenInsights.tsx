@@ -1,6 +1,5 @@
 'use client'
 
-import { useState } from 'react'
 import { useTheme } from '@/lib/ThemeContext'
 
 interface UserProfile {
@@ -16,301 +15,161 @@ interface TeenInsightsProps {
 }
 
 export default function TeenInsights({ profile, onViewIslands }: TeenInsightsProps) {
-  const [expandedSection, setExpandedSection] = useState<string | null>('digest')
   const { theme } = useTheme()
 
-  // Generate insights using theme colors
-  const themes = [
-    { name: 'Self-Discovery', count: 12, trend: 'up', emoji: '🔍' },
-    { name: 'School & Learning', count: 8, trend: 'stable', emoji: '📚' },
-    { name: 'Friendships', count: 6, trend: 'up', emoji: '👥' },
-    { name: 'Creative Projects', count: 5, trend: 'up', emoji: '✨' },
-  ]
+  const weeklyStats = { sessions: 7, questions: 23, topics: 3 }
 
-  const thinkingPatterns = [
-    {
-      pattern: 'You explore multiple perspectives',
-      description: 'In 78% of conversations, you considered different viewpoints before forming your opinion.',
-      icon: '🔄'
-    },
-    {
-      pattern: 'You ask clarifying questions',
-      description: 'You often dig deeper with follow-up questions instead of accepting surface answers.',
-      icon: '❓'
-    },
-    {
-      pattern: 'You connect ideas across topics',
-      description: 'You\'ve made connections between your interests in ' + (profile.interests.slice(0, 2).join(' and ') || 'different areas') + '.',
-      icon: '🔗'
-    },
+  const topTopics = [
+    { emoji: '🔍', name: 'Self-Discovery' },
+    { emoji: '👥', name: 'Friendships' },
+    { emoji: '✨', name: 'Creative' },
   ]
-
-  const weeklyDigest = {
-    sessionsCount: 7,
-    topTopics: ['career exploration', 'friendship dynamics', 'creative writing'],
-    questionsAsked: 23,
-  }
 
   const growthAreas = [
-    { area: 'Decision Making', progress: 75, color: theme.colors.accent1, emoji: '🎯' },
-    { area: 'Self-Awareness', progress: 82, color: theme.colors.accent3, emoji: '🪞' },
-    { area: 'Critical Thinking', progress: 68, color: theme.colors.accent4, emoji: '🧠' },
+    { emoji: '🎯', area: 'Decisions', progress: 75 },
+    { emoji: '🪞', area: 'Self-Aware', progress: 82 },
+    { emoji: '🧠', area: 'Thinking', progress: 68 },
   ]
 
-  const toggleSection = (section: string) => {
-    setExpandedSection(expandedSection === section ? null : section)
-  }
+  const thinkingStyle = [
+    { emoji: '🔄', label: 'Multiple perspectives' },
+    { emoji: '❓', label: 'Asks questions' },
+    { emoji: '🔗', label: 'Connects ideas' },
+  ]
 
   return (
-    <div className="max-w-3xl mx-auto px-4 py-6 space-y-6">
-      {/* Header */}
-      <div className="text-center mb-8">
-        <h1
-          className="text-3xl font-bold mb-3 inline-block px-6 py-2 -rotate-1"
-          style={{
-            backgroundColor: theme.colors.accent2,
-            border: '4px solid black',
-            borderRadius: '12px',
-            boxShadow: '5px 5px 0 black',
-          }}
-        >
-          ✨ My Insights ✨
-        </h1>
-        <p className="text-lg mt-4">Patterns in how you think and what you explore</p>
-      </div>
-
-      {/* Islands of Personality Link */}
-      {onViewIslands && (
-        <button
-          onClick={onViewIslands}
-          className="w-full p-4 -rotate-1 text-left hover:scale-[1.02] transition-transform"
-          style={{
-            backgroundColor: theme.colors.accent4,
-            border: '3px solid black',
-            borderRadius: '16px',
-            boxShadow: '5px 5px 0 black',
-          }}
-        >
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <span className="text-3xl">🏝️</span>
-              <div>
-                <h3 className="font-bold text-lg">Islands of You</h3>
-                <p className="text-sm opacity-80">Discover the core themes that make you who you are</p>
-              </div>
-            </div>
-            <span className="text-2xl">→</span>
-          </div>
-        </button>
-      )}
-
-      {/* Weekly Stats Grid */}
+    <div className="max-w-sm mx-auto px-3 py-4">
+      {/* Main Card - Screenshot friendly */}
       <div
-        className="p-5 rotate-1"
+        className="rounded-2xl overflow-hidden"
         style={{
-          backgroundColor: theme.colors.accent5,
           border: '4px solid black',
-          borderRadius: '16px',
           boxShadow: '6px 6px 0 black',
+          background: `linear-gradient(180deg, ${theme.colors.accent2} 0%, ${theme.colors.accent5} 100%)`,
         }}
       >
-        <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
-          📅 This Week's Stats
-        </h2>
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+        {/* Header */}
+        <div className="text-center py-3 px-4">
+          <h1 className="text-xl font-bold">✨ {profile.name}'s Mind ✨</h1>
+          <p className="text-xs opacity-70">this week's wrapped</p>
+        </div>
+
+        {/* Stats Row */}
+        <div className="grid grid-cols-3 gap-2 px-3 pb-3">
           {[
-            { label: 'Sessions', value: weeklyDigest.sessionsCount, color: theme.colors.accent1, emoji: '💬' },
-            { label: 'Questions', value: weeklyDigest.questionsAsked, color: theme.colors.accent4, emoji: '❓' },
-            { label: 'Topics', value: weeklyDigest.topTopics.length, color: theme.colors.accent3, emoji: '💡' },
-          ].map((stat, i) => (
+            { label: 'chats', value: weeklyStats.sessions, emoji: '💬' },
+            { label: 'questions', value: weeklyStats.questions, emoji: '❓' },
+            { label: 'topics', value: weeklyStats.topics, emoji: '💡' },
+          ].map((stat) => (
             <div
               key={stat.label}
-              className="p-3 text-center"
+              className="p-2 text-center rounded-xl"
               style={{
-                backgroundColor: stat.color,
-                border: '3px solid black',
-                borderRadius: '12px',
-                boxShadow: '3px 3px 0 black',
-                transform: `rotate(${i % 2 === 0 ? -2 : 2}deg)`,
+                backgroundColor: theme.colors.backgroundAlt,
+                border: '2px solid black',
               }}
             >
-              <div className="text-2xl mb-1">{stat.emoji}</div>
-              <div className="text-3xl font-bold">{stat.value}</div>
-              <div className="text-sm font-bold">{stat.label}</div>
+              <div className="text-lg">{stat.emoji}</div>
+              <div className="text-xl font-bold">{stat.value}</div>
+              <div className="text-[10px] font-bold opacity-70">{stat.label}</div>
             </div>
           ))}
         </div>
 
         {/* Top Topics */}
-        <div
-          className="mt-4 p-3"
-          style={{
-            backgroundColor: theme.colors.backgroundAlt,
-            border: '3px solid black',
-            borderRadius: '12px',
-          }}
-        >
-          <h3 className="font-bold mb-2">🔥 Hot Topics This Week</h3>
-          <div className="flex flex-wrap gap-2">
-            {weeklyDigest.topTopics.map((topic, i) => (
-              <span
-                key={topic}
-                className="px-3 py-1 font-bold"
-                style={{
-                  backgroundColor: [theme.colors.accent1, theme.colors.accent3, theme.colors.accent4][i],
-                  border: '2px solid black',
-                  borderRadius: '9999px',
-                }}
-              >
-                {topic}
-              </span>
+        <div className="px-3 pb-3">
+          <div
+            className="p-3 rounded-xl"
+            style={{ backgroundColor: theme.colors.accent1, border: '2px solid black' }}
+          >
+            <div className="text-xs font-bold mb-2">🔥 hot topics</div>
+            <div className="flex gap-2">
+              {topTopics.map((topic) => (
+                <div
+                  key={topic.name}
+                  className="flex-1 text-center p-1.5 rounded-lg text-[10px] font-bold"
+                  style={{ backgroundColor: theme.colors.backgroundAlt, border: '2px solid black' }}
+                >
+                  <div className="text-base">{topic.emoji}</div>
+                  {topic.name}
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Growth + Thinking Style Grid */}
+        <div className="grid grid-cols-2 gap-2 px-3 pb-3">
+          {/* Growth */}
+          <div
+            className="p-2.5 rounded-xl"
+            style={{ backgroundColor: theme.colors.accent4, border: '2px solid black' }}
+          >
+            <div className="text-xs font-bold mb-2">📈 growth</div>
+            {growthAreas.map((area) => (
+              <div key={area.area} className="flex items-center gap-1 mb-1 last:mb-0">
+                <span className="text-sm">{area.emoji}</span>
+                <div className="flex-1">
+                  <div
+                    className="h-2 rounded-full overflow-hidden"
+                    style={{ backgroundColor: 'rgba(255,255,255,0.5)', border: '1px solid black' }}
+                  >
+                    <div
+                      className="h-full rounded-full"
+                      style={{ width: `${area.progress}%`, backgroundColor: theme.colors.accent1 }}
+                    />
+                  </div>
+                </div>
+                <span className="text-[10px] font-bold">{area.progress}%</span>
+              </div>
+            ))}
+          </div>
+
+          {/* Thinking Style */}
+          <div
+            className="p-2.5 rounded-xl"
+            style={{ backgroundColor: theme.colors.accent3, border: '2px solid black' }}
+          >
+            <div className="text-xs font-bold mb-2">🧠 your style</div>
+            {thinkingStyle.map((style) => (
+              <div key={style.label} className="flex items-center gap-1.5 mb-1 last:mb-0">
+                <span className="text-sm">{style.emoji}</span>
+                <span className="text-[10px] font-bold">{style.label}</span>
+              </div>
             ))}
           </div>
         </div>
-      </div>
 
-      {/* Thinking Patterns */}
-      <div
-        className="p-5 -rotate-1"
-        style={{
-          backgroundColor: theme.colors.accent3,
-          border: '4px solid black',
-          borderRadius: '16px',
-          boxShadow: '6px 6px 0 black',
-        }}
-      >
-        <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
-          🧠 Your Thinking Patterns
-        </h2>
-        <div className="space-y-3">
-          {thinkingPatterns.map((pattern, index) => (
-            <div
-              key={index}
-              className="p-3 flex items-start gap-3"
-              style={{
-                backgroundColor: theme.colors.backgroundAlt,
-                border: '3px solid black',
-                borderRadius: '12px',
-                boxShadow: '3px 3px 0 black',
-                transform: `rotate(${index % 2 === 0 ? 1 : -1}deg)`,
-              }}
-            >
-              <span className="text-3xl">{pattern.icon}</span>
-              <div>
-                <h3 className="font-bold">{pattern.pattern}</h3>
-                <p className="text-sm">{pattern.description}</p>
-              </div>
-            </div>
-          ))}
+        {/* Footer */}
+        <div
+          className="text-center py-2 px-3 text-[10px] font-bold"
+          style={{ backgroundColor: 'rgba(0,0,0,0.1)' }}
+        >
+          npc.chat · {new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
         </div>
       </div>
 
-      {/* Growth Areas */}
-      <div
-        className="p-5 rotate-1"
-        style={{
-          backgroundColor: theme.colors.accent4,
-          border: '4px solid black',
-          borderRadius: '16px',
-          boxShadow: '6px 6px 0 black',
-        }}
-      >
-        <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
-          📈 Growth Areas
-        </h2>
-        <div className="space-y-4">
-          {growthAreas.map((area, index) => (
-            <div
-              key={index}
-              className="p-3"
-              style={{
-                backgroundColor: theme.colors.backgroundAlt,
-                border: '3px solid black',
-                borderRadius: '12px',
-                boxShadow: '3px 3px 0 black',
-              }}
-            >
-              <div className="flex items-center justify-between mb-2">
-                <div className="flex items-center gap-2">
-                  <span className="text-2xl">{area.emoji}</span>
-                  <span className="font-bold">{area.area}</span>
-                </div>
-                <span
-                  className="px-2 py-1 font-bold text-sm"
-                  style={{
-                    backgroundColor: area.color,
-                    border: '2px solid black',
-                    borderRadius: '8px',
-                  }}
-                >
-                  {area.progress}%
-                </span>
-              </div>
-              <div
-                className="h-5 rounded-full overflow-hidden"
-                style={{ backgroundColor: '#f0f0f0', border: '2px solid black' }}
-              >
-                <div
-                  className="h-full rounded-full"
-                  style={{
-                    width: `${area.progress}%`,
-                    backgroundColor: area.color,
-                  }}
-                />
-              </div>
+      {/* Islands Link - Below main card */}
+      {onViewIslands && (
+        <button
+          onClick={onViewIslands}
+          className="w-full mt-4 p-3 rounded-xl flex items-center justify-between hover:scale-[1.02] transition-transform"
+          style={{
+            backgroundColor: theme.colors.accent4,
+            border: '3px solid black',
+            boxShadow: '4px 4px 0 black',
+          }}
+        >
+          <div className="flex items-center gap-2">
+            <span className="text-2xl">🏝️</span>
+            <div className="text-left">
+              <div className="font-bold text-sm">Islands of You</div>
+              <div className="text-[10px] opacity-70">your personality themes</div>
             </div>
-          ))}
-        </div>
-      </div>
-
-      {/* Topics You Explore */}
-      <div
-        className="p-5 -rotate-1"
-        style={{
-          backgroundColor: theme.colors.accent1,
-          border: '4px solid black',
-          borderRadius: '16px',
-          boxShadow: '6px 6px 0 black',
-        }}
-      >
-        <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
-          🗺️ Topics You Explore
-        </h2>
-        <div className="grid grid-cols-2 gap-2">
-          {themes.map((themeItem, index) => (
-            <div
-              key={index}
-              className="p-2.5 text-center"
-              style={{
-                backgroundColor: theme.colors.backgroundAlt,
-                border: '3px solid black',
-                borderRadius: '12px',
-                boxShadow: '3px 3px 0 black',
-                transform: `rotate(${index % 2 === 0 ? 1 : -1}deg)`,
-              }}
-            >
-              <span className="text-2xl block mb-1">{themeItem.emoji}</span>
-              <div className="font-bold text-sm leading-tight">{themeItem.name}</div>
-              <div className="text-xs opacity-70 mt-0.5">
-                {themeItem.count} sessions {themeItem.trend === 'up' && '📈'}
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* Footer note */}
-      <p
-        className="text-center text-sm p-3 -rotate-1"
-        style={{
-          backgroundColor: theme.colors.backgroundAlt,
-          border: '2px dashed black',
-          borderRadius: '12px',
-        }}
-      >
-        💭 These insights are based on your conversations and journal entries.
-        They help you notice patterns in your own thinking!
-      </p>
+          </div>
+          <span className="text-xl">→</span>
+        </button>
+      )}
     </div>
   )
 }

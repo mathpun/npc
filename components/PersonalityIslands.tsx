@@ -91,7 +91,7 @@ export default function PersonalityIslands({ userId }: PersonalityIslandsProps) 
           setSelectedIsland({ ...selectedIsland, image_url: data.imageUrl })
         }
       } else if (res.status === 429) {
-        alert('You\'ve used all your image generations for today! Come back tomorrow.')
+        alert('You\'ve used all your image generations for today!')
       }
     } catch (err) {
       console.error('Failed to generate image:', err)
@@ -106,7 +106,6 @@ export default function PersonalityIslands({ userId }: PersonalityIslandsProps) 
     }
   }, [userId])
 
-  // Island colors based on index
   const getIslandColor = (index: number) => {
     const colors = [
       theme.colors.accent1,
@@ -120,241 +119,167 @@ export default function PersonalityIslands({ userId }: PersonalityIslandsProps) 
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center min-h-[400px]">
+      <div className="flex items-center justify-center py-12">
         <div className="text-center">
-          <div className="text-6xl animate-bounce mb-4">🏝️</div>
-          <p className="font-bold text-lg">Discovering your islands...</p>
+          <div className="text-4xl animate-bounce mb-2">🏝️</div>
+          <p className="font-bold text-sm">Loading islands...</p>
         </div>
       </div>
     )
   }
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="text-center">
-        <h2
-          className="text-2xl sm:text-3xl font-bold mb-3 inline-block px-6 py-3 -rotate-1"
+    <div className="max-w-sm mx-auto px-3 py-4">
+      {islands.length === 0 ? (
+        /* Empty state */
+        <div
+          className="rounded-2xl p-6 text-center"
           style={{
-            backgroundColor: theme.colors.accent4,
+            background: `linear-gradient(180deg, ${theme.colors.accent4} 0%, ${theme.colors.accent5} 100%)`,
             border: '4px solid black',
-            borderRadius: '16px',
             boxShadow: '6px 6px 0 black',
           }}
         >
-          🏝️ Islands of You 🏝️
-        </h2>
-        <p className="text-sm sm:text-base mt-4 max-w-md mx-auto opacity-80">
-          Like Inside Out, your personality has core islands that make you <em>you</em>
-        </p>
-      </div>
-
-      {/* Islands View */}
-      {islands.length === 0 ? (
-        <div
-          className="p-8 text-center rotate-1"
-          style={{
-            backgroundColor: theme.colors.accent5,
-            border: '4px solid black',
-            borderRadius: '20px',
-            boxShadow: '8px 8px 0 black',
-          }}
-        >
-          <div className="text-6xl mb-4 animate-bounce">🌅</div>
-          <h3 className="text-2xl font-bold mb-3">Your islands are waiting!</h3>
-          <p className="mb-6 text-base max-w-sm mx-auto">We'll analyze your chats and check-ins to discover the themes that make you unique.</p>
+          <div className="text-4xl mb-3">🏝️</div>
+          <h2 className="text-lg font-bold mb-2">Discover Your Islands</h2>
+          <p className="text-xs mb-4 opacity-80">Find the core themes that make you YOU</p>
           <button
             onClick={analyzeAndCreateIslands}
             disabled={isAnalyzing}
-            className="px-8 py-4 font-bold text-xl hover:scale-105 active:scale-95 transition-transform disabled:opacity-50"
+            className="px-5 py-2.5 font-bold text-sm rounded-xl hover:scale-105 active:scale-95 transition-transform disabled:opacity-50"
             style={{
               backgroundColor: theme.colors.accent1,
-              border: '4px solid black',
-              borderRadius: '16px',
-              boxShadow: '6px 6px 0 black',
+              border: '3px solid black',
+              boxShadow: '4px 4px 0 black',
             }}
           >
-            {isAnalyzing ? (
-              <span className="flex items-center gap-3">
-                <span className="animate-spin text-2xl">🔍</span> Analyzing...
-              </span>
-            ) : (
-              '✨ Discover My Islands ✨'
-            )}
+            {isAnalyzing ? '🔍 Analyzing...' : '✨ Discover'}
           </button>
         </div>
       ) : (
-        <>
-          {/* Instruction */}
-          <p className="text-center text-sm font-bold opacity-70">
-            👆 Tap an island to explore it!
-          </p>
+        /* Islands Card - Screenshot friendly */
+        <div
+          className="rounded-2xl overflow-hidden"
+          style={{
+            border: '4px solid black',
+            boxShadow: '6px 6px 0 black',
+            background: `linear-gradient(180deg, #87CEEB 0%, #E6E6FA 50%, #FFB6C1 100%)`,
+          }}
+        >
+          {/* Header */}
+          <div className="text-center py-3 px-4">
+            <h1 className="text-xl font-bold">🏝️ Islands of You</h1>
+            <p className="text-xs opacity-70">your personality themes</p>
+          </div>
 
-          {/* Beautiful sky with islands as cards */}
-          <div
-            className="relative min-h-[500px] sm:min-h-[550px] overflow-hidden p-4"
-            style={{
-              background: `linear-gradient(180deg,
-                #87CEEB 0%,
-                #B0E0E6 20%,
-                #E6E6FA 50%,
-                #FFB6C1 80%,
-                #FFDAB9 100%)`,
-              border: '4px solid black',
-              borderRadius: '24px',
-              boxShadow: '8px 8px 0 black',
-            }}
-          >
-            {/* Animated clouds */}
-            <div className="absolute inset-0 pointer-events-none overflow-hidden">
-              <div className="absolute text-5xl opacity-70" style={{ top: '5%', left: '5%', animation: 'cloudFloat 20s linear infinite' }}>☁️</div>
-              <div className="absolute text-4xl opacity-60" style={{ top: '15%', right: '10%', animation: 'cloudFloat 25s linear infinite', animationDelay: '-5s' }}>☁️</div>
-              <div className="absolute text-6xl opacity-50" style={{ top: '50%', left: '0%', animation: 'cloudFloat 30s linear infinite', animationDelay: '-10s' }}>☁️</div>
-              <div className="absolute text-4xl opacity-60" style={{ bottom: '20%', right: '5%', animation: 'cloudFloat 22s linear infinite', animationDelay: '-8s' }}>☁️</div>
-              {/* Sparkles */}
-              <div className="absolute text-2xl" style={{ top: '10%', left: '30%', animation: 'sparkle 2s ease-in-out infinite' }}>✨</div>
-              <div className="absolute text-xl" style={{ top: '30%', right: '25%', animation: 'sparkle 2s ease-in-out infinite', animationDelay: '0.5s' }}>✨</div>
-              <div className="absolute text-2xl" style={{ bottom: '30%', left: '20%', animation: 'sparkle 2s ease-in-out infinite', animationDelay: '1s' }}>✨</div>
-            </div>
-
-            {/* Islands as beautiful cards in a grid */}
-            <div className="relative z-10 grid grid-cols-2 sm:grid-cols-3 gap-4 sm:gap-6 pt-8">
-              {islands.map((island, index) => (
-                <button
-                  key={island.id}
-                  onClick={() => setSelectedIsland(island)}
-                  className="group relative focus:outline-none"
-                  style={{
-                    animation: `islandFloat 4s ease-in-out infinite`,
-                    animationDelay: `${index * 0.3}s`,
-                  }}
-                >
-                  {/* Glow effect on hover */}
-                  <div
-                    className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-                    style={{
-                      background: `radial-gradient(circle, ${getIslandColor(index)}80 0%, transparent 70%)`,
-                      filter: 'blur(15px)',
-                      transform: 'scale(1.2)',
-                    }}
+          {/* Islands Grid */}
+          <div className="grid grid-cols-2 gap-2 px-3 pb-3">
+            {islands.slice(0, 4).map((island, index) => (
+              <button
+                key={island.id}
+                onClick={() => setSelectedIsland(island)}
+                className="p-3 rounded-xl text-center hover:scale-105 active:scale-95 transition-transform"
+                style={{
+                  backgroundColor: theme.colors.backgroundAlt,
+                  border: '3px solid black',
+                  boxShadow: '3px 3px 0 black',
+                }}
+              >
+                {island.image_url ? (
+                  <img
+                    src={island.image_url}
+                    alt={island.theme_name}
+                    className="w-12 h-12 mx-auto rounded-lg object-cover mb-1"
+                    style={{ border: '2px solid black' }}
                   />
-
-                  {/* Island card */}
+                ) : (
                   <div
-                    className="relative p-4 sm:p-5 transition-all duration-300 group-hover:scale-110 group-hover:-translate-y-2 group-active:scale-95"
-                    style={{
-                      backgroundColor: theme.colors.backgroundAlt,
-                      border: '4px solid black',
-                      borderRadius: '20px',
-                      boxShadow: '6px 6px 0 black',
-                    }}
+                    className="w-12 h-12 mx-auto rounded-lg flex items-center justify-center text-2xl mb-1"
+                    style={{ backgroundColor: getIslandColor(index), border: '2px solid black' }}
                   >
-                    {/* Colored accent bar */}
-                    <div
-                      className="absolute top-0 left-4 right-4 h-2 -translate-y-1"
-                      style={{
-                        backgroundColor: getIslandColor(index),
-                        borderRadius: '4px',
-                        border: '2px solid black',
-                      }}
-                    />
-
-                    {/* Island image or emoji */}
-                    <div className="flex flex-col items-center gap-3">
-                      {island.image_url ? (
-                        <div className="relative">
-                          <img
-                            src={island.image_url}
-                            alt={island.theme_name}
-                            className="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl object-cover"
-                            style={{
-                              border: '3px solid black',
-                              boxShadow: '4px 4px 0 black',
-                            }}
-                          />
-                          {/* Generated badge */}
-                          <div
-                            className="absolute -top-2 -right-2 text-lg"
-                            style={{
-                              filter: 'drop-shadow(1px 1px 0 black)',
-                            }}
-                          >
-                            🎨
-                          </div>
-                        </div>
-                      ) : (
-                        <div
-                          className="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl flex items-center justify-center text-4xl sm:text-5xl group-hover:animate-bounce"
-                          style={{
-                            backgroundColor: getIslandColor(index),
-                            border: '3px solid black',
-                            boxShadow: '4px 4px 0 black',
-                          }}
-                        >
-                          {island.theme_emoji}
-                        </div>
-                      )}
-
-                      {/* Name */}
-                      <div className="text-center">
-                        <div className="font-bold text-sm sm:text-base leading-tight">
-                          {island.theme_name}
-                        </div>
-
-                        {/* Strength bar */}
-                        <div className="mt-2 w-full">
-                          <div
-                            className="h-2 rounded-full overflow-hidden"
-                            style={{
-                              backgroundColor: theme.colors.backgroundAlt,
-                              border: '2px solid black',
-                            }}
-                          >
-                            <div
-                              className="h-full rounded-full transition-all duration-500"
-                              style={{
-                                width: `${island.strength * 100}%`,
-                                backgroundColor: getIslandColor(index),
-                              }}
-                            />
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Tap hint */}
-                      <div
-                        className="text-xs font-bold px-3 py-1 rounded-full opacity-60 group-hover:opacity-100 transition-opacity"
-                        style={{
-                          backgroundColor: getIslandColor(index),
-                          border: '2px solid black',
-                        }}
-                      >
-                        tap me!
-                      </div>
-                    </div>
+                    {island.theme_emoji}
                   </div>
-                </button>
-              ))}
-            </div>
+                )}
+                <div className="font-bold text-xs leading-tight">{island.theme_name}</div>
+                <div
+                  className="h-1.5 rounded-full mt-1.5 overflow-hidden"
+                  style={{ backgroundColor: 'rgba(0,0,0,0.1)' }}
+                >
+                  <div
+                    className="h-full rounded-full"
+                    style={{ width: `${island.strength * 100}%`, backgroundColor: getIslandColor(index) }}
+                  />
+                </div>
+              </button>
+            ))}
           </div>
 
-          {/* Refresh button */}
-          <div className="text-center">
-            <button
-              onClick={analyzeAndCreateIslands}
-              disabled={isAnalyzing}
-              className="px-6 py-3 font-bold text-base hover:scale-105 active:scale-95 transition-transform disabled:opacity-50"
-              style={{
-                backgroundColor: theme.colors.accent3,
-                border: '3px solid black',
-                borderRadius: '12px',
-                boxShadow: '4px 4px 0 black',
-              }}
-            >
-              {isAnalyzing ? '🔍 Analyzing...' : '🔄 Re-discover my islands'}
-            </button>
+          {/* 5th island if exists */}
+          {islands.length > 4 && (
+            <div className="px-3 pb-3">
+              <button
+                onClick={() => setSelectedIsland(islands[4])}
+                className="w-full p-2.5 rounded-xl flex items-center gap-3 hover:scale-[1.02] active:scale-100 transition-transform"
+                style={{
+                  backgroundColor: theme.colors.backgroundAlt,
+                  border: '3px solid black',
+                  boxShadow: '3px 3px 0 black',
+                }}
+              >
+                {islands[4].image_url ? (
+                  <img
+                    src={islands[4].image_url}
+                    alt={islands[4].theme_name}
+                    className="w-10 h-10 rounded-lg object-cover"
+                    style={{ border: '2px solid black' }}
+                  />
+                ) : (
+                  <div
+                    className="w-10 h-10 rounded-lg flex items-center justify-center text-xl"
+                    style={{ backgroundColor: getIslandColor(4), border: '2px solid black' }}
+                  >
+                    {islands[4].theme_emoji}
+                  </div>
+                )}
+                <div className="flex-1 text-left">
+                  <div className="font-bold text-xs">{islands[4].theme_name}</div>
+                  <div
+                    className="h-1.5 rounded-full mt-1 overflow-hidden"
+                    style={{ backgroundColor: 'rgba(0,0,0,0.1)' }}
+                  >
+                    <div
+                      className="h-full rounded-full"
+                      style={{ width: `${islands[4].strength * 100}%`, backgroundColor: getIslandColor(4) }}
+                    />
+                  </div>
+                </div>
+              </button>
+            </div>
+          )}
+
+          {/* Footer */}
+          <div
+            className="text-center py-2 px-3 text-[10px] font-bold"
+            style={{ backgroundColor: 'rgba(0,0,0,0.1)' }}
+          >
+            tap an island to explore · npc.chat
           </div>
-        </>
+        </div>
+      )}
+
+      {/* Re-analyze button */}
+      {islands.length > 0 && (
+        <button
+          onClick={analyzeAndCreateIslands}
+          disabled={isAnalyzing}
+          className="w-full mt-3 p-2 text-xs font-bold rounded-lg hover:scale-[1.02] transition-transform disabled:opacity-50"
+          style={{
+            backgroundColor: theme.colors.backgroundAlt,
+            border: '2px solid black',
+          }}
+        >
+          {isAnalyzing ? '🔍 Analyzing...' : '🔄 Re-discover'}
+        </button>
       )}
 
       {/* Selected Island Modal */}
@@ -365,160 +290,98 @@ export default function PersonalityIslands({ userId }: PersonalityIslandsProps) 
           onClick={() => setSelectedIsland(null)}
         >
           <div
-            className="relative max-w-sm w-full p-6 animate-fadeIn"
+            className="w-full max-w-xs rounded-2xl p-4"
             style={{
               backgroundColor: theme.colors.backgroundAlt,
               border: '4px solid black',
-              borderRadius: '24px',
-              boxShadow: '10px 10px 0 black',
-              transform: 'rotate(1deg)',
+              boxShadow: '8px 8px 0 black',
             }}
             onClick={(e) => e.stopPropagation()}
           >
-            {/* Colored header bar */}
-            <div
-              className="absolute top-0 left-6 right-6 h-3 -translate-y-1.5"
-              style={{
-                backgroundColor: getIslandColor(islands.findIndex(i => i.id === selectedIsland.id)),
-                borderRadius: '6px',
-                border: '2px solid black',
-              }}
-            />
-
-            {/* Close button */}
+            {/* Close */}
             <button
               onClick={() => setSelectedIsland(null)}
-              className="absolute top-4 right-4 w-10 h-10 flex items-center justify-center font-bold text-xl hover:scale-110 active:scale-95 transition-transform"
-              style={{
-                backgroundColor: theme.colors.accent1,
-                border: '3px solid black',
-                borderRadius: '50%',
-                boxShadow: '3px 3px 0 black',
-              }}
+              className="absolute top-3 right-3 w-8 h-8 flex items-center justify-center font-bold rounded-full hover:scale-110"
+              style={{ backgroundColor: theme.colors.accent1, border: '2px solid black' }}
             >
               ×
             </button>
 
-            <div className="text-center space-y-5 pt-2">
-              {/* Image or emoji */}
+            <div className="text-center">
+              {/* Image/Emoji */}
               {selectedIsland.image_url ? (
                 <img
                   src={selectedIsland.image_url}
                   alt={selectedIsland.theme_name}
-                  className="w-36 h-36 mx-auto rounded-2xl object-cover"
-                  style={{
-                    border: '4px solid black',
-                    boxShadow: '6px 6px 0 black',
-                  }}
+                  className="w-24 h-24 mx-auto rounded-xl object-cover mb-3"
+                  style={{ border: '3px solid black', boxShadow: '4px 4px 0 black' }}
                 />
               ) : (
                 <div
-                  className="w-36 h-36 mx-auto rounded-2xl flex items-center justify-center text-7xl"
+                  className="w-24 h-24 mx-auto rounded-xl flex items-center justify-center text-5xl mb-3"
                   style={{
                     backgroundColor: getIslandColor(islands.findIndex(i => i.id === selectedIsland.id)),
-                    border: '4px solid black',
-                    boxShadow: '6px 6px 0 black',
+                    border: '3px solid black',
+                    boxShadow: '4px 4px 0 black',
                   }}
                 >
                   {selectedIsland.theme_emoji}
                 </div>
               )}
 
-              {/* Title */}
-              <h3 className="text-2xl sm:text-3xl font-bold">
+              <h3 className="text-lg font-bold mb-1">
                 {selectedIsland.theme_emoji} {selectedIsland.theme_name}
               </h3>
 
-              {/* Description */}
               {selectedIsland.theme_description && (
-                <p
-                  className="text-base px-4 py-3 rounded-xl"
-                  style={{
-                    backgroundColor: theme.colors.accent5 + '60',
-                    border: '2px solid black',
-                  }}
-                >
-                  {selectedIsland.theme_description}
-                </p>
+                <p className="text-xs mb-3 opacity-80">{selectedIsland.theme_description}</p>
               )}
 
-              {/* Strength meter */}
-              <div
-                className="px-5 py-3 rounded-xl"
-                style={{
-                  backgroundColor: theme.colors.accent4,
-                  border: '3px solid black',
-                }}
-              >
-                <div className="flex items-center justify-between mb-2">
-                  <span className="font-bold">Strength</span>
-                  <span className="font-bold">{Math.round(selectedIsland.strength * 100)}%</span>
+              {/* Strength */}
+              <div className="mb-3">
+                <div className="flex justify-between text-xs font-bold mb-1">
+                  <span>strength</span>
+                  <span>{Math.round(selectedIsland.strength * 100)}%</span>
                 </div>
                 <div
-                  className="h-4 rounded-full overflow-hidden"
-                  style={{
-                    backgroundColor: theme.colors.backgroundAlt,
-                    border: '2px solid black',
-                  }}
+                  className="h-3 rounded-full overflow-hidden"
+                  style={{ backgroundColor: 'rgba(0,0,0,0.1)', border: '2px solid black' }}
                 >
                   <div
                     className="h-full rounded-full"
                     style={{
                       width: `${selectedIsland.strength * 100}%`,
-                      background: `linear-gradient(90deg, ${theme.colors.accent1}, ${theme.colors.accent2}, ${theme.colors.accent3})`,
+                      background: `linear-gradient(90deg, ${theme.colors.accent1}, ${theme.colors.accent3})`,
                     }}
                   />
                 </div>
               </div>
 
-              {/* Generate image button */}
+              {/* Generate button */}
               <button
                 onClick={() => generateImage(selectedIsland)}
                 disabled={generatingId !== null}
-                className="w-full py-4 font-bold text-lg hover:scale-105 active:scale-95 transition-transform disabled:opacity-50"
+                className="w-full py-2.5 font-bold text-sm rounded-xl hover:scale-105 active:scale-95 transition-transform disabled:opacity-50"
                 style={{
                   backgroundColor: selectedIsland.image_url ? theme.colors.accent3 : theme.colors.accent1,
-                  border: '4px solid black',
-                  borderRadius: '16px',
-                  boxShadow: '5px 5px 0 black',
+                  border: '3px solid black',
+                  boxShadow: '4px 4px 0 black',
                 }}
               >
-                {generatingId === selectedIsland.id ? (
-                  <span className="flex items-center justify-center gap-2">
-                    <span className="animate-spin text-xl">🎨</span> Creating magic...
-                  </span>
-                ) : selectedIsland.image_url ? (
-                  '🔄 Generate New Image'
-                ) : (
-                  '🎨 Create Island Art!'
-                )}
+                {generatingId === selectedIsland.id
+                  ? '🎨 Creating...'
+                  : selectedIsland.image_url
+                  ? '🔄 New Image'
+                  : '🎨 Generate Art'}
               </button>
 
               {remainingGenerations !== null && (
-                <p className="text-sm opacity-70 font-bold">
-                  ✨ {remainingGenerations} image generations left today
-                </p>
+                <p className="text-[10px] mt-2 opacity-60">{remainingGenerations} left today</p>
               )}
             </div>
           </div>
         </div>
       )}
-
-      {/* CSS for animations */}
-      <style jsx>{`
-        @keyframes islandFloat {
-          0%, 100% { transform: translateY(0); }
-          50% { transform: translateY(-8px); }
-        }
-        @keyframes cloudFloat {
-          0% { transform: translateX(-100%); }
-          100% { transform: translateX(calc(100vw + 100%)); }
-        }
-        @keyframes sparkle {
-          0%, 100% { opacity: 0.3; transform: scale(0.8); }
-          50% { opacity: 1; transform: scale(1.2); }
-        }
-      `}</style>
     </div>
   )
 }
