@@ -235,7 +235,7 @@ export default function NavBar({ showBack = false, backHref = '/', backLabel = '
               }}
             >
               <span className="text-base">🎨</span>
-              <span className="text-xs font-bold">theme</span>
+              <span className="text-xs font-bold">skins</span>
             </button>
 
             {isLoggedIn ? (
@@ -291,24 +291,26 @@ export default function NavBar({ showBack = false, backHref = '/', backLabel = '
 
           {/* Footer links */}
           <div className="mt-3 pt-3 border-t-2 border-dashed border-black/20">
-            <div className="flex justify-center gap-4">
+            <div className="flex items-center justify-center gap-6">
               <Link
                 href="/about"
                 onClick={() => setMobileMenuOpen(false)}
-                className="text-xs font-bold hover:scale-105 transition-transform"
+                className="text-xs font-bold hover:scale-105 transition-transform flex items-center gap-1"
                 style={{ color: '#666' }}
               >
-                ✨ about
+                <span>✨</span>
+                <span>about</span>
               </Link>
               <a
                 href="https://forms.gle/iWyp8pUumivZDMxr7"
                 target="_blank"
                 rel="noopener noreferrer"
                 onClick={() => setMobileMenuOpen(false)}
-                className="text-xs font-bold hover:scale-105 transition-transform"
+                className="text-xs font-bold hover:scale-105 transition-transform flex items-center gap-1"
                 style={{ color: '#666' }}
               >
-                💬 feedback
+                <span>💬</span>
+                <span>feedback</span>
               </a>
               {isLoggedIn && (
                 <button
@@ -316,10 +318,11 @@ export default function NavBar({ showBack = false, backHref = '/', backLabel = '
                     setMobileMenuOpen(false)
                     setShowDeleteAccount(true)
                   }}
-                  className="text-xs font-bold hover:scale-105 transition-transform"
+                  className="text-xs font-bold hover:scale-105 transition-transform flex items-center gap-1"
                   style={{ color: '#e74c3c' }}
                 >
-                  🗑️ delete
+                  <span>🗑️</span>
+                  <span>delete</span>
                 </button>
               )}
             </div>
