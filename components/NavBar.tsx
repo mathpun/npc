@@ -185,7 +185,11 @@ export default function NavBar({ showBack = false, backHref = '/', backLabel = '
         <div
           className="fixed inset-x-0 top-[58px] bottom-0 z-50 p-4 md:hidden mobile-nav-enter safe-area-left safe-area-right overflow-y-auto"
           style={{
-            background: 'linear-gradient(135deg, #FFF5F5 0%, #F0F9FF 50%, #F5F0FF 100%)',
+            background: `linear-gradient(180deg,
+              ${theme.colors.accent1}40 0%,
+              ${theme.colors.accent4}50 30%,
+              ${theme.colors.accent3}40 60%,
+              ${theme.colors.accent5}50 100%)`,
           }}
         >
           {/* Fun header */}
