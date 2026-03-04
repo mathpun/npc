@@ -21,7 +21,6 @@ import PeerWisdom from '@/components/PeerWisdom'
 import AILiteracy from '@/components/AILiteracy'
 import DailyCheckIn from '@/components/DailyCheckIn'
 import AIConsentModal from '@/components/AIConsentModal'
-import DailyInsight from '@/components/DailyInsight'
 import PersonalityIslands from '@/components/PersonalityIslands'
 import { SessionGoal, PersonaType, SESSION_GOALS, buildReflectionPrompt, CustomPersona } from '@/lib/prompts'
 import ChatHistory from '@/components/ChatHistory'
@@ -630,19 +629,11 @@ function ChatPageContent() {
         {activeTab === 'chat' && (
           <>
             {showSessionPicker ? (
-              <div className="h-full overflow-y-auto px-4 py-8">
-                <div className="max-w-xl mx-auto space-y-6">
-                  {/* Daily Insight - shown above session picker */}
-                  {userId && (
-                    <DailyInsight userId={userId} />
-                  )}
-                  <div className="flex items-center justify-center">
-                    <SessionPicker
-                      onSelect={handleSessionSelect}
-                      onOpenHistory={() => setShowChatHistory(true)}
-                    />
-                  </div>
-                </div>
+              <div className="h-full flex items-center justify-center px-4 py-8">
+                <SessionPicker
+                  onSelect={handleSessionSelect}
+                  onOpenHistory={() => setShowChatHistory(true)}
+                />
               </div>
             ) : (
               <div className="h-full flex flex-col">

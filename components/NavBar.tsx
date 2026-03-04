@@ -47,9 +47,10 @@ export default function NavBar({ showBack = false, backHref = '/', backLabel = '
     router.push('/')
   }
 
-  // Main nav tabs - 5 core items
+  // Main nav tabs - 6 core items
   const navItems = [
     { href: '/', icon: '🏠', label: 'home', color: '#FF6B9D' },
+    { href: '/today', icon: '🔮', label: 'today', color: '#9B59B6' },
     { href: '/chat', icon: '💬', label: 'chat', color: '#7BED9F' },
     { href: '/create', icon: '✨', label: 'create', color: '#DDA0DD' },
     { href: '/chat?tab=growth', icon: '🌀', label: 'mind wrapped', color: '#FDCB6E' },
