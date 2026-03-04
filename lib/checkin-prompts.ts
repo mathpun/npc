@@ -29,13 +29,14 @@ ${moodSection}
 Generate exactly 1 thoughtful, personalized question for this teen's daily check-in.
 
 Requirements:
-- Be warm and conversational (not clinical or formal)
+- Be FUN! Make them actually want to answer
+- Warm and playful, like a curious friend asking
+- Can be a little silly or creative ("if today was a song, what would it be?")
 - Reference their interests when relevant and natural
-- Can be reflective (how was today) or forward-looking (what's ahead) - vary it day to day
 - Keep it answerable in 1-3 sentences
 - Feel age-appropriate and relatable for a ${context.age} year old
-- Don't be preachy or lecturing
-- Make it specific and interesting, not generic
+- Don't be preachy or boring - bring the joy!
+- Make it specific, interesting, and maybe make them smile
 
 Format your response as a JSON array with one string, like:
 ["Your question here?"]
@@ -51,7 +52,7 @@ export function buildCheckinSummaryPrompt(
 ): string {
   const qaPairs = questions.map((q, i) => `Q: ${q}\nA: ${responses[i] || '(no response)'}`).join('\n\n')
 
-  return `Summarize this teen's daily check-in in 1-2 sentences. Be warm and highlight any notable reflections or moods.
+  return `Summarize this teen's daily check-in in 1-2 sentences. Be warm, playful, and make them feel seen!
 
 Name: ${name}
 ${mood ? `Mood: ${mood}` : ''}
@@ -59,7 +60,7 @@ ${mood ? `Mood: ${mood}` : ''}
 Check-in responses:
 ${qaPairs}
 
-Write a brief, supportive summary that captures the essence of their day. Output only the summary, nothing else.`
+Write a brief, joyful summary that celebrates them and captures their vibe today. Be like a supportive friend who genuinely gets it. Maybe throw in a little humor or warmth. Output only the summary, nothing else.`
 }
 
 export const MOOD_OPTIONS = [

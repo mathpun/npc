@@ -89,13 +89,17 @@ ${moodContext ? `Recent moods/reflections: ${moodContext}` : ''}
 ${topicContext ? `Recent topics they've been thinking about: ${topicContext}` : ''}
 
 Create a 2-3 sentence horoscope-style message that:
-- Feels warm, encouraging, and personal to THEM
+- Sparks JOY! Make them smile or feel good about themselves
+- Feels warm, playful, and personal to THEM
+- Has a touch of humor or delightful energy
 - References something specific from their context if available
-- Offers a gentle insight or encouragement for their day
-- Sounds like a thoughtful friend, not generic advice
+- Sounds like a fun friend hyping them up, not generic advice
+- Could make them laugh or at least go "aww"
 - Is appropriate for a teenager
 
-Also suggest ONE emoji that captures the vibe (not a generic star/sparkle).
+Vibe: fortune cookie meets best friend meets daily affirmation meets inside joke
+
+Also suggest ONE emoji that captures the vibe (fun ones! not generic star/sparkle).
 
 Format your response as JSON:
 {"insight": "Your message here...", "emoji": "emoji"}
