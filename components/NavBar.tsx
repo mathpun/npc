@@ -299,8 +299,35 @@ export default function NavBar({ showBack = false, backHref = '/', backLabel = '
             </div>
           )}
 
-          {/* Footer links */}
+          {/* Social links */}
           <div className="mt-3 pt-3 border-t-2 border-dashed border-black/40">
+            <p className="text-center text-[10px] font-bold opacity-50 mb-2">follow us!</p>
+            <div className="flex items-center justify-center gap-3 mb-3">
+              <a
+                href="https://www.tiktok.com/@npc_theai"
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={() => setMobileMenuOpen(false)}
+                className="px-4 py-2 text-xs font-bold hover:scale-105 transition-transform flex items-center gap-1.5 rounded-full"
+                style={{ backgroundColor: 'rgba(0,0,0,0.8)', color: 'white' }}
+              >
+                <span>🎵</span>
+                <span>TikTok</span>
+              </a>
+              <a
+                href="https://www.instagram.com/npc_theai/"
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={() => setMobileMenuOpen(false)}
+                className="px-4 py-2 text-xs font-bold hover:scale-105 transition-transform flex items-center gap-1.5 rounded-full"
+                style={{ background: 'linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888)', color: 'white' }}
+              >
+                <span>📸</span>
+                <span>Instagram</span>
+              </a>
+            </div>
+
+            {/* Other links */}
             <div className="flex items-center justify-center gap-4">
               <Link
                 href="/about"
