@@ -328,7 +328,7 @@ export default function NavBar({ showBack = false, backHref = '/', backLabel = '
             </div>
 
             {/* Other links */}
-            <div className="flex items-center justify-center gap-4">
+            <div className="flex flex-wrap items-center justify-center gap-2">
               <Link
                 href="/about"
                 onClick={() => setMobileMenuOpen(false)}
@@ -337,6 +337,24 @@ export default function NavBar({ showBack = false, backHref = '/', backLabel = '
               >
                 <span>✨</span>
                 <span>about</span>
+              </Link>
+              <Link
+                href="/privacy"
+                onClick={() => setMobileMenuOpen(false)}
+                className="px-3 py-1.5 text-xs font-bold hover:scale-105 transition-transform flex items-center gap-1 rounded-full"
+                style={{ backgroundColor: 'rgba(255,255,255,0.5)', color: '#333' }}
+              >
+                <span>🔒</span>
+                <span>privacy</span>
+              </Link>
+              <Link
+                href="/chat?tab=growth&subtab=co-design"
+                onClick={() => setMobileMenuOpen(false)}
+                className="px-3 py-1.5 text-xs font-bold hover:scale-105 transition-transform flex items-center gap-1 rounded-full"
+                style={{ backgroundColor: 'rgba(255,255,255,0.5)', color: '#333' }}
+              >
+                <span>🛠️</span>
+                <span>co-design</span>
               </Link>
               <a
                 href="https://forms.gle/iWyp8pUumivZDMxr7"
