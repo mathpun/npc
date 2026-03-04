@@ -309,7 +309,7 @@ export default function NavBar({ showBack = false, backHref = '/', backLabel = '
                 rel="noopener noreferrer"
                 onClick={() => setMobileMenuOpen(false)}
                 className="px-4 py-2 text-xs font-bold hover:scale-105 transition-transform flex items-center gap-1.5 rounded-full"
-                style={{ backgroundColor: 'rgba(0,0,0,0.8)', color: 'white' }}
+                style={{ background: 'linear-gradient(45deg, #69C9D0, #EE1D52, #000)', color: 'white', border: '2px solid black' }}
               >
                 <span>🎵</span>
                 <span>TikTok</span>
