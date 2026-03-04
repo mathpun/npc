@@ -42,7 +42,7 @@ export default function TodayPage() {
         }
       } catch (err) {
         console.error('Failed to fetch daily insight:', err)
-        setInsight("Today is full of possibilities. What will you make of it?")
+        setInsight("Today is yours to shape. Go make something cool happen!")
       } finally {
         setIsLoading(false)
       }
@@ -53,10 +53,6 @@ export default function TodayPage() {
     }
   }, [userId])
 
-  const handleReveal = () => {
-    setIsRevealed(true)
-  }
-
   return (
     <main
       className="min-h-screen flex flex-col"
@@ -64,136 +60,117 @@ export default function TodayPage() {
     >
       <NavBar />
 
-      <div className="flex-1 flex flex-col items-center justify-center p-6">
+      <div className="flex-1 flex flex-col items-center justify-center p-4">
         {/* Header */}
-        <div className="text-center mb-8">
-          <h1 className="text-2xl font-bold mb-2">
+        <div className="text-center mb-6">
+          <h1 className="text-xl sm:text-2xl font-bold mb-1">
             {new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
           </h1>
-          <p className="text-sm opacity-70">your daily card awaits, {userName}</p>
+          <p className="text-sm opacity-70">your daily card, {userName}</p>
         </div>
 
         {/* Tarot Card */}
         <div
-          className="relative w-72 sm:w-80 perspective-1000"
-          style={{ perspective: '1000px' }}
+          className="w-64 sm:w-72 rounded-2xl overflow-hidden"
+          style={{
+            border: '4px solid black',
+            boxShadow: '6px 6px 0 black',
+          }}
         >
-          <div
-            className={`relative transition-all duration-700 cursor-pointer ${
-              isRevealed ? '' : 'hover:scale-105'
-            }`}
-            style={{
-              transformStyle: 'preserve-3d',
-              transform: isRevealed ? 'rotateY(180deg)' : 'rotateY(0deg)',
-            }}
-            onClick={!isRevealed ? handleReveal : undefined}
-          >
-            {/* Card Back (shown first) */}
-            <div
-              className="absolute inset-0 w-full rounded-3xl p-6 flex flex-col items-center justify-center"
+          {!isRevealed ? (
+            /* Card Back */
+            <button
+              onClick={() => setIsRevealed(true)}
+              className="w-full p-6 flex flex-col items-center justify-center hover:scale-[1.02] transition-transform active:scale-100"
               style={{
-                backfaceVisibility: 'hidden',
                 background: `linear-gradient(135deg, ${theme.colors.accent1} 0%, ${theme.colors.accent5} 50%, ${theme.colors.accent4} 100%)`,
-                border: '4px solid black',
-                boxShadow: '8px 8px 0 black',
-                minHeight: '420px',
+                minHeight: '320px',
               }}
             >
-              {/* Decorative pattern */}
-              <div className="absolute inset-4 rounded-2xl border-2 border-black/20" />
-              <div className="absolute inset-8 rounded-xl border border-black/10" />
+              {/* Decorative border */}
+              <div
+                className="absolute inset-3 rounded-xl pointer-events-none"
+                style={{ border: '2px solid rgba(0,0,0,0.15)' }}
+              />
 
-              {/* Center mystical symbol */}
-              <div className="relative z-10 text-center">
-                <div className="text-7xl mb-4 animate-pulse">🔮</div>
-                <div
-                  className="px-6 py-3 rounded-full font-bold text-lg"
-                  style={{
-                    backgroundColor: 'rgba(255,255,255,0.3)',
-                    border: '2px solid black',
-                  }}
-                >
-                  tap to reveal
-                </div>
+              <div className="text-6xl mb-4 animate-pulse">🔮</div>
+              <div
+                className="px-5 py-2 rounded-full font-bold"
+                style={{
+                  backgroundColor: 'rgba(255,255,255,0.4)',
+                  border: '2px solid black',
+                }}
+              >
+                tap to reveal
               </div>
 
-              {/* Corner decorations */}
-              <div className="absolute top-4 left-4 text-2xl">✦</div>
-              <div className="absolute top-4 right-4 text-2xl">✦</div>
-              <div className="absolute bottom-4 left-4 text-2xl">✦</div>
-              <div className="absolute bottom-4 right-4 text-2xl">✦</div>
-            </div>
-
-            {/* Card Front (revealed) */}
+              {/* Corner stars */}
+              <div className="absolute top-3 left-3 text-lg opacity-60">✦</div>
+              <div className="absolute top-3 right-3 text-lg opacity-60">✦</div>
+              <div className="absolute bottom-3 left-3 text-lg opacity-60">✦</div>
+              <div className="absolute bottom-3 right-3 text-lg opacity-60">✦</div>
+            </button>
+          ) : (
+            /* Card Front - Revealed */
             <div
-              className="w-full rounded-3xl p-6 flex flex-col"
+              className="w-full p-5 animate-fadeIn"
               style={{
-                backfaceVisibility: 'hidden',
-                transform: 'rotateY(180deg)',
-                background: `linear-gradient(180deg, ${theme.colors.backgroundAlt} 0%, white 50%, ${theme.colors.accent5}30 100%)`,
-                border: '4px solid black',
-                boxShadow: '8px 8px 0 black',
-                minHeight: '420px',
+                background: `linear-gradient(180deg, ${theme.colors.backgroundAlt} 0%, white 100%)`,
+                minHeight: '320px',
               }}
             >
-              {/* Top decoration */}
-              <div className="text-center mb-4">
-                <div className="inline-flex items-center gap-2 text-xs font-bold opacity-50 uppercase tracking-widest">
-                  <span>✧</span>
-                  <span>today's insight</span>
-                  <span>✧</span>
-                </div>
+              {/* Header */}
+              <div className="text-center mb-3">
+                <span className="text-[10px] font-bold opacity-40 uppercase tracking-widest">
+                  ✧ today's insight ✧
+                </span>
               </div>
 
-              {/* Main emoji */}
-              <div className="text-center mb-6">
+              {/* Emoji */}
+              <div className="text-center mb-4">
                 <div
-                  className="inline-flex items-center justify-center w-24 h-24 rounded-full text-5xl"
+                  className="inline-flex items-center justify-center w-16 h-16 rounded-full text-3xl"
                   style={{
-                    background: `linear-gradient(135deg, ${theme.colors.accent1}50 0%, ${theme.colors.accent3}50 100%)`,
+                    background: `linear-gradient(135deg, ${theme.colors.accent1} 0%, ${theme.colors.accent3} 100%)`,
                     border: '3px solid black',
-                    boxShadow: '4px 4px 0 black',
+                    boxShadow: '3px 3px 0 black',
                   }}
                 >
                   {isLoading ? '✨' : emoji}
                 </div>
               </div>
 
-              {/* Insight text */}
-              <div className="flex-1 flex items-center justify-center px-2">
+              {/* Insight */}
+              <div className="text-center mb-4">
                 {isLoading ? (
-                  <div className="space-y-2 w-full">
-                    <div className="h-4 rounded-full animate-pulse" style={{ backgroundColor: theme.colors.accent4 }} />
-                    <div className="h-4 rounded-full animate-pulse w-4/5 mx-auto" style={{ backgroundColor: theme.colors.accent4 }} />
-                    <div className="h-4 rounded-full animate-pulse w-3/5 mx-auto" style={{ backgroundColor: theme.colors.accent4 }} />
+                  <div className="space-y-2">
+                    <div className="h-3 rounded-full animate-pulse mx-auto w-4/5" style={{ backgroundColor: theme.colors.accent4 }} />
+                    <div className="h-3 rounded-full animate-pulse mx-auto w-3/5" style={{ backgroundColor: theme.colors.accent4 }} />
                   </div>
                 ) : (
-                  <p
-                    className="text-center text-lg leading-relaxed font-medium"
-                    style={{ fontStyle: 'italic' }}
-                  >
+                  <p className="text-sm leading-relaxed font-medium italic">
                     "{insight}"
                   </p>
                 )}
               </div>
 
-              {/* Bottom decoration */}
-              <div className="text-center mt-4 pt-4 border-t-2 border-dashed border-black/20">
-                <p className="text-xs font-bold opacity-50">
-                  ✨ made for {userName} ✨
+              {/* Footer */}
+              <div className="text-center pt-3 border-t border-dashed border-black/20">
+                <p className="text-[10px] font-bold opacity-40">
+                  ✨ for {userName} ✨
                 </p>
               </div>
             </div>
-          </div>
+          )}
         </div>
 
-        {/* Subtext */}
+        {/* Action button */}
         {isRevealed && (
-          <div className="mt-8 text-center animate-fadeIn">
-            <p className="text-sm opacity-70 mb-4">carry this with you today</p>
+          <div className="mt-6 text-center animate-fadeIn">
+            <p className="text-xs opacity-60 mb-3">carry this with you today</p>
             <button
               onClick={() => router.push('/chat')}
-              className="px-6 py-3 font-bold hover:scale-105 active:scale-95 transition-transform"
+              className="px-5 py-2.5 font-bold text-sm hover:scale-105 active:scale-95 transition-transform"
               style={{
                 backgroundColor: theme.colors.accent1,
                 border: '3px solid black',
@@ -206,12 +183,6 @@ export default function TodayPage() {
           </div>
         )}
       </div>
-
-      <style jsx>{`
-        .perspective-1000 {
-          perspective: 1000px;
-        }
-      `}</style>
     </main>
   )
 }

@@ -88,7 +88,7 @@ ${user.goals ? `Their goals: ${user.goals}` : ''}
 ${moodContext ? `Recent moods/reflections: ${moodContext}` : ''}
 ${topicContext ? `Recent topics they've been thinking about: ${topicContext}` : ''}
 
-Create a 2-3 sentence horoscope-style message that:
+Create a SHORT 1-2 sentence message (MAX 30 words) that:
 - Sparks JOY! Make them smile or feel good about themselves
 - Feels warm, playful, and personal to THEM
 - Has a touch of humor or delightful energy
