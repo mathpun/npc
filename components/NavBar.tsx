@@ -187,10 +187,10 @@ export default function NavBar({ showBack = false, backHref = '/', backLabel = '
           className="fixed inset-x-0 top-[58px] bottom-0 z-50 p-4 md:hidden mobile-nav-enter safe-area-left safe-area-right overflow-y-auto"
           style={{
             background: `linear-gradient(180deg,
-              ${theme.colors.accent1}40 0%,
-              ${theme.colors.accent4}50 30%,
-              ${theme.colors.accent3}40 60%,
-              ${theme.colors.accent5}50 100%)`,
+              ${theme.colors.accent1} 0%,
+              ${theme.colors.accent4} 30%,
+              ${theme.colors.accent3} 60%,
+              ${theme.colors.accent5} 100%)`,
           }}
         >
           {/* Fun header */}
@@ -200,16 +200,21 @@ export default function NavBar({ showBack = false, backHref = '/', backLabel = '
             <span className="text-xl">✨</span>
           </div>
 
-          {/* Main nav - 2x3 grid */}
+          {/* Main nav - 3x3 grid */}
           <div className="grid grid-cols-3 gap-2 mb-3">
-            {[...navItems, { href: '/parent', icon: '👨‍👩‍👧', label: 'parent dash', color: '#FD79A8' }].map((item) => {
+            {[...navItems, { href: '/parent', icon: '👨‍👩‍👧', label: 'parent dash', color: '#FD79A8' }].map((item, index) => {
               const active = isActive(item.href)
+              // Center the last item if it's alone in its row
+              const isLastItem = index === navItems.length
+              const itemsInLastRow = (navItems.length + 1) % 3
+              const shouldCenter = isLastItem && itemsInLastRow === 1
+
               return (
                 <Link
                   key={item.href}
                   href={item.href}
                   onClick={() => setMobileMenuOpen(false)}
-                  className="flex flex-col items-center justify-center gap-1 p-3 font-bold hover:scale-105 transition-all active:scale-95"
+                  className={`flex flex-col items-center justify-center gap-1 p-3 font-bold hover:scale-105 transition-all active:scale-95 ${shouldCenter ? 'col-start-2' : ''}`}
                   style={{
                     backgroundColor: item.color,
                     border: '2px solid black',
@@ -295,13 +300,13 @@ export default function NavBar({ showBack = false, backHref = '/', backLabel = '
           )}
 
           {/* Footer links */}
-          <div className="mt-3 pt-3 border-t-2 border-dashed border-black/20">
-            <div className="flex items-center justify-center gap-6">
+          <div className="mt-3 pt-3 border-t-2 border-dashed border-black/40">
+            <div className="flex items-center justify-center gap-4">
               <Link
                 href="/about"
                 onClick={() => setMobileMenuOpen(false)}
-                className="text-xs font-bold hover:scale-105 transition-transform flex items-center gap-1"
-                style={{ color: '#666' }}
+                className="px-3 py-1.5 text-xs font-bold hover:scale-105 transition-transform flex items-center gap-1 rounded-full"
+                style={{ backgroundColor: 'rgba(255,255,255,0.5)', color: '#333' }}
               >
                 <span>✨</span>
                 <span>about</span>
@@ -311,8 +316,8 @@ export default function NavBar({ showBack = false, backHref = '/', backLabel = '
                 target="_blank"
                 rel="noopener noreferrer"
                 onClick={() => setMobileMenuOpen(false)}
-                className="text-xs font-bold hover:scale-105 transition-transform flex items-center gap-1"
-                style={{ color: '#666' }}
+                className="px-3 py-1.5 text-xs font-bold hover:scale-105 transition-transform flex items-center gap-1 rounded-full"
+                style={{ backgroundColor: 'rgba(255,255,255,0.5)', color: '#333' }}
               >
                 <span>💬</span>
                 <span>feedback</span>
@@ -323,8 +328,8 @@ export default function NavBar({ showBack = false, backHref = '/', backLabel = '
                     setMobileMenuOpen(false)
                     setShowDeleteAccount(true)
                   }}
-                  className="text-xs font-bold hover:scale-105 transition-transform flex items-center gap-1"
-                  style={{ color: '#e74c3c' }}
+                  className="px-3 py-1.5 text-xs font-bold hover:scale-105 transition-transform flex items-center gap-1 rounded-full"
+                  style={{ backgroundColor: 'rgba(255,255,255,0.5)', color: '#e74c3c' }}
                 >
                   <span>🗑️</span>
                   <span>delete</span>
