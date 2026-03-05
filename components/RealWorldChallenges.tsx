@@ -9,11 +9,8 @@ interface Challenge {
   title: string
   description: string
   duration: string
-  category: string
-  difficulty: string
   xp: number
   emoji: string
-  color: string
 }
 
 interface Props {
@@ -33,61 +30,11 @@ export default function RealWorldChallenges({ completedChallengeIds = [], onChal
   }, [completedChallengeIds])
 
   const challenges: Challenge[] = [
-    {
-      id: '1',
-      title: 'The Perspective Switch',
-      description: 'Have a convo with someone you disagree with. Really listen!',
-      duration: '1-2 days',
-      category: 'social',
-      difficulty: 'thoughtful',
-      xp: 50,
-      emoji: '🔄',
-      color: theme.colors.accent1,
-    },
-    {
-      id: '2',
-      title: 'Notice Your Reactions',
-      description: 'For one day, notice when you feel strongly. What triggered it?',
-      duration: '1 day',
-      category: 'observation',
-      difficulty: 'easy',
-      xp: 25,
-      emoji: '👀',
-      color: theme.colors.accent2,
-    },
-    {
-      id: '3',
-      title: 'Ask a Trusted Adult',
-      description: 'Ask a parent or mentor what they think about something on your mind.',
-      duration: '1 week',
-      category: 'social',
-      difficulty: 'medium',
-      xp: 40,
-      emoji: '💬',
-      color: theme.colors.accent4,
-    },
-    {
-      id: '4',
-      title: 'The Compliment Experiment',
-      description: 'Give 3 genuine compliments today. Notice how it feels!',
-      duration: '1 day',
-      category: 'action',
-      difficulty: 'easy',
-      xp: 20,
-      emoji: '💝',
-      color: theme.colors.accent3,
-    },
-    {
-      id: '5',
-      title: 'Phone-Free Hour',
-      description: 'One hour without your phone. Sit with your thoughts.',
-      duration: '1 hour',
-      category: 'reflection',
-      difficulty: 'medium',
-      xp: 30,
-      emoji: '📵',
-      color: theme.colors.accent5,
-    },
+    { id: '1', title: 'Perspective Switch', description: 'Listen to someone you disagree with', duration: '1-2 days', xp: 50, emoji: '🔄' },
+    { id: '2', title: 'Notice Reactions', description: 'Track what triggers strong feelings', duration: '1 day', xp: 25, emoji: '👀' },
+    { id: '3', title: 'Ask an Adult', description: 'Get advice from a parent or mentor', duration: '1 week', xp: 40, emoji: '💬' },
+    { id: '4', title: 'Compliment x3', description: 'Give 3 genuine compliments today', duration: '1 day', xp: 20, emoji: '💝' },
+    { id: '5', title: 'Phone-Free Hour', description: 'One hour with your thoughts', duration: '1 hour', xp: 30, emoji: '📵' },
   ]
 
   const completedCount = completedIds.size
@@ -127,207 +74,210 @@ export default function RealWorldChallenges({ completedChallengeIds = [], onChal
     setReflection('')
   }
 
+  const getColor = (index: number) => {
+    const colors = [theme.colors.accent1, theme.colors.accent2, theme.colors.accent3, theme.colors.accent4, theme.colors.accent5]
+    return colors[index % colors.length]
+  }
+
   return (
-    <div className="max-w-3xl mx-auto px-4 py-6 space-y-6 text-black" style={{  }}>
-      {/* Header */}
-      <div className="text-center mb-8">
-        <h1
-          className="text-3xl font-bold mb-3 inline-block px-6 py-2 -rotate-1"
-          style={{
-            backgroundColor: theme.colors.accent3,
-            border: '4px solid black',
-            borderRadius: '12px',
-            boxShadow: '5px 5px 0 black',
-          }}
-        >
-          🎯 Real-World Challenges 🎯
-        </h1>
-        <p className="text-lg mt-4">Thinking is great. Doing is better!</p>
-      </div>
+    <div className="max-w-sm mx-auto px-3 py-4">
+      {/* Main Card - Screenshot friendly */}
+      <div
+        className="rounded-2xl overflow-hidden"
+        style={{
+          border: '4px solid black',
+          boxShadow: '6px 6px 0 black',
+          background: `linear-gradient(180deg, ${theme.colors.accent3} 0%, ${theme.colors.accent1} 100%)`,
+        }}
+      >
+        {/* Header */}
+        <div className="text-center py-3 px-4">
+          <h1 className="text-xl font-bold">🎯 Real-World Quests</h1>
+          <p className="text-xs opacity-70">thinking is great, doing is better!</p>
+        </div>
 
-      {/* Stats */}
-      <div className="grid grid-cols-3 gap-3">
-        {[
-          { label: 'Completed', value: completedCount, emoji: '✅', color: theme.colors.accent3 },
-          { label: 'XP Earned', value: totalXP, emoji: '⭐', color: theme.colors.accent2 },
-          { label: 'Streak', value: completedCount >= 5 ? '🔥' : completedCount >= 3 ? '⚡' : '🌱', emoji: '', color: theme.colors.accent1 },
-        ].map((stat) => (
-          <div
-            key={stat.label}
-            className="p-3 text-center"
-            style={{
-              backgroundColor: stat.color,
-              border: '3px solid black',
-              borderRadius: '12px',
-              boxShadow: '3px 3px 0 black',
-            }}
-          >
-            <div className="text-2xl font-bold">{stat.label === 'Streak' ? stat.value : (stat.emoji || stat.value)}</div>
-            <div className="text-xs font-bold">{stat.label}</div>
-          </div>
-        ))}
-      </div>
-
-      {/* Active Challenge */}
-      {activeChallenge && (
-        <div
-          className="p-5"
-          style={{
-            backgroundColor: activeChallenge.color,
-            border: '4px solid black',
-            borderRadius: '16px',
-            boxShadow: '6px 6px 0 black',
-          }}
-        >
-          <div className="flex items-center gap-2 mb-3">
-            <span className="text-2xl">⚡</span>
-            <span className="font-bold text-lg">Active Challenge!</span>
-          </div>
-
-          <div
-            className="p-4 mb-4"
-            style={{
-              backgroundColor: theme.colors.backgroundAlt,
-              border: '3px solid black',
-              borderRadius: '12px',
-            }}
-          >
-            <div className="flex items-center gap-3 mb-2">
-              <span className="text-3xl">{activeChallenge.emoji}</span>
-              <h3 className="font-bold text-lg">{activeChallenge.title}</h3>
+        {/* Stats Row */}
+        <div className="grid grid-cols-3 gap-2 px-3 pb-3">
+          {[
+            { label: 'done', value: completedCount, emoji: '✅' },
+            { label: 'xp', value: totalXP, emoji: '⭐' },
+            { label: 'streak', value: completedCount >= 5 ? '🔥' : completedCount >= 3 ? '⚡' : '🌱', emoji: '' },
+          ].map((stat) => (
+            <div
+              key={stat.label}
+              className="p-2 text-center rounded-xl"
+              style={{
+                backgroundColor: theme.colors.backgroundAlt,
+                border: '2px solid black',
+              }}
+            >
+              <div className="text-lg">{stat.emoji || stat.value}</div>
+              <div className="text-xl font-bold">{stat.label === 'streak' ? '' : stat.value}</div>
+              <div className="text-[10px] font-bold opacity-70">{stat.label}</div>
             </div>
-            <p>{activeChallenge.description}</p>
-          </div>
+          ))}
+        </div>
 
-          {!showReflection ? (
-            <div className="flex gap-2">
+        {/* Challenge Grid - 2 columns */}
+        <div className="grid grid-cols-2 gap-2 px-3 pb-3">
+          {challenges.slice(0, 4).map((challenge, index) => {
+            const isCompleted = completedIds.has(challenge.id)
+            return (
               <button
-                onClick={() => setActiveChallenge(null)}
-                className="flex-1 py-3 font-bold"
+                key={challenge.id}
+                onClick={() => !isCompleted && startChallenge(challenge)}
+                disabled={isCompleted}
+                className={`p-2.5 rounded-xl text-left ${isCompleted ? 'opacity-60' : 'hover:scale-105 active:scale-95'} transition-transform`}
                 style={{
                   backgroundColor: theme.colors.backgroundAlt,
-                  border: '3px solid black',
-                  borderRadius: '12px',
+                  border: '2px solid black',
+                  boxShadow: '2px 2px 0 black',
                 }}
               >
-                Cancel
+                <div className="flex items-center gap-1.5 mb-1">
+                  <span className="text-lg">{isCompleted ? '✅' : challenge.emoji}</span>
+                  <span className="text-[10px] font-bold px-1.5 py-0.5 rounded" style={{ backgroundColor: getColor(index) }}>
+                    +{challenge.xp}
+                  </span>
+                </div>
+                <div className={`font-bold text-xs leading-tight ${isCompleted ? 'line-through' : ''}`}>
+                  {challenge.title}
+                </div>
+                <div className="text-[10px] opacity-70 mt-0.5">{challenge.duration}</div>
               </button>
-              <button
-                onClick={() => setShowReflection(true)}
-                className="flex-1 py-3 font-bold hover:scale-105 transition-transform"
+            )
+          })}
+        </div>
+
+        {/* 5th challenge - full width */}
+        {challenges.length > 4 && (
+          <div className="px-3 pb-3">
+            {(() => {
+              const challenge = challenges[4]
+              const isCompleted = completedIds.has(challenge.id)
+              return (
+                <button
+                  onClick={() => !isCompleted && startChallenge(challenge)}
+                  disabled={isCompleted}
+                  className={`w-full p-2.5 rounded-xl flex items-center gap-3 ${isCompleted ? 'opacity-60' : 'hover:scale-[1.02] active:scale-100'} transition-transform`}
+                  style={{
+                    backgroundColor: theme.colors.backgroundAlt,
+                    border: '2px solid black',
+                    boxShadow: '2px 2px 0 black',
+                  }}
+                >
+                  <span className="text-xl">{isCompleted ? '✅' : challenge.emoji}</span>
+                  <div className="flex-1 text-left">
+                    <div className={`font-bold text-xs ${isCompleted ? 'line-through' : ''}`}>{challenge.title}</div>
+                    <div className="text-[10px] opacity-70">{challenge.description}</div>
+                  </div>
+                  <span className="text-[10px] font-bold px-1.5 py-0.5 rounded" style={{ backgroundColor: getColor(4) }}>
+                    +{challenge.xp}
+                  </span>
+                </button>
+              )
+            })()}
+          </div>
+        )}
+
+        {/* Footer */}
+        <div
+          className="text-center py-2 px-3 text-[10px] font-bold"
+          style={{ backgroundColor: 'rgba(0,0,0,0.1)' }}
+        >
+          tap a quest to start · npc.chat
+        </div>
+      </div>
+
+      {/* Active Challenge Modal */}
+      {activeChallenge && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4"
+          style={{ backgroundColor: 'rgba(0,0,0,0.6)' }}
+          onClick={() => setActiveChallenge(null)}
+        >
+          <div
+            className="w-full max-w-xs rounded-2xl p-4"
+            style={{
+              backgroundColor: theme.colors.backgroundAlt,
+              border: '4px solid black',
+              boxShadow: '8px 8px 0 black',
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Close */}
+            <button
+              onClick={() => setActiveChallenge(null)}
+              className="absolute top-3 right-3 w-8 h-8 flex items-center justify-center font-bold rounded-full hover:scale-110"
+              style={{ backgroundColor: theme.colors.accent1, border: '2px solid black' }}
+            >
+              ×
+            </button>
+
+            <div className="text-center">
+              <div
+                className="w-16 h-16 mx-auto rounded-xl flex items-center justify-center text-3xl mb-3"
                 style={{
                   backgroundColor: theme.colors.accent3,
                   border: '3px solid black',
-                  borderRadius: '12px',
                   boxShadow: '3px 3px 0 black',
                 }}
               >
-                I Did It! ✓
-              </button>
-            </div>
-          ) : (
-            <div className="space-y-3">
-              <p className="font-bold">How did it go? What did you notice?</p>
-              <textarea
-                value={reflection}
-                onChange={(e) => setReflection(e.target.value)}
-                placeholder="Share your experience..."
-                className="w-full px-3 py-2"
-                rows={3}
-                style={{
-                  border: '3px solid black',
-                  borderRadius: '12px',
-                }}
-              />
-              <button
-                onClick={submitReflection}
-                disabled={!reflection.trim()}
-                className="w-full py-3 font-bold hover:scale-105 transition-transform disabled:opacity-50"
-                style={{
-                  backgroundColor: theme.colors.accent2,
-                  border: '3px solid black',
-                  borderRadius: '12px',
-                  boxShadow: '3px 3px 0 black',
-                }}
-              >
-                Complete & Earn {activeChallenge.xp} XP! 🎉
-              </button>
-            </div>
-          )}
-        </div>
-      )}
+                {activeChallenge.emoji}
+              </div>
 
-      {/* Challenge List */}
-      {!activeChallenge && (
-        <div
-          className="p-5 rotate-1"
-          style={{
-            backgroundColor: theme.colors.accent4,
-            border: '4px solid black',
-            borderRadius: '16px',
-            boxShadow: '6px 6px 0 black',
-          }}
-        >
-          <h2 className="text-xl font-bold mb-4">🎮 Pick a Challenge</h2>
-          <div className="space-y-3">
-            {challenges.map((challenge, index) => {
-              const isCompleted = completedIds.has(challenge.id)
-              return (
-                <div
-                  key={challenge.id}
-                  className={`p-3 ${isCompleted ? 'opacity-75' : 'cursor-pointer hover:scale-[1.02]'} transition-transform`}
-                  onClick={() => !isCompleted && startChallenge(challenge)}
+              <h3 className="text-lg font-bold mb-1">{activeChallenge.title}</h3>
+              <p className="text-xs mb-3 opacity-80">{activeChallenge.description}</p>
+
+              <div className="flex items-center justify-center gap-2 mb-4 text-xs">
+                <span className="px-2 py-1 rounded-lg" style={{ backgroundColor: theme.colors.accent4, border: '2px solid black' }}>
+                  ⏱️ {activeChallenge.duration}
+                </span>
+                <span className="px-2 py-1 rounded-lg" style={{ backgroundColor: theme.colors.accent2, border: '2px solid black' }}>
+                  +{activeChallenge.xp} XP
+                </span>
+              </div>
+
+              {!showReflection ? (
+                <button
+                  onClick={() => setShowReflection(true)}
+                  className="w-full py-2.5 font-bold text-sm rounded-xl hover:scale-105 active:scale-95 transition-transform"
                   style={{
-                    backgroundColor: challenge.color,
+                    backgroundColor: theme.colors.accent3,
                     border: '3px solid black',
-                    borderRadius: '12px',
-                    boxShadow: '3px 3px 0 black',
-                    transform: `rotate(${index % 2 === 0 ? 1 : -1}deg)`,
+                    boxShadow: '4px 4px 0 black',
                   }}
                 >
-                  <div className="flex items-center gap-3">
-                    <span className="text-3xl">{isCompleted ? '✅' : challenge.emoji}</span>
-                    <div className="flex-1">
-                      <div className="flex items-center justify-between">
-                        <h3 className={`font-bold ${isCompleted ? 'line-through' : ''}`}>{challenge.title}</h3>
-                        <span
-                          className="px-2 py-1 text-xs font-bold"
-                          style={{
-                            backgroundColor: isCompleted ? theme.colors.accent3 : theme.colors.backgroundAlt,
-                            border: '2px solid black',
-                            borderRadius: '8px',
-                          }}
-                        >
-                          {isCompleted ? 'Done!' : `+${challenge.xp} XP`}
-                        </span>
-                      </div>
-                      <p className="text-sm">{challenge.description}</p>
-                      <div className="flex gap-2 mt-2">
-                        <span className="text-xs">⏱️ {challenge.duration}</span>
-                        <span className="text-xs">• {challenge.difficulty}</span>
-                      </div>
-                    </div>
-                  </div>
+                  I Did It! ✓
+                </button>
+              ) : (
+                <div className="space-y-2">
+                  <textarea
+                    value={reflection}
+                    onChange={(e) => setReflection(e.target.value)}
+                    placeholder="How did it go?"
+                    className="w-full px-3 py-2 text-sm rounded-lg"
+                    rows={2}
+                    style={{ border: '2px solid black' }}
+                  />
+                  <button
+                    onClick={submitReflection}
+                    disabled={!reflection.trim()}
+                    className="w-full py-2.5 font-bold text-sm rounded-xl hover:scale-105 active:scale-95 transition-transform disabled:opacity-50"
+                    style={{
+                      backgroundColor: theme.colors.accent2,
+                      border: '3px solid black',
+                      boxShadow: '4px 4px 0 black',
+                    }}
+                  >
+                    Complete +{activeChallenge.xp} XP 🎉
+                  </button>
                 </div>
-              )
-            })}
+              )}
+            </div>
           </div>
         </div>
       )}
-
-      {/* Note */}
-      <div
-        className="p-4 text-center -rotate-1"
-        style={{
-          backgroundColor: theme.colors.backgroundAlt,
-          border: '2px dashed black',
-          borderRadius: '12px',
-        }}
-      >
-        <p className="text-sm">
-          💡 AI can help you think, but growth happens when you ACT! Try these IRL challenges.
-        </p>
-      </div>
     </div>
   )
 }

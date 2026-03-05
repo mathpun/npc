@@ -22,6 +22,7 @@ import AILiteracy from '@/components/AILiteracy'
 import DailyCheckIn from '@/components/DailyCheckIn'
 import AIConsentModal from '@/components/AIConsentModal'
 import PersonalityIslands from '@/components/PersonalityIslands'
+import Moltbook from '@/components/Moltbook'
 import { SessionGoal, PersonaType, SESSION_GOALS, buildReflectionPrompt, CustomPersona } from '@/lib/prompts'
 import ChatHistory from '@/components/ChatHistory'
 
@@ -818,6 +819,9 @@ function ChatPageContent() {
                   <ParentReports userId={userId || ''} userName={profile.name} />
                   <ParentDashboard profile={profile} />
                 </div>
+              )}
+              {activeGrowthTab === 'moltbook' && (
+                <Moltbook />
               )}
             </div>
           </div>

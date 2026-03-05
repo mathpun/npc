@@ -16,246 +16,138 @@ export default function EpistemicHealth({
   challengesCompleted = 0,
 }: EpistemicHealthProps) {
   const { theme } = useTheme()
+
   // Calculate scores based on user activity
-  // Each metric has a base score of 30, and can grow to 100 based on activity
-
-  // Uncertainty Calibration: Based on check-ins (reflects self-awareness)
-  // Each check-in adds 10 points, max 100
   const uncertaintyScore = Math.min(100, 30 + checkinsCompleted * 10)
-
-  // Perspective Seeking: Based on sessions (diverse conversations)
-  // Each session adds 7 points, max 100
   const perspectiveScore = Math.min(100, 30 + sessionsCompleted * 7)
-
-  // Source Questioning: Based on challenges completed (critical thinking in action)
-  // Each challenge adds 14 points, max 100
   const sourceScore = Math.min(100, 30 + challengesCompleted * 14)
-
-  // Complexity Tolerance: Based on overall engagement
-  // Average of all activities
   const complexityScore = Math.min(100, 30 + Math.round((sessionsCompleted * 5 + checkinsCompleted * 8 + challengesCompleted * 12) / 3))
 
   const metrics = [
-    {
-      name: 'Uncertainty Calibration',
-      emoji: '⚖️',
-      score: uncertaintyScore,
-      description: "Knowing what you know vs. don't know",
-      color: theme.colors.accent1,
-    },
-    {
-      name: 'Perspective Seeking',
-      emoji: '🔀',
-      score: perspectiveScore,
-      description: 'Actively seeking different viewpoints',
-      color: theme.colors.accent3,
-    },
-    {
-      name: 'Source Questioning',
-      emoji: '🔍',
-      score: sourceScore,
-      description: 'Questioning where info comes from',
-      color: theme.colors.accent4,
-    },
-    {
-      name: 'Complexity Tolerance',
-      emoji: '🧩',
-      score: complexityScore,
-      description: 'Sitting with ambiguity without rushing',
-      color: theme.colors.accent2,
-    },
+    { name: 'Calibration', emoji: '⚖️', score: uncertaintyScore, color: theme.colors.accent1 },
+    { name: 'Perspectives', emoji: '🔀', score: perspectiveScore, color: theme.colors.accent3 },
+    { name: 'Sources', emoji: '🔍', score: sourceScore, color: theme.colors.accent4 },
+    { name: 'Complexity', emoji: '🧩', score: complexityScore, color: theme.colors.accent2 },
   ]
 
-  const overallHealth = Math.round(
-    metrics.reduce((sum, m) => sum + m.score, 0) / metrics.length
-  )
+  const overallHealth = Math.round(metrics.reduce((sum, m) => sum + m.score, 0) / metrics.length)
 
   const getHealthLabel = (score: number) => {
-    if (score >= 80) return { label: 'Excellent! 🌟', color: theme.colors.accent3 }
-    if (score >= 60) return { label: 'Healthy 💪', color: theme.colors.accent4 }
-    if (score >= 40) return { label: 'Growing 🌱', color: theme.colors.accent2 }
-    return { label: 'Building 🔨', color: theme.colors.accent1 }
+    if (score >= 80) return '🌟 Excellent'
+    if (score >= 60) return '💪 Healthy'
+    if (score >= 40) return '🌱 Growing'
+    return '🔨 Building'
   }
 
-  const healthLabel = getHealthLabel(overallHealth)
-
   return (
-    <div className="max-w-3xl mx-auto px-4 py-6 space-y-6 text-black" style={{  }}>
-      {/* Header */}
-      <div className="text-center mb-8">
-        <h1
-          className="text-3xl font-bold mb-3 inline-block px-6 py-2 rotate-1"
-          style={{
-            backgroundColor: theme.colors.accent5,
-            border: '4px solid black',
-            borderRadius: '12px',
-            boxShadow: '5px 5px 0 black',
-          }}
-        >
-          🧠 Thinking Health 🧠
-        </h1>
-        <p className="text-lg mt-4">How well do you know what you know?</p>
-      </div>
-
-      {/* Overall Score */}
+    <div className="max-w-sm mx-auto px-3 py-4">
+      {/* Main Card - Screenshot friendly */}
       <div
-        className="p-6 text-center -rotate-1"
+        className="rounded-2xl overflow-hidden"
         style={{
-          backgroundColor: healthLabel.color,
           border: '4px solid black',
-          borderRadius: '16px',
           boxShadow: '6px 6px 0 black',
+          background: `linear-gradient(180deg, ${theme.colors.accent5} 0%, ${theme.colors.accent2} 100%)`,
         }}
       >
-        <p className="text-sm font-bold mb-2">Overall Thinking Health</p>
-        <div
-          className="w-32 h-32 mx-auto mb-3 flex items-center justify-center"
-          style={{
-            backgroundColor: theme.colors.backgroundAlt,
-            border: '4px solid black',
-            borderRadius: '50%',
-            boxShadow: '4px 4px 0 black',
-          }}
-        >
-          <span className="text-4xl font-bold">{overallHealth}</span>
+        {/* Header */}
+        <div className="text-center py-3 px-4">
+          <h1 className="text-xl font-bold">🧠 Thinking Health</h1>
+          <p className="text-xs opacity-70">how well do you know what you know?</p>
         </div>
-        <p className="text-xl font-bold">{healthLabel.label}</p>
-        <p className="text-sm mt-2">This isn't about being smart—it's about thinking clearly!</p>
-      </div>
 
-      {/* Individual Metrics */}
-      <div
-        className="p-5 rotate-1"
-        style={{
-          backgroundColor: theme.colors.background,
-          border: '4px solid black',
-          borderRadius: '16px',
-          boxShadow: '6px 6px 0 black',
-        }}
-      >
-        <h2 className="text-xl font-bold mb-4">📊 Your Thinking Skills</h2>
-        <div className="space-y-4">
-          {metrics.map((metric, index) => (
+        {/* Overall Score Circle + Label */}
+        <div className="flex items-center justify-center gap-4 px-3 pb-3">
+          <div
+            className="w-20 h-20 flex items-center justify-center rounded-full"
+            style={{
+              backgroundColor: theme.colors.backgroundAlt,
+              border: '3px solid black',
+              boxShadow: '3px 3px 0 black',
+            }}
+          >
+            <span className="text-3xl font-bold">{overallHealth}</span>
+          </div>
+          <div className="text-left">
+            <div className="text-lg font-bold">{getHealthLabel(overallHealth)}</div>
+            <div className="text-[10px] opacity-70">thinking clearly!</div>
+          </div>
+        </div>
+
+        {/* Skills Grid - 2x2 */}
+        <div className="grid grid-cols-2 gap-2 px-3 pb-3">
+          {metrics.map((metric) => (
             <div
               key={metric.name}
-              className="p-3"
+              className="p-2.5 rounded-xl"
               style={{
-                backgroundColor: metric.color,
-                border: '3px solid black',
-                borderRadius: '12px',
-                boxShadow: '3px 3px 0 black',
-                transform: `rotate(${index % 2 === 0 ? 1 : -1}deg)`,
+                backgroundColor: theme.colors.backgroundAlt,
+                border: '2px solid black',
               }}
             >
-              <div className="flex items-center justify-between mb-2">
-                <div className="flex items-center gap-2">
-                  <span className="text-2xl">{metric.emoji}</span>
-                  <div>
-                    <h3 className="font-bold">{metric.name}</h3>
-                    <p className="text-xs">{metric.description}</p>
-                  </div>
-                </div>
-                <div
-                  className="px-3 py-1 font-bold"
-                  style={{
-                    backgroundColor: theme.colors.backgroundAlt,
-                    border: '2px solid black',
-                    borderRadius: '8px',
-                  }}
-                >
-                  {metric.score}
-                </div>
+              <div className="flex items-center gap-1.5 mb-1.5">
+                <span className="text-base">{metric.emoji}</span>
+                <span className="text-xs font-bold">{metric.name}</span>
+                <span className="ml-auto text-xs font-bold">{metric.score}</span>
               </div>
               <div
-                className="h-4 rounded-full overflow-hidden"
-                style={{ backgroundColor: theme.colors.backgroundAlt, border: '2px solid black' }}
+                className="h-2 rounded-full overflow-hidden"
+                style={{ backgroundColor: 'rgba(0,0,0,0.1)', border: '1px solid black' }}
               >
                 <div
                   className="h-full rounded-full"
-                  style={{
-                    width: `${metric.score}%`,
-                    backgroundColor: metric.score >= 70 ? theme.colors.accent3 : theme.colors.accent2,
-                  }}
+                  style={{ width: `${metric.score}%`, backgroundColor: metric.color }}
                 />
               </div>
             </div>
           ))}
         </div>
-      </div>
 
-      {/* Activity Summary */}
-      <div
-        className="p-4"
-        style={{
-          backgroundColor: theme.colors.accent4,
-          border: '3px solid black',
-          borderRadius: '12px',
-          boxShadow: '3px 3px 0 black',
-        }}
-      >
-        <h3 className="font-bold mb-2">📈 Your Activity</h3>
-        <div className="grid grid-cols-3 gap-2 text-center text-sm">
-          <div className="p-2 rounded-lg border-2 border-black" style={{ backgroundColor: theme.colors.backgroundAlt }}>
-            <div className="font-bold text-lg">{sessionsCompleted}</div>
-            <div className="text-xs">Sessions</div>
-          </div>
-          <div className="p-2 rounded-lg border-2 border-black" style={{ backgroundColor: theme.colors.backgroundAlt }}>
-            <div className="font-bold text-lg">{checkinsCompleted}</div>
-            <div className="text-xs">Check-ins</div>
-          </div>
-          <div className="p-2 rounded-lg border-2 border-black" style={{ backgroundColor: theme.colors.backgroundAlt }}>
-            <div className="font-bold text-lg">{challengesCompleted}</div>
-            <div className="text-xs">Challenges</div>
-          </div>
-        </div>
-      </div>
-
-      {/* Why This Matters */}
-      <div
-        className="p-5 -rotate-1"
-        style={{
-          backgroundColor: theme.colors.backgroundAccent,
-          border: '4px solid black',
-          borderRadius: '16px',
-          boxShadow: '6px 6px 0 black',
-        }}
-      >
-        <h2 className="text-xl font-bold mb-3">❓ Why This Matters</h2>
-        <div className="space-y-2">
-          {[
-            { emoji: '🎯', text: 'Better decisions - know when to ask for help' },
-            { emoji: '🛡️', text: 'Less manipulation - harder to fool when you think clearly' },
-            { emoji: '💪', text: 'Real confidence - based on evidence, not wishful thinking' },
-            { emoji: '🌱', text: 'Intellectual humility - a strength, not a weakness!' },
-          ].map((item, i) => (
-            <div
-              key={i}
-              className="p-2 flex items-center gap-2"
-              style={{
-                backgroundColor: theme.colors.backgroundAlt,
-                border: '2px solid black',
-                borderRadius: '8px',
-              }}
-            >
-              <span className="text-xl">{item.emoji}</span>
-              <span className="text-sm">{item.text}</span>
+        {/* Activity + Tips Row */}
+        <div className="grid grid-cols-2 gap-2 px-3 pb-3">
+          {/* Activity */}
+          <div
+            className="p-2.5 rounded-xl"
+            style={{ backgroundColor: theme.colors.accent4, border: '2px solid black' }}
+          >
+            <div className="text-xs font-bold mb-1.5">📈 activity</div>
+            <div className="space-y-1 text-[10px]">
+              <div className="flex justify-between">
+                <span>Sessions</span>
+                <span className="font-bold">{sessionsCompleted}</span>
+              </div>
+              <div className="flex justify-between">
+                <span>Check-ins</span>
+                <span className="font-bold">{checkinsCompleted}</span>
+              </div>
+              <div className="flex justify-between">
+                <span>Challenges</span>
+                <span className="font-bold">{challengesCompleted}</span>
+              </div>
             </div>
-          ))}
-        </div>
-      </div>
+          </div>
 
-      {/* Tips */}
-      <div
-        className="p-4 text-center"
-        style={{
-          backgroundColor: theme.colors.backgroundAlt,
-          border: '2px dashed black',
-          borderRadius: '12px',
-        }}
-      >
-        <p className="text-sm">
-          💡 Pro tip: Practice saying "I'm not sure" when you genuinely aren't. It's a superpower!
-        </p>
+          {/* Why it matters */}
+          <div
+            className="p-2.5 rounded-xl"
+            style={{ backgroundColor: theme.colors.accent1, border: '2px solid black' }}
+          >
+            <div className="text-xs font-bold mb-1.5">✨ superpowers</div>
+            <div className="space-y-0.5 text-[10px]">
+              <div>🎯 Better decisions</div>
+              <div>🛡️ Less manipulation</div>
+              <div>💪 Real confidence</div>
+            </div>
+          </div>
+        </div>
+
+        {/* Footer */}
+        <div
+          className="text-center py-2 px-3 text-[10px] font-bold"
+          style={{ backgroundColor: 'rgba(0,0,0,0.1)' }}
+        >
+          say "i'm not sure" - it's a superpower! · npc.chat
+        </div>
       </div>
     </div>
   )

@@ -9,45 +9,17 @@ export default function PeerWisdom() {
   const [markedHelpful, setMarkedHelpful] = useState<Set<string>>(new Set())
 
   const commonWonders = [
-    { question: "What do I actually want to do with my life?", percentage: 87 },
-    { question: "How do I know if my friendships are healthy?", percentage: 73 },
-    { question: "Am I normal for feeling anxious about the future?", percentage: 81 },
-    { question: "Is it okay to not have everything figured out?", percentage: 92 },
+    { q: "What do I want to do with my life?", pct: 87 },
+    { q: "Are my friendships healthy?", pct: 73 },
+    { q: "Is it ok to feel anxious?", pct: 81 },
+    { q: "Do I need it all figured out?", pct: 92 },
   ]
 
   const peerInsights = [
-    {
-      id: '1',
-      topic: 'Making decisions',
-      insight: "I used to think every decision was permanent. Then I realized most aren't - you can adjust!",
-      emoji: '🎯',
-      color: theme.colors.accent1,
-      helpfulCount: 234,
-    },
-    {
-      id: '2',
-      topic: 'Friend drama',
-      insight: "Ask yourself: 'will this matter in a year?' Most friend drama won't.",
-      emoji: '👥',
-      color: theme.colors.accent4,
-      helpfulCount: 189,
-    },
-    {
-      id: '3',
-      topic: 'Feeling different',
-      insight: "Everyone feels like they're pretending. We're all figuring it out together!",
-      emoji: '🌟',
-      color: theme.colors.accent3,
-      helpfulCount: 312,
-    },
-    {
-      id: '4',
-      topic: 'Social media',
-      insight: "I unfollowed anyone who made me feel bad. My feed is smaller but I actually enjoy it.",
-      emoji: '📱',
-      color: theme.colors.accent2,
-      helpfulCount: 278,
-    },
+    { id: '1', topic: 'Decisions', insight: "Most decisions aren't permanent - you can adjust!", emoji: '🎯', count: 234 },
+    { id: '2', topic: 'Drama', insight: "Will this matter in a year? Probably not.", emoji: '👥', count: 189 },
+    { id: '3', topic: 'Different', insight: "Everyone's pretending. We're all figuring it out!", emoji: '🌟', count: 312 },
+    { id: '4', topic: 'Socials', insight: "Unfollow anyone who makes you feel bad.", emoji: '📱', count: 278 },
   ]
 
   const handleMarkHelpful = (id: string) => {
@@ -60,152 +32,113 @@ export default function PeerWisdom() {
     setMarkedHelpful(newSet)
   }
 
+  const getColor = (index: number) => {
+    const colors = [theme.colors.accent1, theme.colors.accent2, theme.colors.accent3, theme.colors.accent4]
+    return colors[index % colors.length]
+  }
+
   return (
-    <div className="max-w-3xl mx-auto px-4 py-6 space-y-6 text-black" style={{  }}>
-      {/* Header */}
-      <div className="text-center mb-8">
-        <h1
-          className="text-3xl font-bold mb-3 inline-block px-6 py-2 -rotate-1"
-          style={{
-            backgroundColor: theme.colors.accent1,
-            border: '4px solid black',
-            borderRadius: '12px',
-            boxShadow: '5px 5px 0 black',
-          }}
-        >
-          👥 Peer Wisdom 👥
-        </h1>
-        <p className="text-lg mt-4">You're not alone in what you're thinking about!</p>
-      </div>
-
-      {/* Privacy Note */}
+    <div className="max-w-sm mx-auto px-3 py-4">
+      {/* Main Card - Screenshot friendly */}
       <div
-        className="p-3 flex items-center gap-2"
+        className="rounded-2xl overflow-hidden"
         style={{
-          backgroundColor: theme.colors.accent3,
-          border: '3px solid black',
-          borderRadius: '12px',
-        }}
-      >
-        <span className="text-xl">🔒</span>
-        <p className="text-sm">All insights are anonymous. No names, no identifying info.</p>
-      </div>
-
-      {/* Common Wonders */}
-      <div
-        className="p-5 rotate-1"
-        style={{
-          backgroundColor: theme.colors.accent5,
           border: '4px solid black',
-          borderRadius: '16px',
           boxShadow: '6px 6px 0 black',
+          background: `linear-gradient(180deg, ${theme.colors.accent1} 0%, ${theme.colors.accent4} 100%)`,
         }}
       >
-        <h2 className="text-xl font-bold mb-4">💭 You're Not Alone In Wondering...</h2>
-        <div className="space-y-2">
-          {commonWonders.map((wonder, index) => (
-            <div
-              key={index}
-              className="p-3 flex items-center justify-between"
-              style={{
-                backgroundColor: theme.colors.backgroundAlt,
-                border: '3px solid black',
-                borderRadius: '12px',
-                boxShadow: '2px 2px 0 black',
-                transform: `rotate(${index % 2 === 0 ? 1 : -1}deg)`,
-              }}
-            >
-              <p className="text-sm font-bold flex-1">"{wonder.question}"</p>
-              <div
-                className="px-3 py-1 ml-2"
-                style={{
-                  backgroundColor: theme.colors.accent2,
-                  border: '2px solid black',
-                  borderRadius: '8px',
-                }}
-              >
-                <span className="font-bold">{wonder.percentage}%</span>
-                <span className="text-xs"> of teens</span>
-              </div>
-            </div>
-          ))}
+        {/* Header */}
+        <div className="text-center py-3 px-4">
+          <h1 className="text-xl font-bold">👥 Peer Wisdom</h1>
+          <p className="text-xs opacity-70">you're not alone in wondering</p>
         </div>
-      </div>
 
-      {/* Peer Insights */}
-      <div
-        className="p-5 -rotate-1"
-        style={{
-          backgroundColor: theme.colors.accent4,
-          border: '4px solid black',
-          borderRadius: '16px',
-          boxShadow: '6px 6px 0 black',
-        }}
-      >
-        <h2 className="text-xl font-bold mb-4">💡 Wisdom From Other Teens</h2>
-        <div className="space-y-3">
+        {/* Common Questions - Compact Grid */}
+        <div className="px-3 pb-3">
+          <div
+            className="p-2.5 rounded-xl"
+            style={{ backgroundColor: theme.colors.accent5, border: '2px solid black' }}
+          >
+            <div className="text-xs font-bold mb-2">💭 others wonder too...</div>
+            <div className="grid grid-cols-2 gap-1.5">
+              {commonWonders.map((wonder, index) => (
+                <div
+                  key={index}
+                  className="p-1.5 rounded-lg text-[10px]"
+                  style={{ backgroundColor: theme.colors.backgroundAlt, border: '1px solid black' }}
+                >
+                  <div className="font-bold leading-tight mb-0.5">"{wonder.q}"</div>
+                  <div className="text-[9px] opacity-70">{wonder.pct}% of teens</div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Peer Insights - 2x2 Grid */}
+        <div className="grid grid-cols-2 gap-2 px-3 pb-3">
           {peerInsights.map((insight, index) => {
             const isHelpful = markedHelpful.has(insight.id)
             return (
-              <div
+              <button
                 key={insight.id}
-                className="p-4"
+                onClick={() => handleMarkHelpful(insight.id)}
+                className="p-2.5 rounded-xl text-left hover:scale-105 active:scale-95 transition-transform"
                 style={{
-                  backgroundColor: insight.color,
-                  border: '3px solid black',
-                  borderRadius: '12px',
-                  boxShadow: '3px 3px 0 black',
-                  transform: `rotate(${index % 2 === 0 ? 1 : -1}deg)`,
+                  backgroundColor: theme.colors.backgroundAlt,
+                  border: '2px solid black',
+                  boxShadow: '2px 2px 0 black',
                 }}
               >
-                <div className="flex items-center gap-2 mb-2">
-                  <span className="text-2xl">{insight.emoji}</span>
+                <div className="flex items-center gap-1 mb-1">
+                  <span className="text-base">{insight.emoji}</span>
                   <span
-                    className="px-2 py-1 text-xs font-bold"
-                    style={{
-                      backgroundColor: theme.colors.backgroundAlt,
-                      border: '2px solid black',
-                      borderRadius: '8px',
-                    }}
+                    className="text-[9px] font-bold px-1 py-0.5 rounded"
+                    style={{ backgroundColor: getColor(index) }}
                   >
                     {insight.topic}
                   </span>
                 </div>
-                <p className="font-bold mb-3">"{insight.insight}"</p>
-                <div className="flex items-center justify-between">
-                  <button
-                    onClick={() => handleMarkHelpful(insight.id)}
-                    className="px-3 py-1 font-bold hover:scale-105 transition-transform"
-                    style={{
-                      backgroundColor: isHelpful ? theme.colors.accent2 : theme.colors.backgroundAlt,
-                      border: '2px solid black',
-                      borderRadius: '8px',
-                    }}
-                  >
-                    {isHelpful ? '💛 Helpful!' : '🤍 This helped'}
-                  </button>
-                  <span className="text-xs">
-                    {insight.helpfulCount + (isHelpful ? 1 : 0)} found this helpful
-                  </span>
+                <div className="text-[10px] font-bold leading-tight mb-1.5">
+                  "{insight.insight}"
                 </div>
-              </div>
+                <div className="flex items-center justify-between text-[9px]">
+                  <span className={isHelpful ? 'font-bold' : 'opacity-60'}>
+                    {isHelpful ? '💛 helped!' : '🤍 helpful?'}
+                  </span>
+                  <span className="opacity-60">{insight.count + (isHelpful ? 1 : 0)}</span>
+                </div>
+              </button>
             )
           })}
         </div>
-      </div>
 
-      {/* Share CTA */}
-      <div
-        className="p-4 text-center"
-        style={{
-          backgroundColor: theme.colors.background,
-          border: '3px solid black',
-          borderRadius: '12px',
-          boxShadow: '4px 4px 0 black',
-        }}
-      >
-        <p className="font-bold mb-2">Got wisdom to share? 🌟</p>
-        <p className="text-sm">Your insight could help hundreds of other teens!</p>
+        {/* Privacy + Share Row */}
+        <div className="flex gap-2 px-3 pb-3">
+          <div
+            className="flex-1 p-2 rounded-xl flex items-center gap-1.5"
+            style={{ backgroundColor: theme.colors.accent3, border: '2px solid black' }}
+          >
+            <span className="text-sm">🔒</span>
+            <span className="text-[10px] font-bold">all anonymous</span>
+          </div>
+          <div
+            className="flex-1 p-2 rounded-xl flex items-center gap-1.5"
+            style={{ backgroundColor: theme.colors.backgroundAlt, border: '2px solid black' }}
+          >
+            <span className="text-sm">💬</span>
+            <span className="text-[10px] font-bold">share your wisdom!</span>
+          </div>
+        </div>
+
+        {/* Footer */}
+        <div
+          className="text-center py-2 px-3 text-[10px] font-bold"
+          style={{ backgroundColor: 'rgba(0,0,0,0.1)' }}
+        >
+          tap to mark helpful · npc.chat
+        </div>
       </div>
     </div>
   )

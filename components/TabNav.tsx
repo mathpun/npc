@@ -4,9 +4,9 @@ import { useTheme } from '@/lib/ThemeContext'
 
 export type TabId = 'chat' | 'growth'
 // Keep original types for backwards compatibility, but simplify display
-export type GrowthSubTab = 'insights' | 'islands' | 'progress' | 'challenges' | 'epistemic' | 'peers' | 'literacy' | 'anti-engagement' | 'co-design' | 'parent'
+export type GrowthSubTab = 'insights' | 'islands' | 'progress' | 'challenges' | 'epistemic' | 'peers' | 'literacy' | 'anti-engagement' | 'co-design' | 'parent' | 'moltbook'
 // Simplified grouped tabs
-export type GrowthGroup = 'insights' | 'progress' | 'learn' | 'connect'
+export type GrowthGroup = 'insights' | 'progress' | 'learn' | 'connect' | 'moltbook'
 
 interface TabNavProps {
   activeTab: TabId
@@ -20,12 +20,13 @@ const MAIN_TABS = [
   { id: 'growth' as TabId, label: 'mind wrapped', emoji: '🌀' },
 ]
 
-// Simplified to 4 tabs - grouped from 9
+// Simplified to 5 tabs - grouped from 9 + moltbook
 const GROWTH_GROUPS = [
   { id: 'insights' as GrowthGroup, label: 'insights', emoji: '💡', subTab: 'insights' as GrowthSubTab },
   { id: 'progress' as GrowthGroup, label: 'goals', emoji: '🎯', subTab: 'challenges' as GrowthSubTab },
   { id: 'learn' as GrowthGroup, label: 'learn', emoji: '🧠', subTab: 'epistemic' as GrowthSubTab },
   { id: 'connect' as GrowthGroup, label: 'connect', emoji: '👥', subTab: 'peers' as GrowthSubTab },
+  { id: 'moltbook' as GrowthGroup, label: 'moltbook', emoji: '🦋', subTab: 'moltbook' as GrowthSubTab },
 ]
 
 // Map groups to their subtabs for active state
@@ -34,6 +35,7 @@ const GROUP_SUBTABS: Record<GrowthGroup, GrowthSubTab[]> = {
   'progress': ['progress', 'challenges'],
   'learn': ['epistemic', 'literacy', 'anti-engagement'],
   'connect': ['peers', 'co-design', 'parent'],
+  'moltbook': ['moltbook'],
 }
 
 export default function TabNav({
