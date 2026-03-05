@@ -2,7 +2,7 @@
 
 import { useTheme } from '@/lib/ThemeContext'
 
-export type TabId = 'chat' | 'growth' | 'world'
+export type TabId = 'chat' | 'growth'
 // Keep original types for backwards compatibility, but simplify display
 export type GrowthSubTab = 'insights' | 'islands' | 'progress' | 'challenges' | 'epistemic' | 'peers' | 'literacy' | 'anti-engagement' | 'co-design' | 'parent'
 // Simplified grouped tabs
@@ -18,7 +18,6 @@ interface TabNavProps {
 const MAIN_TABS = [
   { id: 'chat' as TabId, label: 'chat', emoji: '💬' },
   { id: 'growth' as TabId, label: 'mind wrapped', emoji: '🌀' },
-  { id: 'world' as TabId, label: 'world', emoji: '🦋' },
 ]
 
 // Simplified to 4 tabs - grouped from 9
@@ -67,7 +66,7 @@ export default function TabNav({
               className="flex items-center gap-1.5 px-3 sm:px-5 py-1.5 font-bold transition-all duration-200 hover:scale-105"
               style={{
                 backgroundColor: isActive
-                  ? (tab.id === 'chat' ? theme.colors.accent1 : tab.id === 'growth' ? theme.colors.accent3 : theme.colors.accent4)
+                  ? (tab.id === 'chat' ? theme.colors.accent1 : theme.colors.accent3)
                   : 'transparent',
                 borderRadius: '9999px',
                 border: isActive ? '2px solid black' : '2px solid transparent',
