@@ -820,9 +820,15 @@ function ChatPageContent() {
                   <ParentDashboard profile={profile} />
                 </div>
               )}
-              {activeGrowthTab === 'moltbook' && (
-                <Moltbook />
-              )}
+            </div>
+          </div>
+        )}
+
+        {/* World Tab - Moltbook */}
+        {activeTab === 'world' && (
+          <div className="flex-1 overflow-y-auto pb-20">
+            <div className="max-w-3xl mx-auto">
+              <Moltbook />
             </div>
           </div>
         )}

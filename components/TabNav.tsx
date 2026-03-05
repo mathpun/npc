@@ -2,11 +2,11 @@
 
 import { useTheme } from '@/lib/ThemeContext'
 
-export type TabId = 'chat' | 'growth'
+export type TabId = 'chat' | 'growth' | 'world'
 // Keep original types for backwards compatibility, but simplify display
-export type GrowthSubTab = 'insights' | 'islands' | 'progress' | 'challenges' | 'epistemic' | 'peers' | 'literacy' | 'anti-engagement' | 'co-design' | 'parent' | 'moltbook'
+export type GrowthSubTab = 'insights' | 'islands' | 'progress' | 'challenges' | 'epistemic' | 'peers' | 'literacy' | 'anti-engagement' | 'co-design' | 'parent'
 // Simplified grouped tabs
-export type GrowthGroup = 'insights' | 'progress' | 'learn' | 'connect' | 'moltbook'
+export type GrowthGroup = 'insights' | 'progress' | 'learn' | 'connect'
 
 interface TabNavProps {
   activeTab: TabId
@@ -18,15 +18,15 @@ interface TabNavProps {
 const MAIN_TABS = [
   { id: 'chat' as TabId, label: 'chat', emoji: '💬' },
   { id: 'growth' as TabId, label: 'mind wrapped', emoji: '🌀' },
+  { id: 'world' as TabId, label: 'world', emoji: '🦋' },
 ]
 
-// Simplified to 5 tabs - grouped from 9 + moltbook
+// Simplified to 4 tabs - grouped from 9
 const GROWTH_GROUPS = [
   { id: 'insights' as GrowthGroup, label: 'insights', emoji: '💡', subTab: 'insights' as GrowthSubTab },
   { id: 'progress' as GrowthGroup, label: 'goals', emoji: '🎯', subTab: 'challenges' as GrowthSubTab },
   { id: 'learn' as GrowthGroup, label: 'learn', emoji: '🧠', subTab: 'epistemic' as GrowthSubTab },
   { id: 'connect' as GrowthGroup, label: 'connect', emoji: '👥', subTab: 'peers' as GrowthSubTab },
-  { id: 'moltbook' as GrowthGroup, label: 'moltbook', emoji: '🦋', subTab: 'moltbook' as GrowthSubTab },
 ]
 
 // Map groups to their subtabs for active state
@@ -35,7 +35,6 @@ const GROUP_SUBTABS: Record<GrowthGroup, GrowthSubTab[]> = {
   'progress': ['progress', 'challenges'],
   'learn': ['epistemic', 'literacy', 'anti-engagement'],
   'connect': ['peers', 'co-design', 'parent'],
-  'moltbook': ['moltbook'],
 }
 
 export default function TabNav({
@@ -67,7 +66,9 @@ export default function TabNav({
               onClick={() => onTabChange?.(tab.id)}
               className="flex items-center gap-1.5 px-3 sm:px-5 py-1.5 font-bold transition-all duration-200 hover:scale-105"
               style={{
-                backgroundColor: isActive ? (tab.id === 'chat' ? theme.colors.accent1 : theme.colors.accent3) : 'transparent',
+                backgroundColor: isActive
+                  ? (tab.id === 'chat' ? theme.colors.accent1 : tab.id === 'growth' ? theme.colors.accent3 : theme.colors.accent4)
+                  : 'transparent',
                 borderRadius: '9999px',
                 border: isActive ? '2px solid black' : '2px solid transparent',
                 color: theme.colors.text,

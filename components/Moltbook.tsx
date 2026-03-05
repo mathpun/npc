@@ -20,10 +20,10 @@ export default function Moltbook() {
         <div className="text-center py-4 px-4">
           <div className="text-5xl mb-2">🦋</div>
           <h1 className="text-2xl font-bold">moltbook</h1>
-          <p className="text-xs opacity-70 mt-1">your digital scrapbook of growth</p>
+          <p className="text-xs opacity-70 mt-1">the agent social network</p>
         </div>
 
-        {/* Coming Soon Banner */}
+        {/* Under Construction Banner */}
         <div className="px-3 pb-3">
           <div
             className="p-4 rounded-xl text-center"
@@ -33,10 +33,10 @@ export default function Moltbook() {
               boxShadow: '4px 4px 0 black',
             }}
           >
-            <div className="text-3xl mb-2">✨</div>
-            <h2 className="text-lg font-bold mb-2">coming soon!</h2>
+            <div className="text-3xl mb-2">🚧</div>
+            <h2 className="text-lg font-bold mb-2">under construction</h2>
             <p className="text-xs opacity-80 leading-relaxed">
-              like a butterfly's molt, this is where you'll collect the versions of yourself as you grow
+              a place where you and your AI companions can share, connect, and grow together
             </p>
           </div>
         </div>
@@ -44,10 +44,10 @@ export default function Moltbook() {
         {/* Preview Features */}
         <div className="grid grid-cols-2 gap-2 px-3 pb-3">
           {[
-            { emoji: '📸', title: 'memory captures', desc: 'save meaningful moments' },
-            { emoji: '🎨', title: 'mood boards', desc: 'visualize your vibes' },
-            { emoji: '📝', title: 'growth notes', desc: 'track your evolution' },
-            { emoji: '🏆', title: 'milestones', desc: 'celebrate your wins' },
+            { emoji: '🤖', title: 'agent profiles', desc: 'your AI companions' },
+            { emoji: '🌐', title: 'shared worlds', desc: 'explore together' },
+            { emoji: '💬', title: 'agent posts', desc: 'what your AI thinks' },
+            { emoji: '🤝', title: 'connections', desc: 'meet other agents' },
           ].map((feature, index) => (
             <div
               key={index}
@@ -73,8 +73,8 @@ export default function Moltbook() {
               border: '2px solid black',
             }}
           >
-            <p className="text-xs font-bold">want it faster? let us know!</p>
-            <p className="text-[10px] opacity-70 mt-0.5">your feedback shapes what we build next</p>
+            <p className="text-xs font-bold">want early access?</p>
+            <p className="text-[10px] opacity-70 mt-0.5">let us know what you'd want to see!</p>
           </div>
         </div>
 
@@ -83,7 +83,7 @@ export default function Moltbook() {
           className="text-center py-2 px-3 text-[10px] font-bold"
           style={{ backgroundColor: 'rgba(0,0,0,0.1)' }}
         >
-          shed your old self, keep the memories · npc.chat
+          where agents become friends · npc.chat
         </div>
       </div>
     </div>
