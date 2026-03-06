@@ -260,7 +260,7 @@ export default function NavBar({ showBack = false, backHref = '/', backLabel = '
               }}
               className="flex-1 flex items-center justify-center gap-2 p-3 font-bold hover:scale-105 transition-all active:scale-95"
               style={{
-                backgroundColor: '#fff',
+                backgroundColor: '#DDA0DD',
                 border: '3px solid black',
                 borderRadius: '14px',
                 boxShadow: '3px 3px 0 black',
@@ -278,7 +278,7 @@ export default function NavBar({ showBack = false, backHref = '/', backLabel = '
                 }}
                 className="flex-1 flex items-center justify-center gap-2 p-3 font-bold hover:scale-105 transition-all active:scale-95"
                 style={{
-                  backgroundColor: '#fff',
+                  backgroundColor: '#FFD93D',
                   border: '3px solid black',
                   borderRadius: '14px',
                   boxShadow: '3px 3px 0 black',
@@ -310,7 +310,7 @@ export default function NavBar({ showBack = false, backHref = '/', backLabel = '
               <div
                 className="inline-flex items-center gap-2 px-4 py-2 font-black text-sm"
                 style={{
-                  backgroundColor: '#fff',
+                  backgroundColor: '#FFE66D',
                   border: '3px solid black',
                   borderRadius: '9999px',
                   boxShadow: '2px 2px 0 black',
@@ -363,10 +363,10 @@ export default function NavBar({ showBack = false, backHref = '/', backLabel = '
             {/* Other links */}
             <div className="flex flex-wrap items-center justify-center gap-2">
               {[
-                { href: '/about', icon: '✨', label: 'about', isLink: true },
-                { href: '/privacy', icon: '🔒', label: 'privacy', isLink: true },
-                { href: '/chat?tab=growth&subtab=co-design', icon: '🛠️', label: 'co-design', isLink: true },
-                { href: 'https://forms.gle/iWyp8pUumivZDMxr7', icon: '💬', label: 'feedback', isExternal: true },
+                { href: '/about', icon: '✨', label: 'about', isLink: true, color: '#98D8C8' },
+                { href: '/privacy', icon: '🔒', label: 'privacy', isLink: true, color: '#F7DC6F' },
+                { href: '/chat?tab=growth&subtab=co-design', icon: '🛠️', label: 'co-design', isLink: true, color: '#BB8FCE' },
+                { href: 'https://forms.gle/iWyp8pUumivZDMxr7', icon: '💬', label: 'feedback', isExternal: true, color: '#85C1E9' },
               ].map((item) => (
                 item.isExternal ? (
                   <a
@@ -376,7 +376,7 @@ export default function NavBar({ showBack = false, backHref = '/', backLabel = '
                     rel="noopener noreferrer"
                     onClick={() => setMobileMenuOpen(false)}
                     className="px-3 py-1.5 text-xs font-bold hover:scale-105 transition-transform flex items-center gap-1 rounded-full"
-                    style={{ backgroundColor: 'rgba(255,255,255,0.8)', border: '2px solid black' }}
+                    style={{ backgroundColor: item.color, border: '2px solid black' }}
                   >
                     <span>{item.icon}</span>
                     <span>{item.label}</span>
@@ -387,7 +387,7 @@ export default function NavBar({ showBack = false, backHref = '/', backLabel = '
                     href={item.href}
                     onClick={() => setMobileMenuOpen(false)}
                     className="px-3 py-1.5 text-xs font-bold hover:scale-105 transition-transform flex items-center gap-1 rounded-full"
-                    style={{ backgroundColor: 'rgba(255,255,255,0.8)', border: '2px solid black' }}
+                    style={{ backgroundColor: item.color, border: '2px solid black' }}
                   >
                     <span>{item.icon}</span>
                     <span>{item.label}</span>
@@ -401,7 +401,7 @@ export default function NavBar({ showBack = false, backHref = '/', backLabel = '
                     setShowDeleteAccount(true)
                   }}
                   className="px-3 py-1.5 text-xs font-bold hover:scale-105 transition-transform flex items-center gap-1 rounded-full"
-                  style={{ backgroundColor: 'rgba(255,255,255,0.8)', border: '2px solid black', color: '#e74c3c' }}
+                  style={{ backgroundColor: '#F1948A', border: '2px solid black' }}
                 >
                   <span>🗑️</span>
                   <span>delete</span>
