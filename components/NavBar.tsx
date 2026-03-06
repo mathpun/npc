@@ -187,66 +187,87 @@ export default function NavBar({ showBack = false, backHref = '/', backLabel = '
         <div
           className="fixed inset-x-0 top-[58px] bottom-0 z-50 p-4 md:hidden mobile-nav-enter safe-area-left safe-area-right overflow-y-auto"
           style={{
-            background: `linear-gradient(180deg,
-              ${theme.colors.accent1} 0%,
-              ${theme.colors.accent4} 30%,
-              ${theme.colors.accent3} 60%,
-              ${theme.colors.accent5} 100%)`,
+            background: `linear-gradient(165deg,
+              #FF6B9D 0%,
+              #C44DFF 25%,
+              #7B68EE 50%,
+              #4ECDC4 75%,
+              #95E1D3 100%)`,
           }}
         >
           {/* Fun header */}
-          <div className="flex items-center justify-center gap-2 mb-3">
-            <span className="text-xl">✨</span>
-            <span className="font-black text-base">where to?</span>
-            <span className="text-xl">✨</span>
+          <div className="flex items-center justify-center gap-2 mb-4">
+            <span className="text-2xl animate-pulse">⚡</span>
+            <span className="font-black text-lg tracking-tight">where to?</span>
+            <span className="text-2xl animate-pulse">⚡</span>
           </div>
 
-          {/* Main nav - 3x3 grid */}
-          <div className="grid grid-cols-3 gap-2 mb-3">
-            {[...navItems, { href: '/parent', icon: '👨‍👩‍👧', label: 'parent dash', color: '#FD79A8' }].map((item, index) => {
+          {/* Main nav - 3x3 grid for first 6, then centered row for last 2 */}
+          <div className="grid grid-cols-3 gap-2.5 mb-2.5">
+            {navItems.slice(0, 6).map((item) => {
               const active = isActive(item.href)
-              // Center the last item if it's alone in its row
-              const isLastItem = index === navItems.length
-              const itemsInLastRow = (navItems.length + 1) % 3
-              const shouldCenter = isLastItem && itemsInLastRow === 1
-
               return (
                 <Link
                   key={item.href}
                   href={item.href}
                   onClick={() => setMobileMenuOpen(false)}
-                  className={`flex flex-col items-center justify-center gap-1 p-3 font-bold hover:scale-105 transition-all active:scale-95 ${shouldCenter ? 'col-start-2' : ''}`}
+                  className="flex flex-col items-center justify-center gap-1.5 p-3.5 font-bold hover:scale-105 transition-all active:scale-95"
                   style={{
                     backgroundColor: item.color,
-                    border: '2px solid black',
-                    borderRadius: '14px',
-                    boxShadow: active ? '3px 3px 0 black' : '2px 2px 0 black',
+                    border: '3px solid black',
+                    borderRadius: '16px',
+                    boxShadow: active ? '4px 4px 0 black' : '3px 3px 0 black',
                   }}
                 >
-                  <span className="text-2xl">{item.icon}</span>
-                  <span className="text-[10px] font-bold text-center leading-tight">{item.label}</span>
+                  <span className="text-3xl">{item.icon}</span>
+                  <span className="text-[11px] font-black text-center leading-tight">{item.label}</span>
+                </Link>
+              )
+            })}
+          </div>
+
+          {/* Last row - centered */}
+          <div className="flex justify-center gap-2.5 mb-3">
+            {[...navItems.slice(6), { href: '/parent', icon: '👨‍👩‍👧', label: 'parent dash', color: '#FD79A8' }].map((item) => {
+              const active = isActive(item.href)
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="flex flex-col items-center justify-center gap-1.5 p-3.5 font-bold hover:scale-105 transition-all active:scale-95"
+                  style={{
+                    backgroundColor: item.color,
+                    border: '3px solid black',
+                    borderRadius: '16px',
+                    boxShadow: active ? '4px 4px 0 black' : '3px 3px 0 black',
+                    minWidth: '100px',
+                  }}
+                >
+                  <span className="text-3xl">{item.icon}</span>
+                  <span className="text-[11px] font-black text-center leading-tight">{item.label}</span>
                 </Link>
               )
             })}
           </div>
 
           {/* Settings row */}
-          <div className="flex gap-2 mb-3">
+          <div className="flex gap-2.5 mb-3">
             <button
               onClick={() => {
                 setMobileMenuOpen(false)
                 setShowThemePicker(true)
               }}
-              className="flex-1 flex items-center justify-center gap-2 p-2.5 font-bold hover:scale-105 transition-all active:scale-95"
+              className="flex-1 flex items-center justify-center gap-2 p-3 font-bold hover:scale-105 transition-all active:scale-95"
               style={{
-                backgroundColor: '#E6E6FA',
-                border: '2px solid black',
-                borderRadius: '10px',
-                boxShadow: '2px 2px 0 black',
+                backgroundColor: '#fff',
+                border: '3px solid black',
+                borderRadius: '14px',
+                boxShadow: '3px 3px 0 black',
               }}
             >
-              <span className="text-base">🎨</span>
-              <span className="text-xs font-bold">skins</span>
+              <span className="text-xl">🎨</span>
+              <span className="text-sm font-black">skins</span>
             </button>
 
             {isLoggedIn ? (
@@ -255,64 +276,70 @@ export default function NavBar({ showBack = false, backHref = '/', backLabel = '
                   setMobileMenuOpen(false)
                   setShowChangePassword(true)
                 }}
-                className="flex-1 flex items-center justify-center gap-2 p-2.5 font-bold hover:scale-105 transition-all active:scale-95"
+                className="flex-1 flex items-center justify-center gap-2 p-3 font-bold hover:scale-105 transition-all active:scale-95"
                 style={{
-                  backgroundColor: '#FFE4B5',
-                  border: '2px solid black',
-                  borderRadius: '10px',
-                  boxShadow: '2px 2px 0 black',
+                  backgroundColor: '#fff',
+                  border: '3px solid black',
+                  borderRadius: '14px',
+                  boxShadow: '3px 3px 0 black',
                 }}
               >
-                <span className="text-base">🔐</span>
-                <span className="text-xs font-bold">settings</span>
+                <span className="text-xl">⚙️</span>
+                <span className="text-sm font-black">settings</span>
               </button>
             ) : (
               <Link
                 href="/login"
                 onClick={() => setMobileMenuOpen(false)}
-                className="flex-1 flex items-center justify-center gap-2 p-2.5 font-bold hover:scale-105 transition-all active:scale-95"
+                className="flex-1 flex items-center justify-center gap-2 p-3 font-bold hover:scale-105 transition-all active:scale-95"
                 style={{
-                  backgroundColor: '#90EE90',
-                  border: '2px solid black',
-                  borderRadius: '10px',
-                  boxShadow: '2px 2px 0 black',
+                  backgroundColor: '#7BED9F',
+                  border: '3px solid black',
+                  borderRadius: '14px',
+                  boxShadow: '3px 3px 0 black',
                 }}
               >
-                <span className="text-base">👋</span>
-                <span className="text-xs font-bold">log in</span>
+                <span className="text-xl">👋</span>
+                <span className="text-sm font-black">log in</span>
               </Link>
             )}
           </div>
 
           {isLoggedIn && (
-            <div className="text-center">
+            <div className="text-center mb-3">
               <div
-                className="inline-flex items-center gap-2 px-3 py-1.5 font-bold text-xs"
+                className="inline-flex items-center gap-2 px-4 py-2 font-black text-sm"
                 style={{
-                  backgroundColor: 'white',
-                  border: '2px dashed black',
+                  backgroundColor: '#fff',
+                  border: '3px solid black',
                   borderRadius: '9999px',
+                  boxShadow: '2px 2px 0 black',
                 }}
               >
-                <span>👻</span>
+                <span className="text-lg">👻</span>
                 <span>hi {userName}!</span>
               </div>
             </div>
           )}
 
           {/* Social links */}
-          <div className="mt-3 pt-3 border-t-2 border-dashed border-black/40">
-            <p className="text-center text-[10px] font-bold opacity-50 mb-2">follow us!</p>
-            <div className="flex items-center justify-center gap-3 mb-3">
+          <div className="pt-3 border-t-2 border-black/20">
+            <p className="text-center text-xs font-black mb-3 opacity-70">follow the vibes</p>
+            <div className="flex items-center justify-center gap-3 mb-4">
               <a
                 href="https://www.tiktok.com/@npc_theai"
                 target="_blank"
                 rel="noopener noreferrer"
                 onClick={() => setMobileMenuOpen(false)}
-                className="px-4 py-2 text-xs font-bold hover:scale-105 transition-transform flex items-center gap-1.5 rounded-full"
-                style={{ background: 'linear-gradient(45deg, #69C9D0, #EE1D52, #000)', color: 'white', border: '2px solid black' }}
+                className="px-5 py-2.5 font-black hover:scale-105 transition-transform flex items-center gap-2 rounded-xl"
+                style={{
+                  backgroundColor: '#000',
+                  color: 'white',
+                  border: '3px solid black',
+                  boxShadow: '3px 3px 0 #69C9D0',
+                }}
               >
-                <span>🎵</span>
+                <span className="text-lg">🎵</span>
                 <span>TikTok</span>
               </a>
               <a
@@ -320,54 +347,53 @@ export default function NavBar({ showBack = false, backHref = '/', backLabel = '
                 target="_blank"
                 rel="noopener noreferrer"
                 onClick={() => setMobileMenuOpen(false)}
-                className="px-4 py-2 text-xs font-bold hover:scale-105 transition-transform flex items-center gap-1.5 rounded-full"
-                style={{ background: 'linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888)', color: 'white' }}
+                className="px-5 py-2.5 font-black hover:scale-105 transition-transform flex items-center gap-2 rounded-xl"
+                style={{
+                  backgroundColor: '#E1306C',
+                  color: 'white',
+                  border: '3px solid black',
+                  boxShadow: '3px 3px 0 #833AB4',
+                }}
               >
-                <span>📸</span>
-                <span>Instagram</span>
+                <span className="text-lg">📸</span>
+                <span>Insta</span>
               </a>
             </div>
 
             {/* Other links */}
             <div className="flex flex-wrap items-center justify-center gap-2">
-              <Link
-                href="/about"
-                onClick={() => setMobileMenuOpen(false)}
-                className="px-3 py-1.5 text-xs font-bold hover:scale-105 transition-transform flex items-center gap-1 rounded-full"
-                style={{ backgroundColor: 'rgba(255,255,255,0.5)', color: '#333' }}
-              >
-                <span>✨</span>
-                <span>about</span>
-              </Link>
-              <Link
-                href="/privacy"
-                onClick={() => setMobileMenuOpen(false)}
-                className="px-3 py-1.5 text-xs font-bold hover:scale-105 transition-transform flex items-center gap-1 rounded-full"
-                style={{ backgroundColor: 'rgba(255,255,255,0.5)', color: '#333' }}
-              >
-                <span>🔒</span>
-                <span>privacy</span>
-              </Link>
-              <Link
-                href="/chat?tab=growth&subtab=co-design"
-                onClick={() => setMobileMenuOpen(false)}
-                className="px-3 py-1.5 text-xs font-bold hover:scale-105 transition-transform flex items-center gap-1 rounded-full"
-                style={{ backgroundColor: 'rgba(255,255,255,0.5)', color: '#333' }}
-              >
-                <span>🛠️</span>
-                <span>co-design</span>
-              </Link>
-              <a
-                href="https://forms.gle/iWyp8pUumivZDMxr7"
-                target="_blank"
-                rel="noopener noreferrer"
-                onClick={() => setMobileMenuOpen(false)}
-                className="px-3 py-1.5 text-xs font-bold hover:scale-105 transition-transform flex items-center gap-1 rounded-full"
-                style={{ backgroundColor: 'rgba(255,255,255,0.5)', color: '#333' }}
-              >
-                <span>💬</span>
-                <span>feedback</span>
-              </a>
+              {[
+                { href: '/about', icon: '✨', label: 'about', isLink: true },
+                { href: '/privacy', icon: '🔒', label: 'privacy', isLink: true },
+                { href: '/chat?tab=growth&subtab=co-design', icon: '🛠️', label: 'co-design', isLink: true },
+                { href: 'https://forms.gle/iWyp8pUumivZDMxr7', icon: '💬', label: 'feedback', isExternal: true },
+              ].map((item) => (
+                item.isExternal ? (
+                  <a
+                    key={item.label}
+                    href={item.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="px-3 py-1.5 text-xs font-bold hover:scale-105 transition-transform flex items-center gap-1 rounded-full"
+                    style={{ backgroundColor: 'rgba(255,255,255,0.8)', border: '2px solid black' }}
+                  >
+                    <span>{item.icon}</span>
+                    <span>{item.label}</span>
+                  </a>
+                ) : (
+                  <Link
+                    key={item.label}
+                    href={item.href}
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="px-3 py-1.5 text-xs font-bold hover:scale-105 transition-transform flex items-center gap-1 rounded-full"
+                    style={{ backgroundColor: 'rgba(255,255,255,0.8)', border: '2px solid black' }}
+                  >
+                    <span>{item.icon}</span>
+                    <span>{item.label}</span>
+                  </Link>
+                )
+              ))}
               {isLoggedIn && (
                 <button
                   onClick={() => {
@@ -375,7 +401,7 @@ export default function NavBar({ showBack = false, backHref = '/', backLabel = '
                     setShowDeleteAccount(true)
                   }}
                   className="px-3 py-1.5 text-xs font-bold hover:scale-105 transition-transform flex items-center gap-1 rounded-full"
-                  style={{ backgroundColor: 'rgba(255,255,255,0.5)', color: '#e74c3c' }}
+                  style={{ backgroundColor: 'rgba(255,255,255,0.8)', border: '2px solid black', color: '#e74c3c' }}
                 >
                   <span>🗑️</span>
                   <span>delete</span>
