@@ -333,10 +333,10 @@ export default function NavBar({ showBack = false, backHref = '/', backLabel = '
                 onClick={() => setMobileMenuOpen(false)}
                 className="px-5 py-2.5 font-black hover:scale-105 transition-transform flex items-center gap-2 rounded-xl"
                 style={{
-                  backgroundColor: '#000',
-                  color: 'white',
+                  backgroundColor: '#69C9D0',
+                  color: 'black',
                   border: '3px solid black',
-                  boxShadow: '3px 3px 0 #69C9D0',
+                  boxShadow: '3px 3px 0 #EE1D52',
                 }}
               >
                 <span className="text-lg">🎵</span>
