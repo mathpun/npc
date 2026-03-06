@@ -1149,7 +1149,7 @@ export default function AdminDashboard() {
                         stuck: { label: "I'm stuck", emoji: '🌀', color: '#DDA0DD' },
                         future: { label: 'My future', emoji: '🔮', color: '#87CEEB' },
                         identity: { label: 'Who am I', emoji: '🪞', color: '#FFB6C1' },
-                        people: { label: 'People stuff', emoji: '👥', color: '#90EE90' },
+                        people: { label: 'Friends & drama', emoji: '👥', color: '#90EE90' },
                         venting: { label: 'Need to vent', emoji: '🔥', color: '#FF6B6B' },
                         creating: { label: 'Make something', emoji: '✨', color: '#FFD93D' },
                         thinking: { label: 'Thinking', emoji: '🧠', color: '#DDA0DD' },

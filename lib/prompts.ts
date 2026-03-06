@@ -48,7 +48,7 @@ export const SESSION_GOALS = {
     emoji: '🪞',
   },
   people: {
-    label: "people stuff",
+    label: "friends & drama",
     description: "Friends, dating, family, social things",
     icon: 'people',
     examples: ['friend drama', 'crush stuff', "parents don't get it"],
