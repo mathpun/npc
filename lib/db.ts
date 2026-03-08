@@ -513,6 +513,25 @@ async function initDb() {
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         UNIQUE(user_id, analysis_date)
       );
+
+      -- Touch grass submissions (photos of grass for wellness breaks)
+      CREATE TABLE IF NOT EXISTS grass_touches (
+        id SERIAL PRIMARY KEY,
+        user_id TEXT NOT NULL REFERENCES users(id),
+        photo_url TEXT,
+        points_earned INTEGER DEFAULT 10,
+        session_minutes INTEGER,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      );
+
+      -- User grass points total (cached for quick lookup)
+      CREATE TABLE IF NOT EXISTS grass_points (
+        user_id TEXT PRIMARY KEY REFERENCES users(id),
+        total_points INTEGER DEFAULT 0,
+        total_touches INTEGER DEFAULT 0,
+        last_touch TIMESTAMP,
+        streak_days INTEGER DEFAULT 0
+      );
     `)
     console.log('Database tables initialized')
   } catch (error) {

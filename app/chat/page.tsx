@@ -22,6 +22,7 @@ import AILiteracy from '@/components/AILiteracy'
 import DailyCheckIn from '@/components/DailyCheckIn'
 import AIConsentModal from '@/components/AIConsentModal'
 import PersonalityIslands from '@/components/PersonalityIslands'
+import TouchGrass, { GrassPointsBadge } from '@/components/TouchGrass'
 import { SessionGoal, PersonaType, SESSION_GOALS, buildReflectionPrompt, CustomPersona } from '@/lib/prompts'
 import ChatHistory from '@/components/ChatHistory'
 
@@ -78,6 +79,9 @@ function ChatPageContent() {
     completedChallengeIds: [] as string[],
   })
   const [userAvatarUrl, setUserAvatarUrl] = useState<string | null>(null)
+  const [showTouchGrass, setShowTouchGrass] = useState(false)
+  const [sessionStartTime, setSessionStartTime] = useState<Date | null>(null)
+  const [hasShownGrassPrompt, setHasShownGrassPrompt] = useState(false)
   const messagesEndRef = useRef<HTMLDivElement>(null)
 
   // Track activity helper
@@ -218,6 +222,35 @@ function ChatPageContent() {
     setShowCheckIn(false)
   }
 
+  // Touch Grass timer - show prompt after 10 minutes of chatting
+  useEffect(() => {
+    if (!sessionStartTime || hasShownGrassPrompt || showSessionPicker) return
+
+    const checkGrassTime = () => {
+      const now = new Date()
+      const minutesElapsed = (now.getTime() - sessionStartTime.getTime()) / (1000 * 60)
+
+      // Show grass prompt after 10 minutes
+      if (minutesElapsed >= 10 && !hasShownGrassPrompt) {
+        setShowTouchGrass(true)
+        setHasShownGrassPrompt(true)
+      }
+    }
+
+    // Check every minute
+    const interval = setInterval(checkGrassTime, 60000)
+
+    // Also check immediately in case we're resuming
+    checkGrassTime()
+
+    return () => clearInterval(interval)
+  }, [sessionStartTime, hasShownGrassPrompt, showSessionPicker])
+
+  const getSessionMinutes = () => {
+    if (!sessionStartTime) return 0
+    return Math.floor((new Date().getTime() - sessionStartTime.getTime()) / (1000 * 60))
+  }
+
   const handleAIConsentAccept = () => {
     localStorage.setItem('ai_data_consent', 'true')
     setHasAIConsent(true)
@@ -329,6 +362,8 @@ function ChatPageContent() {
 
     setSession({ goal, topic, persona, customPersona })
     setShowSessionPicker(false)
+    setSessionStartTime(new Date())
+    setHasShownGrassPrompt(false)
 
     // Track session start
     trackActivity('session_start', { goal, topic, persona, customPersonaName: customPersona?.name })
@@ -597,6 +632,20 @@ function ChatPageContent() {
         />
       )}
 
+      {/* Touch Grass Modal */}
+      {showTouchGrass && userId && (
+        <TouchGrass
+          userId={userId}
+          sessionMinutes={getSessionMinutes()}
+          onClose={() => setShowTouchGrass(false)}
+          onComplete={() => {
+            // Reset timer for another 10 minutes
+            setSessionStartTime(new Date())
+            setHasShownGrassPrompt(false)
+          }}
+        />
+      )}
+
       {/* Doodle decorations */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden">
         <div className="absolute top-20 right-10 text-3xl rotate-12">☀️</div>
@@ -666,19 +715,22 @@ function ChatPageContent() {
                         )}
                       </div>
                     </div>
-                    <button
-                      onClick={startNewSession}
-                      className="px-3 sm:px-4 py-1.5 sm:py-2 font-bold text-sm sm:text-base hover:scale-105 transition-transform"
-                      style={{
-                        backgroundColor: theme.colors.backgroundAlt,
-                        border: '2px solid black',
-                        borderRadius: '9999px',
-                        boxShadow: '2px 2px 0 black',
-                      }}
-                    >
-                      <span className="sm:hidden">🔄</span>
-                      <span className="hidden sm:inline">🔄 new chat</span>
-                    </button>
+                    <div className="flex items-center gap-2">
+                      {userId && <GrassPointsBadge userId={userId} />}
+                      <button
+                        onClick={startNewSession}
+                        className="px-3 sm:px-4 py-1.5 sm:py-2 font-bold text-sm sm:text-base hover:scale-105 transition-transform"
+                        style={{
+                          backgroundColor: theme.colors.backgroundAlt,
+                          border: '2px solid black',
+                          borderRadius: '9999px',
+                          boxShadow: '2px 2px 0 black',
+                        }}
+                      >
+                        <span className="sm:hidden">🔄</span>
+                        <span className="hidden sm:inline">🔄 new chat</span>
+                      </button>
+                    </div>
                   </div>
                 </div>
 
