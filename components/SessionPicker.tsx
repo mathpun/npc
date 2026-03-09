@@ -201,35 +201,6 @@ export default function SessionPicker({ onSelect, onClose, onOpenHistory, onLoad
           </button>
         )}
 
-        {/* Continue Previous Chat button - shown if there are recent chats */}
-        {!loadingRecent && recentChats.length > 0 && onOpenHistory && (
-          <div className="mb-5">
-            <button
-              onClick={onOpenHistory}
-              className="w-full p-3 text-left hover:scale-[1.02] transition-transform flex items-center gap-3"
-              style={{
-                backgroundColor: '#E6E6FA',
-                border: '3px solid black',
-                borderRadius: '12px',
-                boxShadow: '3px 3px 0 black',
-              }}
-            >
-              <span className="text-2xl">📂</span>
-              <div className="flex-1">
-                <p className="font-bold text-sm">continue a chat</p>
-                <p className="text-xs text-gray-600">{recentChats.length} recent chats{buckets.length > 0 ? ` · ${buckets.length} projects` : ''}</p>
-              </div>
-              <span className="text-lg">→</span>
-            </button>
-
-            {/* Divider */}
-            <div className="flex items-center gap-4 mt-4">
-              <div className="flex-1 border-t-2 border-dashed border-black/30" />
-              <span className="text-xs font-bold text-gray-500 whitespace-nowrap">or start fresh</span>
-              <div className="flex-1 border-t-2 border-dashed border-black/30" />
-            </div>
-          </div>
-        )}
 
         {/* Centered animated character */}
         <div className="flex flex-col items-center mb-5">
@@ -320,30 +291,44 @@ export default function SessionPicker({ onSelect, onClose, onOpenHistory, onLoad
           )}
         </div>
 
-        {/* Divider - only show if no recent chats (since we already have one above) */}
-        {recentChats.length === 0 && (
-          <div className="flex items-center gap-4 mb-4">
-            <div className="flex-1 border-t-2 border-dashed border-black/30" />
-            <span className="text-xs font-bold text-gray-500 whitespace-nowrap">or</span>
-            <div className="flex-1 border-t-2 border-dashed border-black/30" />
-          </div>
-        )}
+        {/* Divider */}
+        <div className="flex items-center gap-4 mb-4">
+          <div className="flex-1 border-t-2 border-dashed border-black/30" />
+          <span className="text-xs font-bold text-gray-500 whitespace-nowrap">or</span>
+          <div className="flex-1 border-t-2 border-dashed border-black/30" />
+        </div>
 
-        {/* Just Chat - at the bottom */}
-        <div className="flex justify-center">
+        {/* Just Chat + Continue Chat tabs at the bottom */}
+        <div className="flex justify-center gap-3">
           <button
             onClick={handleQuickStart}
-            className="px-6 py-3 text-base sm:text-lg font-bold transition-all duration-300 hover:scale-105 flex items-center gap-2 group"
+            className="px-5 py-2.5 text-sm sm:text-base font-bold transition-all duration-300 hover:scale-105 flex items-center gap-2 group"
             style={{
               background: 'linear-gradient(135deg, #90EE90 0%, #7BED9F 100%)',
               border: '3px solid black',
               borderRadius: '9999px',
-              boxShadow: '4px 4px 0 black',
+              boxShadow: '3px 3px 0 black',
             }}
           >
-            <span className="text-xl group-hover:animate-bounce">👻</span>
+            <span className="text-lg group-hover:animate-bounce">👻</span>
             <span>just chat!</span>
           </button>
+
+          {onOpenHistory && (
+            <button
+              onClick={onOpenHistory}
+              className="px-5 py-2.5 text-sm sm:text-base font-bold transition-all duration-300 hover:scale-105 flex items-center gap-2"
+              style={{
+                background: 'linear-gradient(135deg, #E6E6FA 0%, #D8BFD8 100%)',
+                border: '3px solid black',
+                borderRadius: '9999px',
+                boxShadow: '3px 3px 0 black',
+              }}
+            >
+              <span className="text-lg">📂</span>
+              <span>continue</span>
+            </button>
+          )}
         </div>
       </div>
     )
