@@ -347,25 +347,22 @@ export default function IslandsOfYou({ userId, onClose }: IslandsOfYouProps) {
             const finalScale = pos.scale * baseScale * (isHighlighted ? 1.15 : 1)
 
             return (
-              // Outer wrapper for positioning only
-              <div
+              <button
                 key={island.id}
-                className="absolute"
+                onClick={() => setSelectedIsland(island)}
+                className="absolute transition-all duration-500"
                 style={{
                   left: `${pos.x}%`,
                   top: `${pos.y}%`,
+                  transform: `translate(-50%, -50%) scale(${finalScale})`,
                   zIndex: isHighlighted ? 15 : 10 - index,
+                  filter: isHighlighted ? 'drop-shadow(0 0 30px rgba(255, 215, 0, 0.8))' : 'drop-shadow(0 10px 20px rgba(0,0,0,0.3))',
                 }}
               >
-                {/* Inner wrapper for animation and scaling */}
-                <button
-                  onClick={() => setSelectedIsland(island)}
-                  className="island-float transition-all duration-500"
-                  style={{
-                    transform: `translate(-50%, -50%) scale(${finalScale})`,
-                    animationDelay: `${pos.delay}s`,
-                    filter: isHighlighted ? 'drop-shadow(0 0 30px rgba(255, 215, 0, 0.8))' : 'drop-shadow(0 10px 20px rgba(0,0,0,0.3))',
-                  }}
+                {/* Animated inner content */}
+                <div
+                  className="island-float"
+                  style={{ animationDelay: `${pos.delay}s` }}
                 >
                   {/* Island base */}
                   <div className="relative">
@@ -438,8 +435,8 @@ export default function IslandsOfYou({ userId, onClose }: IslandsOfYouProps) {
                       />
                     )}
                   </div>
-                </button>
-              </div>
+                </div>
+              </button>
             )
           })}
         </div>
