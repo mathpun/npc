@@ -678,10 +678,11 @@ function ChatPageContent() {
         {activeTab === 'chat' && (
           <>
             {showSessionPicker ? (
-              <div className="h-full flex items-center justify-center px-4 py-8">
+              <div className="h-full flex items-center justify-center px-4 py-8 overflow-y-auto">
                 <SessionPicker
                   onSelect={handleSessionSelect}
                   onOpenHistory={() => setShowChatHistory(true)}
+                  onLoadSession={handleLoadSession}
                 />
               </div>
             ) : (

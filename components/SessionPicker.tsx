@@ -1,23 +1,47 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { SessionGoal, PersonaType, SESSION_GOALS, PERSONAS, CustomPersona } from '@/lib/prompts'
+
+interface RecentChat {
+  id: number
+  title: string | null
+  session_topic: string | null
+  first_message: string | null
+  started_at: string
+  message_count: number
+  bucket_name: string | null
+  bucket_emoji: string | null
+}
+
+interface Bucket {
+  id: number
+  name: string
+  emoji: string
+  session_count: number
+}
 
 interface SessionPickerProps {
   onSelect: (goal: SessionGoal, topic: string, persona: PersonaType, customPersona?: CustomPersona) => void
   onClose?: () => void
   onOpenHistory?: () => void
+  onLoadSession?: (sessionId: number) => void
 }
 
 type Step = 'goal' | 'persona' | 'custom'
 
 const EMOJI_OPTIONS = ['😊', '🦊', '🌟', '🔮', '🎭', '🦋', '🌈', '🍄', '🐉', '👽', '🤖', '🧙', '🦄', '🐱', '🎪', '💫']
 
-export default function SessionPicker({ onSelect, onClose, onOpenHistory }: SessionPickerProps) {
+export default function SessionPicker({ onSelect, onClose, onOpenHistory, onLoadSession }: SessionPickerProps) {
   const [step, setStep] = useState<Step>('goal')
   const [selectedGoal, setSelectedGoal] = useState<SessionGoal | null>(null)
   const [selectedPersona, setSelectedPersona] = useState<PersonaType | null>(null)
   const [topic, setTopic] = useState('')
+
+  // Recent chats and buckets
+  const [recentChats, setRecentChats] = useState<RecentChat[]>([])
+  const [buckets, setBuckets] = useState<Bucket[]>([])
+  const [loadingRecent, setLoadingRecent] = useState(true)
 
   // Custom persona state
   const [customName, setCustomName] = useState('')
@@ -26,6 +50,58 @@ export default function SessionPicker({ onSelect, onClose, onOpenHistory }: Sess
   const [customVibe, setCustomVibe] = useState('')
   const [customImageUrl, setCustomImageUrl] = useState<string | null>(null)
   const [isGeneratingImage, setIsGeneratingImage] = useState(false)
+
+  // Fetch recent chats and buckets
+  useEffect(() => {
+    const fetchRecent = async () => {
+      const userId = localStorage.getItem('npc_user_id')
+      if (!userId) {
+        setLoadingRecent(false)
+        return
+      }
+
+      try {
+        // Fetch recent sessions
+        const sessionsRes = await fetch(`/api/chat-sessions?userId=${userId}&limit=3`)
+        if (sessionsRes.ok) {
+          const data = await sessionsRes.json()
+          setRecentChats(data.sessions || [])
+        }
+
+        // Fetch buckets
+        const bucketsRes = await fetch(`/api/chat-buckets?userId=${userId}`)
+        if (bucketsRes.ok) {
+          const data = await bucketsRes.json()
+          setBuckets(data.buckets || [])
+        }
+      } catch (err) {
+        console.error('Failed to fetch recent:', err)
+      } finally {
+        setLoadingRecent(false)
+      }
+    }
+
+    fetchRecent()
+  }, [])
+
+  const getTimeAgo = (dateStr: string) => {
+    const date = new Date(dateStr)
+    const now = new Date()
+    const diff = now.getTime() - date.getTime()
+    const hours = Math.floor(diff / (1000 * 60 * 60))
+    if (hours < 1) return 'just now'
+    if (hours < 24) return `${hours}h ago`
+    const days = Math.floor(hours / 24)
+    if (days === 1) return 'yesterday'
+    return `${days}d ago`
+  }
+
+  const getChatTitle = (chat: RecentChat) => {
+    if (chat.title) return chat.title
+    if (chat.session_topic) return chat.session_topic.slice(0, 30) + (chat.session_topic.length > 30 ? '...' : '')
+    if (chat.first_message) return chat.first_message.slice(0, 30) + (chat.first_message.length > 30 ? '...' : '')
+    return 'Untitled chat'
+  }
 
   const handleGoalSelect = (goal: SessionGoal) => {
     setSelectedGoal(goal)
@@ -125,6 +201,95 @@ export default function SessionPicker({ onSelect, onClose, onOpenHistory }: Sess
           </button>
         )}
 
+        {/* Continue Previous Chat - shown if there are recent chats */}
+        {!loadingRecent && recentChats.length > 0 && (
+          <div className="mb-5">
+            <div className="flex items-center justify-between mb-2">
+              <h3 className="text-sm font-bold text-gray-600">📂 continue a chat</h3>
+              {onOpenHistory && (
+                <button
+                  onClick={onOpenHistory}
+                  className="text-xs font-bold px-2 py-1 hover:scale-105 transition-transform"
+                  style={{
+                    backgroundColor: '#E6E6FA',
+                    border: '2px solid black',
+                    borderRadius: '8px',
+                  }}
+                >
+                  see all →
+                </button>
+              )}
+            </div>
+            <div className="space-y-2">
+              {recentChats.slice(0, 3).map((chat) => (
+                <button
+                  key={chat.id}
+                  onClick={() => onLoadSession?.(chat.id)}
+                  className="w-full text-left p-2.5 hover:scale-[1.02] transition-transform flex items-center gap-2"
+                  style={{
+                    backgroundColor: 'white',
+                    border: '2px solid black',
+                    borderRadius: '10px',
+                    boxShadow: '2px 2px 0 black',
+                  }}
+                >
+                  <span className="text-lg">💬</span>
+                  <div className="flex-1 min-w-0">
+                    <p className="font-bold text-sm truncate">{getChatTitle(chat)}</p>
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs text-gray-500">{getTimeAgo(chat.started_at)}</span>
+                      {chat.bucket_name && (
+                        <span className="text-xs px-1.5 py-0.5 rounded" style={{ backgroundColor: '#E8F5E9', border: '1px solid #81C784' }}>
+                          {chat.bucket_emoji} {chat.bucket_name}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                  <span className="text-gray-400">→</span>
+                </button>
+              ))}
+            </div>
+
+            {/* Projects/Buckets quick access */}
+            {buckets.length > 0 && (
+              <div className="mt-3 flex flex-wrap gap-1.5">
+                {buckets.slice(0, 4).map((bucket) => (
+                  <button
+                    key={bucket.id}
+                    onClick={onOpenHistory}
+                    className="px-2.5 py-1 text-xs font-bold hover:scale-105 transition-transform"
+                    style={{
+                      backgroundColor: '#FFFACD',
+                      border: '2px solid black',
+                      borderRadius: '8px',
+                    }}
+                  >
+                    {bucket.emoji} {bucket.name} ({bucket.session_count})
+                  </button>
+                ))}
+                <button
+                  onClick={onOpenHistory}
+                  className="px-2.5 py-1 text-xs font-bold hover:scale-105 transition-transform"
+                  style={{
+                    backgroundColor: '#E6E6FA',
+                    border: '2px dashed black',
+                    borderRadius: '8px',
+                  }}
+                >
+                  + new project
+                </button>
+              </div>
+            )}
+
+            {/* Divider */}
+            <div className="flex items-center gap-4 mt-4">
+              <div className="flex-1 border-t-2 border-dashed border-black/30" />
+              <span className="text-xs font-bold text-gray-500 whitespace-nowrap">or start fresh</span>
+              <div className="flex-1 border-t-2 border-dashed border-black/30" />
+            </div>
+          </div>
+        )}
+
         {/* Centered animated character */}
         <div className="flex flex-col items-center mb-5">
           <div className="relative mb-3">
@@ -151,7 +316,7 @@ export default function SessionPicker({ onSelect, onClose, onOpenHistory }: Sess
               boxShadow: '3px 3px 0 black',
             }}
           >
-            mood?
+            {recentChats.length > 0 ? 'new chat' : 'mood?'}
           </h2>
         </div>
 
@@ -198,7 +363,7 @@ export default function SessionPicker({ onSelect, onClose, onOpenHistory }: Sess
             {selectedGoal ? 'pick a character →' : 'tap a vibe'}
           </button>
 
-          {onOpenHistory && (
+          {onOpenHistory && recentChats.length === 0 && (
             <button
               onClick={onOpenHistory}
               className="px-4 py-2 font-bold text-sm transition-all duration-200 hover:scale-105"
@@ -209,17 +374,19 @@ export default function SessionPicker({ onSelect, onClose, onOpenHistory }: Sess
                 boxShadow: '2px 2px 0 black',
               }}
             >
-              📋
+              📋 history
             </button>
           )}
         </div>
 
-        {/* Divider */}
-        <div className="flex items-center gap-4 mb-4">
-          <div className="flex-1 border-t-2 border-dashed border-black/30" />
-          <span className="text-xs font-bold text-gray-500 whitespace-nowrap">or</span>
-          <div className="flex-1 border-t-2 border-dashed border-black/30" />
-        </div>
+        {/* Divider - only show if no recent chats (since we already have one above) */}
+        {recentChats.length === 0 && (
+          <div className="flex items-center gap-4 mb-4">
+            <div className="flex-1 border-t-2 border-dashed border-black/30" />
+            <span className="text-xs font-bold text-gray-500 whitespace-nowrap">or</span>
+            <div className="flex-1 border-t-2 border-dashed border-black/30" />
+          </div>
+        )}
 
         {/* Just Chat - at the bottom */}
         <div className="flex justify-center">
