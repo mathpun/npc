@@ -168,7 +168,7 @@ export default function Home() {
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {[
-              { emoji: '📚', title: 'homework help', desc: 'understand concepts, not just get answers' },
+              { emoji: '🪞', title: 'identity exploration', desc: 'figure out who you are and want to be' },
               { emoji: '💭', title: 'processing feelings', desc: 'talk through what\'s on your mind' },
               { emoji: '✨', title: 'creative projects', desc: 'brainstorm ideas and get unstuck' },
               { emoji: '🎯', title: 'making decisions', desc: 'think through your options clearly' },
