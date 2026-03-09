@@ -54,7 +54,7 @@ export default function NavBar({ showBack = false, backHref = '/', backLabel = '
     { href: '/chat', icon: '💬', label: 'chat', color: '#7BED9F' },
     { href: '/create', icon: '✨', label: 'create', color: '#DDA0DD' },
     { href: '/chat?tab=growth', icon: '🌀', label: 'mind wrapped', color: '#FDCB6E' },
-    { href: '/journal', icon: '📓', label: 'journal', color: '#FFE4EC' },
+    { href: '/journal', icon: '📓', label: 'journal', color: '#FFCBA4' },
     { href: '/profile', icon: '👤', label: 'profile', color: '#87CEEB' },
   ]
 
