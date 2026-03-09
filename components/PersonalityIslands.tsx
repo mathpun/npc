@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import { useTheme } from '@/lib/ThemeContext'
 
 interface Island {
@@ -18,6 +19,7 @@ interface PersonalityIslandsProps {
 
 export default function PersonalityIslands({ userId }: PersonalityIslandsProps) {
   const { theme } = useTheme()
+  const router = useRouter()
   const [islands, setIslands] = useState<Island[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [isAnalyzing, setIsAnalyzing] = useState(false)
@@ -267,19 +269,36 @@ export default function PersonalityIslands({ userId }: PersonalityIslandsProps) 
         </div>
       )}
 
-      {/* Re-analyze button */}
+      {/* Action buttons */}
       {islands.length > 0 && (
-        <button
-          onClick={analyzeAndCreateIslands}
-          disabled={isAnalyzing}
-          className="w-full mt-3 p-2 text-xs font-bold rounded-lg hover:scale-[1.02] transition-transform disabled:opacity-50"
-          style={{
-            backgroundColor: theme.colors.backgroundAlt,
-            border: '2px solid black',
-          }}
-        >
-          {isAnalyzing ? '🔍 Analyzing...' : '🔄 Re-discover'}
-        </button>
+        <div className="mt-3 space-y-2">
+          {/* Enter Mindscape button */}
+          <button
+            onClick={() => router.push('/islands')}
+            className="w-full p-3 font-bold text-sm rounded-xl hover:scale-[1.02] transition-transform"
+            style={{
+              background: 'linear-gradient(135deg, #7b4397 0%, #dc2430 100%)',
+              color: 'white',
+              border: '3px solid black',
+              boxShadow: '4px 4px 0 black',
+            }}
+          >
+            ✨ Enter Your Mindscape
+          </button>
+
+          {/* Re-analyze button */}
+          <button
+            onClick={analyzeAndCreateIslands}
+            disabled={isAnalyzing}
+            className="w-full p-2 text-xs font-bold rounded-lg hover:scale-[1.02] transition-transform disabled:opacity-50"
+            style={{
+              backgroundColor: theme.colors.backgroundAlt,
+              border: '2px solid black',
+            }}
+          >
+            {isAnalyzing ? '🔍 Analyzing...' : '🔄 Re-discover'}
+          </button>
+        </div>
       )}
 
       {/* Selected Island Modal */}
