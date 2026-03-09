@@ -24,6 +24,8 @@ export default function SessionPicker({ onSelect, onClose, onOpenHistory }: Sess
   const [customEmoji, setCustomEmoji] = useState('✨')
   const [customDescription, setCustomDescription] = useState('')
   const [customVibe, setCustomVibe] = useState('')
+  const [customImageUrl, setCustomImageUrl] = useState<string | null>(null)
+  const [isGeneratingImage, setIsGeneratingImage] = useState(false)
 
   const handleGoalSelect = (goal: SessionGoal) => {
     setSelectedGoal(goal)
@@ -52,8 +54,31 @@ export default function SessionPicker({ onSelect, onClose, onOpenHistory }: Sess
     }
   }
 
-  const handleCustomCreate = () => {
+  const handleCustomCreate = async () => {
     if (customName && customVibe) {
+      // Generate AI image for the persona
+      setIsGeneratingImage(true)
+      try {
+        const res = await fetch('/api/persona-image', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            name: customName,
+            emoji: customEmoji,
+            description: customDescription,
+            vibe: customVibe,
+          }),
+        })
+        if (res.ok) {
+          const data = await res.json()
+          setCustomImageUrl(data.imageUrl)
+        }
+      } catch (err) {
+        console.error('Failed to generate persona image:', err)
+      } finally {
+        setIsGeneratingImage(false)
+      }
+
       setSelectedPersona('custom')
       setStep('persona')
     }
@@ -67,6 +92,7 @@ export default function SessionPicker({ onSelect, onClose, onOpenHistory }: Sess
           emoji: customEmoji,
           description: customDescription,
           vibe: customVibe,
+          imageUrl: customImageUrl || undefined,
         }
         onSelect(selectedGoal, topic, selectedPersona, customPersona)
       } else {
@@ -381,15 +407,24 @@ export default function SessionPicker({ onSelect, onClose, onOpenHistory }: Sess
           >
             <p className="font-bold mb-2">preview:</p>
             <div className="flex items-center gap-3">
-              <div
-                className="w-12 h-12 rounded-full flex items-center justify-center text-2xl"
-                style={{
-                  backgroundColor: 'white',
-                  border: '3px solid black',
-                }}
-              >
-                {customEmoji}
-              </div>
+              {customImageUrl ? (
+                <img
+                  src={customImageUrl}
+                  alt={customName}
+                  className="w-12 h-12 rounded-full object-cover"
+                  style={{ border: '3px solid black' }}
+                />
+              ) : (
+                <div
+                  className="w-12 h-12 rounded-full flex items-center justify-center text-2xl"
+                  style={{
+                    backgroundColor: 'white',
+                    border: '3px solid black',
+                  }}
+                >
+                  {customEmoji}
+                </div>
+              )}
               <div>
                 <h3 className="font-bold">{customName}</h3>
                 <p className="text-sm opacity-80">{customDescription || 'your custom persona'}</p>
@@ -402,17 +437,17 @@ export default function SessionPicker({ onSelect, onClose, onOpenHistory }: Sess
         <div className="flex justify-center mt-6">
           <button
             onClick={handleCustomCreate}
-            disabled={!customName || !customVibe}
+            disabled={!customName || !customVibe || isGeneratingImage}
             className="px-10 py-4 text-xl font-bold transition-all duration-300 hover:scale-105"
             style={{
               backgroundColor: customName && customVibe ? '#90EE90' : '#ccc',
               border: '4px solid black',
               borderRadius: '9999px',
               boxShadow: customName && customVibe ? '5px 5px 0 black' : 'none',
-              cursor: customName && customVibe ? 'pointer' : 'not-allowed',
+              cursor: customName && customVibe && !isGeneratingImage ? 'pointer' : 'not-allowed',
             }}
           >
-            create & use this persona ✨
+            {isGeneratingImage ? '🎨 generating avatar...' : 'create & use this persona ✨'}
           </button>
         </div>
       </div>
@@ -508,7 +543,16 @@ export default function SessionPicker({ onSelect, onClose, onOpenHistory }: Sess
         }}
       >
         <div className="flex items-center gap-2">
-          <span className="text-2xl">{selectedPersona === 'custom' && customEmoji ? customEmoji : '➕'}</span>
+          {selectedPersona === 'custom' && customImageUrl ? (
+            <img
+              src={customImageUrl}
+              alt={customName}
+              className="w-10 h-10 rounded-full object-cover"
+              style={{ border: '2px solid black' }}
+            />
+          ) : (
+            <span className="text-2xl">{selectedPersona === 'custom' && customEmoji ? customEmoji : '➕'}</span>
+          )}
           <div className="flex-1">
             <h3 className="font-bold text-sm">
               {selectedPersona === 'custom' && customName ? customName : 'create your own'}

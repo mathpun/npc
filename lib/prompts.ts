@@ -13,6 +13,7 @@ export interface CustomPersona {
   emoji: string
   description: string
   vibe: string
+  imageUrl?: string  // AI-generated thumbnail
 }
 
 export interface SessionContext {
