@@ -184,15 +184,32 @@ async function initDb() {
         END IF;
       END $$;
 
-      -- Journal entries
+      -- Journal entries (legacy - kept for migration compatibility)
       CREATE TABLE IF NOT EXISTS journal_entries (
         id SERIAL PRIMARY KEY,
         user_id TEXT NOT NULL REFERENCES users(id),
-        entry_type TEXT NOT NULL,
+        entry_type TEXT NOT NULL DEFAULT 'free',
         content TEXT NOT NULL,
         context TEXT,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       );
+
+      -- Add missing columns to journal_entries if they don't exist
+      DO $$
+      BEGIN
+        IF NOT EXISTS (SELECT 1 FROM information_schema.columns
+                       WHERE table_name = 'journal_entries' AND column_name = 'prompt_id') THEN
+          ALTER TABLE journal_entries ADD COLUMN prompt_id TEXT;
+        END IF;
+        IF NOT EXISTS (SELECT 1 FROM information_schema.columns
+                       WHERE table_name = 'journal_entries' AND column_name = 'voice_url') THEN
+          ALTER TABLE journal_entries ADD COLUMN voice_url TEXT;
+        END IF;
+        IF NOT EXISTS (SELECT 1 FROM information_schema.columns
+                       WHERE table_name = 'journal_entries' AND column_name = 'mood') THEN
+          ALTER TABLE journal_entries ADD COLUMN mood TEXT;
+        END IF;
+      END $$;
 
       -- User goals
       CREATE TABLE IF NOT EXISTS user_goals (

@@ -38,6 +38,7 @@ export default function GratitudeJournal({ userId }: GratitudeJournalProps) {
   const [selectedMood, setSelectedMood] = useState<string | null>(null)
   const [showSuccess, setShowSuccess] = useState(false)
   const [successMessage, setSuccessMessage] = useState('')
+  const [error, setError] = useState<string | null>(null)
   const mediaRecorderRef = useRef<MediaRecorder | null>(null)
   const chunksRef = useRef<Blob[]>([])
 
@@ -125,7 +126,9 @@ export default function GratitudeJournal({ userId }: GratitudeJournalProps) {
     if (!content.trim() && !audioBlob) return
 
     setIsSubmitting(true)
+    setError(null)
     try {
+      console.log('[Journal] Saving entry for userId:', userId)
       const res = await fetch('/api/journal', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -139,30 +142,39 @@ export default function GratitudeJournal({ userId }: GratitudeJournalProps) {
         }),
       })
 
-      if (res.ok) {
-        const data = await res.json()
-        setSuccessMessage(data.message)
-        setShowSuccess(true)
-        setStreak(data.streak)
+      console.log('[Journal] Save response status:', res.status)
 
-        // Reset form
-        setContent('')
-        setAudioBlob(null)
-        setAudioUrl(null)
-        setSelectedMood(null)
-        setCurrentPrompt(null)
-
-        // Refresh entries
-        fetchJournalData()
-
-        // Show success briefly then go home
-        setTimeout(() => {
-          setShowSuccess(false)
-          setMode('home')
-        }, 2000)
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => ({}))
+        console.error('[Journal] Save failed:', errorData)
+        setError(errorData.error || 'Failed to save entry')
+        return
       }
+
+      const data = await res.json()
+      console.log('[Journal] Save success:', data)
+      setSuccessMessage(data.message)
+      setShowSuccess(true)
+      setStreak(data.streak)
+
+      // Reset form
+      setContent('')
+      setAudioBlob(null)
+      setAudioUrl(null)
+      setSelectedMood(null)
+      setCurrentPrompt(null)
+
+      // Refresh entries
+      fetchJournalData()
+
+      // Show success briefly then go home
+      setTimeout(() => {
+        setShowSuccess(false)
+        setMode('home')
+      }, 2000)
     } catch (err) {
-      console.error('Failed to save entry:', err)
+      console.error('[Journal] Failed to save entry:', err)
+      setError('Something went wrong. Please try again.')
     } finally {
       setIsSubmitting(false)
     }
@@ -397,6 +409,11 @@ export default function GratitudeJournal({ userId }: GratitudeJournalProps) {
 
           {/* Submit */}
           <div className="p-3 border-t-2 border-dashed border-black/30">
+            {error && (
+              <div className="mb-3 p-3 rounded-lg bg-red-100 border-2 border-red-400 text-red-700 text-sm">
+                {error}
+              </div>
+            )}
             <button
               onClick={handleSubmit}
               disabled={isSubmitting || (!content.trim() && !audioBlob)}
