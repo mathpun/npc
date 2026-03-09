@@ -201,85 +201,26 @@ export default function SessionPicker({ onSelect, onClose, onOpenHistory, onLoad
           </button>
         )}
 
-        {/* Continue Previous Chat - shown if there are recent chats */}
-        {!loadingRecent && recentChats.length > 0 && (
+        {/* Continue Previous Chat button - shown if there are recent chats */}
+        {!loadingRecent && recentChats.length > 0 && onOpenHistory && (
           <div className="mb-5">
-            <div className="flex items-center justify-between mb-2">
-              <h3 className="text-sm font-bold text-gray-600">📂 continue a chat</h3>
-              {onOpenHistory && (
-                <button
-                  onClick={onOpenHistory}
-                  className="text-xs font-bold px-2 py-1 hover:scale-105 transition-transform"
-                  style={{
-                    backgroundColor: '#E6E6FA',
-                    border: '2px solid black',
-                    borderRadius: '8px',
-                  }}
-                >
-                  see all →
-                </button>
-              )}
-            </div>
-            <div className="space-y-2">
-              {recentChats.slice(0, 3).map((chat) => (
-                <button
-                  key={chat.id}
-                  onClick={() => onLoadSession?.(chat.id)}
-                  className="w-full text-left p-2.5 hover:scale-[1.02] transition-transform flex items-center gap-2"
-                  style={{
-                    backgroundColor: 'white',
-                    border: '2px solid black',
-                    borderRadius: '10px',
-                    boxShadow: '2px 2px 0 black',
-                  }}
-                >
-                  <span className="text-lg">💬</span>
-                  <div className="flex-1 min-w-0">
-                    <p className="font-bold text-sm truncate">{getChatTitle(chat)}</p>
-                    <div className="flex items-center gap-2">
-                      <span className="text-xs text-gray-500">{getTimeAgo(chat.started_at)}</span>
-                      {chat.bucket_name && (
-                        <span className="text-xs px-1.5 py-0.5 rounded" style={{ backgroundColor: '#E8F5E9', border: '1px solid #81C784' }}>
-                          {chat.bucket_emoji} {chat.bucket_name}
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                  <span className="text-gray-400">→</span>
-                </button>
-              ))}
-            </div>
-
-            {/* Projects/Buckets quick access */}
-            {buckets.length > 0 && (
-              <div className="mt-3 flex flex-wrap gap-1.5">
-                {buckets.slice(0, 4).map((bucket) => (
-                  <button
-                    key={bucket.id}
-                    onClick={onOpenHistory}
-                    className="px-2.5 py-1 text-xs font-bold hover:scale-105 transition-transform"
-                    style={{
-                      backgroundColor: '#FFFACD',
-                      border: '2px solid black',
-                      borderRadius: '8px',
-                    }}
-                  >
-                    {bucket.emoji} {bucket.name} ({bucket.session_count})
-                  </button>
-                ))}
-                <button
-                  onClick={onOpenHistory}
-                  className="px-2.5 py-1 text-xs font-bold hover:scale-105 transition-transform"
-                  style={{
-                    backgroundColor: '#E6E6FA',
-                    border: '2px dashed black',
-                    borderRadius: '8px',
-                  }}
-                >
-                  + new project
-                </button>
+            <button
+              onClick={onOpenHistory}
+              className="w-full p-3 text-left hover:scale-[1.02] transition-transform flex items-center gap-3"
+              style={{
+                backgroundColor: '#E6E6FA',
+                border: '3px solid black',
+                borderRadius: '12px',
+                boxShadow: '3px 3px 0 black',
+              }}
+            >
+              <span className="text-2xl">📂</span>
+              <div className="flex-1">
+                <p className="font-bold text-sm">continue a chat</p>
+                <p className="text-xs text-gray-600">{recentChats.length} recent chats{buckets.length > 0 ? ` · ${buckets.length} projects` : ''}</p>
               </div>
-            )}
+              <span className="text-lg">→</span>
+            </button>
 
             {/* Divider */}
             <div className="flex items-center gap-4 mt-4">
@@ -316,7 +257,7 @@ export default function SessionPicker({ onSelect, onClose, onOpenHistory, onLoad
               boxShadow: '3px 3px 0 black',
             }}
           >
-            {recentChats.length > 0 ? 'new chat' : 'mood?'}
+            mood?
           </h2>
         </div>
 
