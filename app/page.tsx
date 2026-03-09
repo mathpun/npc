@@ -267,7 +267,7 @@ export default function Home() {
               free to use. the potato is waiting.
             </p>
             <Link
-              href="/dashboard"
+              href="/chat"
               className="inline-block px-10 py-5 text-xl font-bold hover:scale-110 hover:-rotate-2 transition-all"
               style={{
                 backgroundColor: theme.colors.buttonPrimary,
