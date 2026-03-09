@@ -1,80 +1,23 @@
 'use client'
 
-import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import NavBar from '@/components/NavBar'
 import { useTheme } from '@/lib/ThemeContext'
 
-// HOT SLANG TAGLINES - update these to stay current!
-const SLANG_TAGLINES = [
-  "self-awareness maxxing 🧠",
-  "brain rot? nah, brain growth 🌱",
-  "no cap just clarity ✨",
-  "lowkey life changing fr fr",
-  "main character energy loading... 💫",
-  "delulu is NOT the solulu here",
-  "slay your intrusive thoughts 💅",
-  "understood the assignment 📝",
-  "it's giving... emotional intelligence",
-  "vibe check: actually helpful 🎯",
-]
-
 export default function Home() {
   const { theme } = useTheme()
-  const [taglineIndex, setTaglineIndex] = useState(0)
-  const [isAnimating, setIsAnimating] = useState(false)
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setIsAnimating(true)
-      setTimeout(() => {
-        setTaglineIndex((prev) => (prev + 1) % SLANG_TAGLINES.length)
-        setIsAnimating(false)
-      }, 300)
-    }, 3000)
-    return () => clearInterval(interval)
-  }, [])
 
   return (
     <main className="min-h-screen font-hand" style={{ backgroundColor: theme.colors.background }}>
-      {/* Doodle decorations */}
-      <div className="fixed inset-0 pointer-events-none overflow-hidden">
-        <div className="absolute top-10 left-10 text-6xl rotate-12 animate-bounce">⭐</div>
-        <div className="absolute top-20 right-20 text-5xl -rotate-12">🌈</div>
-        <div className="absolute bottom-40 left-20 text-4xl rotate-6">✨</div>
-        <div className="absolute bottom-20 right-40 text-5xl -rotate-6 animate-bounce" style={{ animationDelay: '0.5s' }}>🌸</div>
-        <div className="absolute top-1/3 right-10 text-4xl">☀️</div>
-        <div className="absolute bottom-1/3 left-5 text-3xl rotate-12">🍪</div>
-      </div>
-
       {/* Nav */}
       <NavBar />
 
       {/* Hero Section */}
       <div className="relative z-10 flex flex-col items-center justify-center px-4 py-16">
-        <div className="text-center max-w-3xl mx-auto" style={{  }}>
-          {/* Rotating slang tagline */}
-          <div
-            className="inline-block px-6 py-3 mb-8 rotate-2 min-w-[280px]"
-            style={{
-              backgroundColor: theme.colors.accent4,
-              border: '3px solid black',
-              borderRadius: '9999px',
-              boxShadow: '4px 4px 0 black',
-            }}
-          >
-            <span
-              className={`text-lg font-bold block transition-all duration-300 ${
-                isAnimating ? 'opacity-0 translate-y-2' : 'opacity-100 translate-y-0'
-              }`}
-            >
-              {SLANG_TAGLINES[taglineIndex]}
-            </span>
-          </div>
-
+        <div className="text-center max-w-3xl mx-auto">
           {/* Main heading */}
           <h1 className="text-5xl md:text-7xl font-black mb-6">
-            not like
+            an AI that
             <br />
             <span
               className="inline-block px-4 py-2 mt-2 -rotate-2"
@@ -84,7 +27,7 @@ export default function Home() {
                 boxShadow: '6px 6px 0 black',
               }}
             >
-              other AIs
+              asks questions
             </span>
           </h1>
 
@@ -98,12 +41,6 @@ export default function Home() {
               <circle cx="25" cy="16" r="2" fill="white"/>
               <circle cx="37" cy="16" r="2" fill="white"/>
               <path d="M24 28 Q30 33 36 28" stroke="black" strokeWidth="2" fill="none"/>
-              {/* Speech bubble */}
-              <g transform="translate(-20, -30)">
-                <ellipse cx="30" cy="10" rx="35" ry="15" fill="white" stroke="black" strokeWidth="2"/>
-                <polygon points="40,22 35,25 45,30" fill="white" stroke="black" strokeWidth="2"/>
-                <text x="30" y="14" textAnchor="middle" fontSize="8" fontWeight="600">hi im npc!</text>
-              </g>
             </svg>
           </div>
 
@@ -116,13 +53,13 @@ export default function Home() {
               boxShadow: '4px 4px 0 black',
             }}
           >
-            an AI that helps you think, not one that thinks for you
+            instead of just giving you answers
           </p>
-          <p className="text-lg text-gray-700 mb-10">
-            no cap. just real conversations that help you figure stuff out.
+          <p className="text-lg text-gray-700 mb-10 max-w-md mx-auto">
+            a thinking partner that helps you figure things out for yourself
           </p>
 
-          {/* CTA Buttons */}
+          {/* CTA Button */}
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
             <Link
               href="/dashboard"
@@ -134,46 +71,18 @@ export default function Home() {
                 boxShadow: '6px 6px 0 black',
               }}
             >
-              start chatting →
+              start chatting
             </Link>
           </div>
 
-          {/* Social proof */}
-          <div className="mt-12 flex flex-wrap justify-center gap-4">
-            <div
-              className="flex items-center gap-3 px-4 py-2 -rotate-1"
-              style={{
-                backgroundColor: 'white',
-                border: '2px solid black',
-                borderRadius: '12px',
-              }}
-            >
-              <div className="flex -space-x-3">
-                {['🧑‍🎤', '👩‍🎨', '🧑‍💻', '👨‍🚀'].map((emoji, i) => (
-                  <div
-                    key={i}
-                    className="w-10 h-10 rounded-full flex items-center justify-center text-xl"
-                    style={{
-                      backgroundColor: theme.colors.primary[i % theme.colors.primary.length],
-                      border: '2px solid black',
-                    }}
-                  >
-                    {emoji}
-                  </div>
-                ))}
-              </div>
-              <span className="font-bold">10k+ convos this week!</span>
-            </div>
-          </div>
-
-          {/* About us teaser */}
-          <div className="mt-6">
+          {/* About link */}
+          <div className="mt-8">
             <Link
               href="/about"
               className="text-sm font-bold hover:scale-105 transition-transform inline-flex items-center gap-2"
               style={{ color: '#666' }}
             >
-              learn what makes us different →
+              learn more about how it works →
             </Link>
           </div>
         </div>
@@ -181,7 +90,7 @@ export default function Home() {
 
       {/* Features Section */}
       <div className="relative z-10 px-4 py-16" style={{ backgroundColor: theme.colors.backgroundAlt }}>
-        <div className="max-w-5xl mx-auto" style={{  }}>
+        <div className="max-w-5xl mx-auto">
           <div className="text-center mb-12">
             <h2
               className="text-3xl md:text-5xl font-bold inline-block px-6 py-3 -rotate-1"
@@ -191,11 +100,8 @@ export default function Home() {
                 boxShadow: '6px 6px 0 black',
               }}
             >
-              built different fr fr
+              how it&apos;s different
             </h2>
-            <p className="text-lg mt-6">
-              we actually talked to teens about what they want from AI. wild concept, right?
-            </p>
           </div>
 
           <div className="grid md:grid-cols-3 gap-6">
@@ -210,9 +116,9 @@ export default function Home() {
               }}
             >
               <div className="text-5xl mb-4">🧠</div>
-              <h3 className="text-xl font-bold mb-2">thinks WITH you</h3>
+              <h3 className="text-xl font-bold mb-2">thinks with you</h3>
               <p className="text-sm">
-                asks questions instead of just giving answers. helps you figure out what YOU actually think.
+                asks questions to help you understand what you actually think, instead of just telling you what to do
               </p>
             </div>
 
@@ -227,9 +133,9 @@ export default function Home() {
               }}
             >
               <div className="text-5xl mb-4">💬</div>
-              <h3 className="text-xl font-bold mb-2">keeps it real</h3>
+              <h3 className="text-xl font-bold mb-2">honest about limits</h3>
               <p className="text-sm">
-                doesn&apos;t pretend to know everything. says &quot;idk&quot; when it actually doesn&apos;t know.
+                says &quot;I don&apos;t know&quot; when it doesn&apos;t. reminds you to talk to real people when that&apos;s what you need.
               </p>
             </div>
 
@@ -243,10 +149,10 @@ export default function Home() {
                 boxShadow: '5px 5px 0 black',
               }}
             >
-              <div className="text-5xl mb-4">⚡</div>
-              <h3 className="text-xl font-bold mb-2">no weird vibes</h3>
+              <div className="text-5xl mb-4">🔒</div>
+              <h3 className="text-xl font-bold mb-2">private by design</h3>
               <p className="text-sm">
-                built safe from the start. reminds you to talk to real humans too. no parasocial bs.
+                your conversations stay yours. we don&apos;t sell your data or use it to train AI models.
               </p>
             </div>
           </div>
@@ -262,10 +168,10 @@ export default function Home() {
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {[
-              { emoji: '🧠', title: 'hw help', desc: 'without just giving answers' },
-              { emoji: '💭', title: 'vent sesh', desc: 'process feelings safely' },
-              { emoji: '✨', title: 'creative stuff', desc: 'brainstorm & create' },
-              { emoji: '🎯', title: 'decisions', desc: 'think through choices' },
+              { emoji: '📚', title: 'homework help', desc: 'understand concepts, not just get answers' },
+              { emoji: '💭', title: 'processing feelings', desc: 'talk through what\'s on your mind' },
+              { emoji: '✨', title: 'creative projects', desc: 'brainstorm ideas and get unstuck' },
+              { emoji: '🎯', title: 'making decisions', desc: 'think through your options clearly' },
             ].map((item, i) => (
               <div
                 key={i}
@@ -316,10 +222,10 @@ export default function Home() {
             </div>
 
             <h2 className="text-3xl md:text-4xl font-bold mb-4">
-              ready to chat?
+              ready to try it?
             </h2>
             <p className="text-lg mb-8">
-              free to try. no credit card. no selling ur data.
+              free to use. no credit card needed.
             </p>
             <Link
               href="/dashboard"
@@ -331,7 +237,7 @@ export default function Home() {
                 boxShadow: '5px 5px 0 black',
               }}
             >
-              let&apos;s gooooo! 🚀
+              start a conversation
             </Link>
           </div>
         </div>
@@ -347,8 +253,6 @@ export default function Home() {
             <div className="flex items-center gap-3">
               <span className="text-3xl">👻</span>
               <span className="text-xl font-bold">npc</span>
-              <span>|</span>
-              <span className="text-sm">AI that gets it</span>
             </div>
             <p
               className="text-sm text-center px-4 py-2"
@@ -358,7 +262,7 @@ export default function Home() {
                 borderRadius: '8px',
               }}
             >
-              not a therapist. not a replacement for real friends. just a thinking buddy.
+              not a therapist. not a replacement for friends. a thinking partner.
             </p>
           </div>
 
@@ -373,7 +277,7 @@ export default function Home() {
                 borderRadius: '8px',
               }}
             >
-              ✨ about us
+              about
             </Link>
             <a
               href="https://forms.gle/iWyp8pUumivZDMxr7"
@@ -386,7 +290,7 @@ export default function Home() {
                 borderRadius: '8px',
               }}
             >
-              💬 feedback
+              feedback
             </a>
             <Link
               href="/privacy"
@@ -397,23 +301,12 @@ export default function Home() {
                 borderRadius: '8px',
               }}
             >
-              🔒 privacy
-            </Link>
-            <Link
-              href="/chat?tab=growth&subtab=co-design"
-              className="text-sm font-bold hover:scale-105 transition-transform px-3 py-1"
-              style={{
-                backgroundColor: 'white',
-                border: '2px solid black',
-                borderRadius: '8px',
-              }}
-            >
-              🎨 co-design
+              privacy
             </Link>
           </div>
 
           <p className="text-center text-xs mt-4 opacity-60">
-            made with 💚 for teens, by teens
+            made for teens who want to think for themselves
           </p>
         </div>
       </footer>
