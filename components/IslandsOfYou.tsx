@@ -69,32 +69,59 @@ export default function IslandsOfYou({ userId, onClose }: IslandsOfYouProps) {
     }
   }
 
+  const [error, setError] = useState<string | null>(null)
+
   const analyzeAndCreateIslands = async () => {
     setIsAnalyzing(true)
+    setError(null)
     try {
+      console.log('[Islands] Starting analysis for userId:', userId)
+
       const analyzeRes = await fetch('/api/personality-islands/analyze', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ userId }),
       })
 
-      if (analyzeRes.ok) {
-        const analyzeData = await analyzeRes.json()
-        const themes = analyzeData.themes
+      console.log('[Islands] Analyze response status:', analyzeRes.status)
 
-        const createRes = await fetch('/api/personality-islands', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ userId, themes }),
-        })
-
-        if (createRes.ok) {
-          const createData = await createRes.json()
-          setIslands(createData.islands || [])
-        }
+      if (!analyzeRes.ok) {
+        const errorData = await analyzeRes.json().catch(() => ({}))
+        console.error('[Islands] Analyze failed:', errorData)
+        setError(`Analysis failed: ${errorData.error || 'Unknown error'}`)
+        return
       }
+
+      const analyzeData = await analyzeRes.json()
+      const themes = analyzeData.themes
+      console.log('[Islands] Got themes:', themes?.length, themes)
+
+      if (!themes || themes.length === 0) {
+        setError('No themes found. Try chatting more first!')
+        return
+      }
+
+      const createRes = await fetch('/api/personality-islands', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId, themes }),
+      })
+
+      console.log('[Islands] Create response status:', createRes.status)
+
+      if (!createRes.ok) {
+        const errorData = await createRes.json().catch(() => ({}))
+        console.error('[Islands] Create failed:', errorData)
+        setError(`Failed to create islands: ${errorData.error || 'Unknown error'}`)
+        return
+      }
+
+      const createData = await createRes.json()
+      console.log('[Islands] Created islands:', createData.islands?.length)
+      setIslands(createData.islands || [])
     } catch (err) {
-      console.error('Failed to analyze:', err)
+      console.error('[Islands] Failed to analyze:', err)
+      setError('Something went wrong. Please try again.')
     } finally {
       setIsAnalyzing(false)
     }
@@ -320,9 +347,14 @@ export default function IslandsOfYou({ userId, onClose }: IslandsOfYouProps) {
           >
             <div className="text-5xl md:text-6xl mb-4">🏝️</div>
             <h2 className="text-xl md:text-2xl font-bold text-white mb-2">Discover Your Islands</h2>
-            <p className="text-white/70 mb-6 text-sm md:text-base">
+            <p className="text-white/70 mb-4 text-sm md:text-base">
               We&apos;ll analyze your conversations to find the core themes that make you YOU
             </p>
+            {error && (
+              <div className="mb-4 p-3 rounded-lg bg-red-500/20 border border-red-400/50 text-red-100 text-sm">
+                {error}
+              </div>
+            )}
             <button
               onClick={analyzeAndCreateIslands}
               disabled={isAnalyzing}
