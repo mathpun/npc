@@ -132,9 +132,9 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       return NextResponse.json({ error: 'User ID is required' }, { status: 400 })
     }
 
-    // Verify island belongs to user
+    // Verify island belongs to user and get all details
     const island = await db.prepare(`
-      SELECT id, theme_name, theme_emoji, theme_description
+      SELECT id, theme_name, theme_emoji, theme_description, details_json
       FROM personality_islands
       WHERE id = ? AND user_id = ?
     `).get(islandId, userId) as {
@@ -142,6 +142,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       theme_name: string
       theme_emoji: string
       theme_description: string | null
+      details_json: string | null
     } | undefined
 
     if (!island) {
@@ -158,31 +159,52 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       }, { status: 429 })
     }
 
-    // Generate a rich prompt using Claude - optimized for Pixar/Inside Out style
+    // Parse the detailed island data
+    let details: { keyMemories?: string[]; symbols?: string[]; emotions?: string[]; people?: string[]; colors?: string[] } = {}
+    if (island.details_json) {
+      try {
+        details = JSON.parse(island.details_json)
+      } catch {
+        // Ignore parse errors
+      }
+    }
+
+    // Generate a rich prompt using Claude - optimized for Pixar/Inside Out style with DETAILED content
     let imagePrompt = ''
     try {
       const response = await anthropic.messages.create({
         model: 'claude-sonnet-4-20250514',
-        max_tokens: 300,
+        max_tokens: 500,
         messages: [{
           role: 'user',
-          content: `Create a stunning image generation prompt for a floating personality island. Theme: "${island.theme_name}" ${island.theme_emoji}
+          content: `Create a HIGHLY DETAILED image prompt for a floating personality island like Pixar's Inside Out.
 
-${island.theme_description ? `Context: ${island.theme_description}` : ''}
+=== ISLAND IDENTITY ===
+Theme: "${island.theme_name}" ${island.theme_emoji}
+Description: ${island.theme_description || 'A core part of who this person is'}
 
-CRITICAL STYLE REQUIREMENTS:
-- Pixar "Inside Out" movie aesthetic - the floating islands of personality
-- 3D rendered look with soft, volumetric lighting and subsurface scattering
-- Dreamlike atmosphere with gradient sky (purple to pink to golden orange)
-- The island floats in vast cloudy sky, connected by thin glowing threads below
-- Lush, whimsical landscape ON TOP of a purple/lavender rocky floating base
-- Include 2-3 symbolic objects/structures that represent "${island.theme_name}"
-- Soft bokeh, depth of field, cinematic composition
-- Color palette: pastel purples, pinks, teals, warm golds
-- Magical glowing particles/orbs floating around
-- Style keywords: Pixar, Disney, dreamworks, 3D animation, octane render, volumetric lighting
+=== SPECIFIC DETAILS TO INCLUDE ===
+Symbolic Objects: ${details.symbols?.join(', ') || 'various thematic objects'}
+Key Memories: ${details.keyMemories?.join(', ') || 'meaningful moments'}
+Emotions: ${details.emotions?.join(', ') || 'mixed feelings'}
+Color Palette: ${details.colors?.join(', ') || 'vibrant and warm'}
 
-Create ONE detailed prompt (150-200 words) focusing on visual elements. Output ONLY the prompt.`
+=== CRITICAL REQUIREMENTS ===
+Create an EXTREMELY DETAILED floating island like in Inside Out:
+1. PURPLE/LAVENDER ROCKY BASE - the classic Inside Out island foundation with vertical cliff textures
+2. DENSE LANDSCAPE on top - packed with structures, machines, decorations (like the "Goofball Island" with its funny props)
+3. SPECIFIC OBJECTS - Include ALL the symbolic objects listed above as actual detailed structures/items on the island
+4. CENTRAL FOCAL POINT - One main impressive structure that represents the core of this theme
+5. INTRICATE DETAILS - Gears, pipes, lights, moving parts, small decorative elements everywhere
+6. GLOWING ELEMENTS - Memory orbs, light threads, magical particles
+7. DREAMY SKY - Purple to pink to gold gradient, soft clouds
+
+The island should be DENSELY PACKED with whimsical, detailed structures - not sparse or simple!
+Think of how detailed and busy the real Inside Out islands are.
+
+Style: Pixar 3D animation, octane render, volumetric lighting, 8K detail, cinematic
+
+Output ONLY the image prompt (200-250 words), no explanation.`
         }]
       })
 
@@ -191,12 +213,14 @@ Create ONE detailed prompt (150-200 words) focusing on visual elements. Output O
       }
     } catch (err) {
       console.error('Error generating prompt:', err)
-      // Fallback prompt - still high quality
-      imagePrompt = `A stunning floating island representing ${island.theme_name}, Pixar Inside Out movie style, 3D rendered animation aesthetic. The island has a purple-lavender rocky base floating in a dreamy gradient sky of purple, pink, and golden orange. On top sits a whimsical landscape with glowing structures and symbolic objects. Volumetric lighting, soft bokeh, magical glowing orbs floating around, cinematic composition. Style: Pixar, Disney, DreamWorks, octane render, subsurface scattering, depth of field.`
+      // Fallback prompt - still high quality and detailed
+      const symbolsList = details.symbols?.slice(0, 4).join(', ') || 'glowing structures, decorative elements'
+      const colorsList = details.colors?.join(' and ') || 'purple, pink, and gold'
+      imagePrompt = `A highly detailed floating personality island representing "${island.theme_name}", Pixar Inside Out movie style. The island has a purple-lavender rocky cliff base with vertical texture lines. On top is a DENSELY PACKED whimsical landscape featuring: ${symbolsList}. The central structure is an impressive ${island.theme_name}-themed building with intricate details, gears, pipes, and glowing elements. Small decorative objects, memory orbs, and magical particles fill every corner. Colors: ${colorsList}. Dreamy gradient sky from deep purple to pink to golden orange. Volumetric lighting, soft bokeh, 8K detail, cinematic composition. Style: Pixar, Disney, DreamWorks, octane render, extremely detailed.`
     }
 
-    // Add consistent style suffix to ensure quality
-    const styledPrompt = `${imagePrompt} --style: Pixar Inside Out, 3D animation, cinematic lighting, 8k quality, highly detailed`
+    // Add consistent style suffix to ensure quality and detail
+    const styledPrompt = `${imagePrompt} --style: Pixar Inside Out personality island, 3D animation, extremely detailed and intricate, dense with objects and structures, volumetric cinematic lighting, 8K quality, octane render`
 
     // Generate the image
     let imageUrl: string | null = null

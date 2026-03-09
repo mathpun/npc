@@ -499,6 +499,7 @@ async function initDb() {
         theme_description TEXT,
         image_url TEXT,
         strength REAL DEFAULT 0.0,
+        details_json TEXT,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         UNIQUE(user_id, theme_name)

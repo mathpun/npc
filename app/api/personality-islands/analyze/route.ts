@@ -19,6 +19,12 @@ interface Theme {
   emoji: string
   description: string
   strength: number
+  // Deep details for rich island generation
+  keyMemories?: string[]      // Specific moments/conversations
+  symbols?: string[]          // Objects that represent this theme
+  emotions?: string[]         // Feelings associated
+  people?: string[]           // People connected to this theme
+  colors?: string[]           // Color palette for this island
 }
 
 // POST - Analyze user's chat history and identify 3-5 core themes
@@ -119,42 +125,61 @@ export async function POST(request: NextRequest) {
       })
     }
 
-    // Use Claude to analyze and extract themes
-    const prompt = `You are analyzing a teen's chat history to identify their core personality themes - like the Islands of Personality from Inside Out.
+    // Use Claude to analyze and extract themes - DEEP analysis
+    const prompt = `You are creating detailed "Islands of Personality" (like Pixar's Inside Out) for a specific person based on their chat history. These islands need to be DEEPLY PERSONAL and SPECIFIC - not generic.
 
-User interests: ${user.interests}
-${user.goals ? `User goals: ${user.goals}` : ''}
+=== USER DATA ===
+Name: ${user.name}${user.nickname ? ` (${user.nickname})` : ''}
+Interests: ${user.interests}
+${user.goals ? `Goals: ${user.goals}` : ''}
 
-Recent session topics:
+=== CHAT SESSION TOPICS ===
 ${sessionTopics || 'No sessions yet'}
 
-Sample messages from the user:
+=== ACTUAL MESSAGES FROM USER ===
 ${messageSnippets || 'No messages yet'}
 
-Recent moods/reflections:
+=== MOODS & REFLECTIONS ===
 ${moodData || 'No check-ins yet'}
 
-Based on this data, identify 3-5 core themes that define this person's inner world. These should be:
-- Specific to THIS person (not generic like "happiness")
-- Named in a way a teen would relate to (e.g., "Creative Projects" not "Artistic Expression")
-- Based on patterns you actually see in the data
-- Each with a unique, fitting emoji
+=== YOUR TASK ===
+Identify 4-5 SPECIFIC personality islands that define THIS person's inner world.
 
-Examples of good themes: "Friendships", "School Stress", "Creative Projects", "Music & Vibes", "Future Dreams", "Family Stuff", "Gaming World", "Identity Questions"
+CRITICAL: Be SPECIFIC, not generic!
+- BAD: "Relationships" (too generic)
+- GOOD: "Building NPC" (their specific startup)
+- GOOD: "Music Production Dreams" (their specific passion)
+- GOOD: "College Anxiety" (their specific worry)
 
-Output as JSON array with exactly this format:
-[
-  {"name": "Theme Name", "emoji": "emoji", "description": "One sentence description", "strength": 0.8},
-  ...
-]
+For each island, include:
+1. name: A specific, personal name (not generic categories)
+2. emoji: Perfect emoji for this theme
+3. description: 2-3 sentences about what this represents for them
+4. strength: 0.0-1.0 how prominent this is
+5. keyMemories: 2-3 specific moments/topics from their chats
+6. symbols: 4-6 physical objects that could appear on this island (be creative and specific!)
+7. emotions: 2-3 feelings associated with this theme
+8. people: Any people mentioned connected to this (or "self" if internal)
+9. colors: 2-3 colors that represent this theme's mood
 
-strength should be 0.0-1.0 based on how much this theme appears in the data.
+Example of GOOD detailed island:
+{
+  "name": "Startup Dreams",
+  "emoji": "🚀",
+  "description": "The burning passion to build something that helps people. Late nights coding, user interviews, the thrill of seeing it work.",
+  "strength": 0.95,
+  "keyMemories": ["discussing user feedback", "planning new features", "worrying about growth"],
+  "symbols": ["glowing laptop", "rocket launchpad", "whiteboard with diagrams", "coffee cups", "user feedback notes", "celebration confetti"],
+  "emotions": ["excited", "anxious", "determined"],
+  "people": ["co-founders", "users", "mentors"],
+  "colors": ["electric blue", "gold", "purple"]
+}
 
-Output ONLY the JSON array, nothing else.`
+Output ONLY a JSON array of 4-5 islands. No explanation, just valid JSON.`
 
     const response = await getAnthropicClient().messages.create({
       model: 'claude-sonnet-4-20250514',
-      max_tokens: 500,
+      max_tokens: 2000, // More tokens for detailed islands
       messages: [{ role: 'user', content: prompt }],
     })
 
@@ -163,15 +188,27 @@ Output ONLY the JSON array, nothing else.`
     const textContent = response.content.find(block => block.type === 'text')
     if (textContent && textContent.type === 'text') {
       try {
-        themes = JSON.parse(textContent.text)
-        // Validate and clean up
+        // Try to extract JSON from the response
+        let jsonText = textContent.text.trim()
+        // Handle markdown code blocks if present
+        if (jsonText.startsWith('```')) {
+          jsonText = jsonText.replace(/```json?\n?/g, '').replace(/```$/g, '').trim()
+        }
+        themes = JSON.parse(jsonText)
+        // Validate and clean up while preserving new fields
         themes = themes.slice(0, 5).map(t => ({
           name: String(t.name || 'Unknown').slice(0, 50),
           emoji: String(t.emoji || '🏝️').slice(0, 4),
-          description: String(t.description || '').slice(0, 200),
+          description: String(t.description || '').slice(0, 500),
           strength: Math.max(0, Math.min(1, Number(t.strength) || 0.5)),
+          keyMemories: Array.isArray(t.keyMemories) ? t.keyMemories.slice(0, 5) : [],
+          symbols: Array.isArray(t.symbols) ? t.symbols.slice(0, 8) : [],
+          emotions: Array.isArray(t.emotions) ? t.emotions.slice(0, 4) : [],
+          people: Array.isArray(t.people) ? t.people.slice(0, 5) : [],
+          colors: Array.isArray(t.colors) ? t.colors.slice(0, 4) : [],
         }))
-      } catch {
+      } catch (parseError) {
+        console.error('Failed to parse themes JSON:', parseError, textContent.text)
         // Fallback if parsing fails
         themes = [
           { name: 'Self-Discovery', emoji: '🔍', description: 'Exploring who you are', strength: 0.5 },
