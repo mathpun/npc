@@ -326,7 +326,7 @@ export default function SessionPicker({ onSelect, onClose, onOpenHistory, onLoad
               }}
             >
               <span className="text-lg">📂</span>
-              <span>continue</span>
+              <span>continue chat</span>
             </button>
           )}
         </div>
