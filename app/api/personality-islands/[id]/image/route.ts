@@ -39,7 +39,7 @@ async function checkAndIncrementUsage(userId: string): Promise<{ allowed: boolea
   }
 }
 
-// Generate image using Fal AI
+// Generate image using Fal AI - Flux Pro for high quality
 async function generateWithFalAI(prompt: string): Promise<string | null> {
   const falApiKey = process.env.FAL_API_KEY
   if (!falApiKey) {
@@ -48,7 +48,8 @@ async function generateWithFalAI(prompt: string): Promise<string | null> {
   }
 
   try {
-    const response = await fetch('https://queue.fal.run/fal-ai/flux/schnell', {
+    // Use Flux Pro for higher quality images
+    const response = await fetch('https://queue.fal.run/fal-ai/flux-pro/v1.1', {
       method: 'POST',
       headers: {
         'Authorization': `Key ${falApiKey}`,
@@ -56,9 +57,10 @@ async function generateWithFalAI(prompt: string): Promise<string | null> {
       },
       body: JSON.stringify({
         prompt: prompt,
-        image_size: 'square',
+        image_size: 'square_hd', // Higher resolution
         num_images: 1,
         enable_safety_checker: true,
+        safety_tolerance: '2',
       }),
     })
 
@@ -76,12 +78,12 @@ async function generateWithFalAI(prompt: string): Promise<string | null> {
       return null
     }
 
-    // Poll for result (max 60 seconds)
-    const maxAttempts = 30
+    // Poll for result (max 90 seconds for Pro model)
+    const maxAttempts = 45
     for (let i = 0; i < maxAttempts; i++) {
       await new Promise(resolve => setTimeout(resolve, 2000))
 
-      const statusResponse = await fetch(`https://queue.fal.run/fal-ai/flux/schnell/requests/${requestId}/status`, {
+      const statusResponse = await fetch(`https://queue.fal.run/fal-ai/flux-pro/v1.1/requests/${requestId}/status`, {
         headers: {
           'Authorization': `Key ${falApiKey}`,
         },
@@ -92,7 +94,7 @@ async function generateWithFalAI(prompt: string): Promise<string | null> {
       const statusData = await statusResponse.json()
 
       if (statusData.status === 'COMPLETED') {
-        const resultResponse = await fetch(`https://queue.fal.run/fal-ai/flux/schnell/requests/${requestId}`, {
+        const resultResponse = await fetch(`https://queue.fal.run/fal-ai/flux-pro/v1.1/requests/${requestId}`, {
           headers: {
             'Authorization': `Key ${falApiKey}`,
           },
@@ -156,27 +158,31 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       }, { status: 429 })
     }
 
-    // Generate a rich prompt using Claude
+    // Generate a rich prompt using Claude - optimized for Pixar/Inside Out style
     let imagePrompt = ''
     try {
       const response = await anthropic.messages.create({
         model: 'claude-sonnet-4-20250514',
-        max_tokens: 200,
+        max_tokens: 300,
         messages: [{
           role: 'user',
-          content: `Create a vivid image generation prompt for a floating island representing the personality theme: "${island.theme_name}" ${island.theme_emoji}
+          content: `Create a stunning image generation prompt for a floating personality island. Theme: "${island.theme_name}" ${island.theme_emoji}
 
-${island.theme_description ? `Theme description: ${island.theme_description}` : ''}
+${island.theme_description ? `Context: ${island.theme_description}` : ''}
 
-Requirements:
-- Style: Pixar's Inside Out inspired, dreamy floating island in the sky
-- The island should visually represent "${island.theme_name}" through its landscape, objects, and atmosphere
-- Vibrant colors, soft lighting, magical and whimsical feel
-- Island floating in a beautiful sky with clouds
-- Make it suitable for a teen's vision of their personality
-- Keep under 100 words, focus on visual details
+CRITICAL STYLE REQUIREMENTS:
+- Pixar "Inside Out" movie aesthetic - the floating islands of personality
+- 3D rendered look with soft, volumetric lighting and subsurface scattering
+- Dreamlike atmosphere with gradient sky (purple to pink to golden orange)
+- The island floats in vast cloudy sky, connected by thin glowing threads below
+- Lush, whimsical landscape ON TOP of a purple/lavender rocky floating base
+- Include 2-3 symbolic objects/structures that represent "${island.theme_name}"
+- Soft bokeh, depth of field, cinematic composition
+- Color palette: pastel purples, pinks, teals, warm golds
+- Magical glowing particles/orbs floating around
+- Style keywords: Pixar, Disney, dreamworks, 3D animation, octane render, volumetric lighting
 
-Output ONLY the image prompt, nothing else.`
+Create ONE detailed prompt (150-200 words) focusing on visual elements. Output ONLY the prompt.`
         }]
       })
 
@@ -185,14 +191,17 @@ Output ONLY the image prompt, nothing else.`
       }
     } catch (err) {
       console.error('Error generating prompt:', err)
-      // Fallback prompt
-      imagePrompt = `Floating island in dreamy sky, Pixar Inside Out style, representing ${island.theme_name}, vibrant colors, magical whimsical atmosphere, soft clouds, beautiful lighting`
+      // Fallback prompt - still high quality
+      imagePrompt = `A stunning floating island representing ${island.theme_name}, Pixar Inside Out movie style, 3D rendered animation aesthetic. The island has a purple-lavender rocky base floating in a dreamy gradient sky of purple, pink, and golden orange. On top sits a whimsical landscape with glowing structures and symbolic objects. Volumetric lighting, soft bokeh, magical glowing orbs floating around, cinematic composition. Style: Pixar, Disney, DreamWorks, octane render, subsurface scattering, depth of field.`
     }
+
+    // Add consistent style suffix to ensure quality
+    const styledPrompt = `${imagePrompt} --style: Pixar Inside Out, 3D animation, cinematic lighting, 8k quality, highly detailed`
 
     // Generate the image
     let imageUrl: string | null = null
     if (process.env.FAL_API_KEY) {
-      imageUrl = await generateWithFalAI(imagePrompt)
+      imageUrl = await generateWithFalAI(styledPrompt)
     }
 
     if (!imageUrl) {
@@ -211,7 +220,7 @@ Output ONLY the image prompt, nothing else.`
     return NextResponse.json({
       success: true,
       imageUrl,
-      imagePrompt,
+      imagePrompt: styledPrompt,
       remaining: usageResult.remaining,
       dailyLimit: DAILY_GENERATION_LIMIT,
     })
