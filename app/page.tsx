@@ -15,48 +15,77 @@ export default function Home() {
       {/* Hero Section */}
       <div className="relative z-10 flex flex-col items-center justify-center px-4 py-16">
         <div className="text-center max-w-3xl mx-auto">
+          {/* Hook question */}
+          <p
+            className="text-xl md:text-2xl mb-6 inline-block px-6 py-3 -rotate-1"
+            style={{
+              backgroundColor: theme.colors.accent3,
+              border: '3px solid black',
+              boxShadow: '4px 4px 0 black',
+              borderRadius: '12px',
+            }}
+          >
+            ever feel like an npc?
+          </p>
+
           {/* Main heading */}
-          <h1 className="text-5xl md:text-7xl font-black mb-6">
-            an AI that
+          <h1 className="text-4xl md:text-6xl font-black mb-6">
+            sometimes it helps to
             <br />
             <span
-              className="inline-block px-4 py-2 mt-2 -rotate-2"
+              className="inline-block px-4 py-2 mt-2 rotate-1"
               style={{
                 backgroundColor: theme.colors.accent2,
                 border: '4px solid black',
                 boxShadow: '6px 6px 0 black',
               }}
             >
-              asks questions
+              talk it out
             </span>
           </h1>
 
-          {/* Little blob character */}
+          {/* Unhinged potato character */}
           <div className="flex justify-center my-8">
-            <svg width="120" height="140" viewBox="0 0 60 70">
-              <ellipse cx="30" cy="45" rx="20" ry="25" fill={theme.colors.accent5} stroke="black" strokeWidth="3"/>
-              <circle cx="30" cy="20" r="18" fill="white" stroke="black" strokeWidth="3"/>
-              <circle cx="24" cy="18" r="5" fill="black"/>
-              <circle cx="36" cy="18" r="5" fill="black"/>
-              <circle cx="25" cy="16" r="2" fill="white"/>
-              <circle cx="37" cy="16" r="2" fill="white"/>
-              <path d="M24 28 Q30 33 36 28" stroke="black" strokeWidth="2" fill="none"/>
+            <svg width="140" height="160" viewBox="0 0 70 80">
+              {/* Potato body - wonky oval shape */}
+              <path
+                d="M35 75 C10 75 5 45 12 25 C18 8 52 8 58 25 C65 45 60 75 35 75"
+                fill="#D4A574"
+                stroke="black"
+                strokeWidth="3"
+              />
+              {/* Potato spots */}
+              <ellipse cx="20" cy="40" rx="4" ry="3" fill="#C4956A"/>
+              <ellipse cx="50" cy="55" rx="3" ry="4" fill="#C4956A"/>
+              <ellipse cx="45" cy="35" rx="2" ry="2" fill="#C4956A"/>
+              {/* Eyes - slightly uneven for unhinged look */}
+              <circle cx="25" cy="35" r="8" fill="white" stroke="black" strokeWidth="2"/>
+              <circle cx="45" cy="33" r="9" fill="white" stroke="black" strokeWidth="2"/>
+              {/* Pupils - looking slightly different directions */}
+              <circle cx="27" cy="36" r="4" fill="black"/>
+              <circle cx="48" cy="32" r="5" fill="black"/>
+              <circle cx="28" cy="34" r="1.5" fill="white"/>
+              <circle cx="49" cy="30" r="2" fill="white"/>
+              {/* Wonky smile */}
+              <path d="M22 50 Q35 60 48 48" stroke="black" strokeWidth="3" fill="none" strokeLinecap="round"/>
+              {/* Little arms */}
+              <path d="M8 45 Q0 40 5 32" stroke="black" strokeWidth="3" fill="none" strokeLinecap="round"/>
+              <path d="M62 43 Q70 38 65 30" stroke="black" strokeWidth="3" fill="none" strokeLinecap="round"/>
+              {/* Speech bubble */}
+              <g transform="translate(45, -5)">
+                <ellipse cx="15" cy="12" rx="20" ry="12" fill="white" stroke="black" strokeWidth="2"/>
+                <polygon points="5,20 10,24 12,18" fill="white" stroke="black" strokeWidth="2"/>
+                <text x="15" y="15" textAnchor="middle" fontSize="7" fontWeight="600">hi!</text>
+              </g>
             </svg>
           </div>
 
           {/* Subtitle */}
-          <p
-            className="text-xl md:text-2xl mb-4 p-4 inline-block rotate-1"
-            style={{
-              backgroundColor: 'white',
-              border: '3px solid black',
-              boxShadow: '4px 4px 0 black',
-            }}
-          >
-            instead of just giving you answers
+          <p className="text-lg md:text-xl text-gray-700 mb-3 max-w-lg mx-auto">
+            talk to an unhinged potato about whatever&apos;s on your mind
           </p>
-          <p className="text-lg text-gray-700 mb-10 max-w-md mx-auto">
-            a thinking partner that helps you figure things out for yourself
+          <p className="text-base text-gray-500 mb-10 max-w-md mx-auto">
+            an AI that asks questions to help you think, not one that thinks for you
           </p>
 
           {/* CTA Button */}
@@ -82,7 +111,7 @@ export default function Home() {
               className="text-sm font-bold hover:scale-105 transition-transform inline-flex items-center gap-2"
               style={{ color: '#666' }}
             >
-              learn more about how it works →
+              why a potato? →
             </Link>
           </div>
         </div>
@@ -149,10 +178,10 @@ export default function Home() {
                 boxShadow: '5px 5px 0 black',
               }}
             >
-              <div className="text-5xl mb-4">🔒</div>
-              <h3 className="text-xl font-bold mb-2">private by design</h3>
+              <div className="text-5xl mb-4">🥔</div>
+              <h3 className="text-xl font-bold mb-2">zero judgment</h3>
               <p className="text-sm">
-                your conversations stay yours. we don&apos;t sell your data or use it to train AI models.
+                it&apos;s a potato. it&apos;s not going to judge you. say whatever you need to say.
               </p>
             </div>
           </div>
@@ -163,15 +192,15 @@ export default function Home() {
       <div className="relative z-10 px-4 py-16" style={{ backgroundColor: 'white' }}>
         <div className="max-w-5xl mx-auto">
           <h2 className="text-2xl md:text-4xl font-bold text-center mb-10">
-            what people use it for
+            what people talk about
           </h2>
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {[
-              { emoji: '🪞', title: 'identity exploration', desc: 'figure out who you are and want to be' },
-              { emoji: '💭', title: 'processing feelings', desc: 'talk through what\'s on your mind' },
-              { emoji: '✨', title: 'creative projects', desc: 'brainstorm ideas and get unstuck' },
-              { emoji: '🎯', title: 'making decisions', desc: 'think through your options clearly' },
+              { emoji: '🪞', title: 'identity stuff', desc: 'figuring out who you are' },
+              { emoji: '💭', title: 'feelings', desc: 'processing what\'s going on' },
+              { emoji: '✨', title: 'ideas', desc: 'brainstorming and creating' },
+              { emoji: '🎯', title: 'decisions', desc: 'thinking through choices' },
             ].map((item, i) => (
               <div
                 key={i}
@@ -205,27 +234,37 @@ export default function Home() {
               boxShadow: '8px 8px 0 black',
             }}
           >
-            {/* Little excited blob */}
+            {/* Excited potato */}
             <div className="flex justify-center mb-6">
               <svg width="80" height="90" viewBox="0 0 60 70">
-                <ellipse cx="30" cy="45" rx="20" ry="25" fill={theme.colors.accent2} stroke="black" strokeWidth="3"/>
-                <circle cx="30" cy="20" r="18" fill="white" stroke="black" strokeWidth="3"/>
-                <circle cx="22" cy="16" r="6" fill="black"/>
-                <circle cx="38" cy="16" r="6" fill="black"/>
-                <circle cx="24" cy="14" r="2" fill="white"/>
-                <circle cx="40" cy="14" r="2" fill="white"/>
-                <ellipse cx="30" cy="28" rx="8" ry="5" fill="black"/>
+                {/* Potato body */}
+                <path
+                  d="M30 65 C10 65 5 40 10 22 C15 8 45 8 50 22 C55 40 50 65 30 65"
+                  fill="#D4A574"
+                  stroke="black"
+                  strokeWidth="3"
+                />
+                {/* Eyes - excited */}
+                <circle cx="20" cy="30" r="7" fill="white" stroke="black" strokeWidth="2"/>
+                <circle cx="40" cy="28" r="8" fill="white" stroke="black" strokeWidth="2"/>
+                <circle cx="22" cy="30" r="4" fill="black"/>
+                <circle cx="43" cy="27" r="5" fill="black"/>
+                <circle cx="23" cy="28" r="1.5" fill="white"/>
+                <circle cx="44" cy="25" r="2" fill="white"/>
+                {/* Big excited smile */}
+                <ellipse cx="30" cy="45" rx="10" ry="7" fill="black"/>
+                <ellipse cx="30" cy="43" rx="6" ry="3" fill="#FF6B6B"/>
                 {/* Arms up */}
-                <line x1="10" y1="35" x2="0" y2="20" stroke="black" strokeWidth="3" strokeLinecap="round"/>
-                <line x1="50" y1="35" x2="60" y2="20" stroke="black" strokeWidth="3" strokeLinecap="round"/>
+                <path d="M5 35 Q-5 25 0 15" stroke="black" strokeWidth="3" fill="none" strokeLinecap="round"/>
+                <path d="M55 33 Q65 23 60 13" stroke="black" strokeWidth="3" fill="none" strokeLinecap="round"/>
               </svg>
             </div>
 
             <h2 className="text-3xl md:text-4xl font-bold mb-4">
-              ready to try it?
+              stop feeling like a background character
             </h2>
             <p className="text-lg mb-8">
-              free to use. no credit card needed.
+              free to use. the potato is waiting.
             </p>
             <Link
               href="/dashboard"
@@ -237,7 +276,7 @@ export default function Home() {
                 boxShadow: '5px 5px 0 black',
               }}
             >
-              start a conversation
+              talk to the potato
             </Link>
           </div>
         </div>
@@ -251,7 +290,7 @@ export default function Home() {
         <div className="max-w-5xl mx-auto">
           <div className="flex flex-col md:flex-row items-center justify-between gap-4 mb-4">
             <div className="flex items-center gap-3">
-              <span className="text-3xl">👻</span>
+              <span className="text-3xl">🥔</span>
               <span className="text-xl font-bold">npc</span>
             </div>
             <p
@@ -262,7 +301,7 @@ export default function Home() {
                 borderRadius: '8px',
               }}
             >
-              not a therapist. not a replacement for friends. a thinking partner.
+              not a therapist. not a replacement for friends. just a potato that listens.
             </p>
           </div>
 
@@ -306,7 +345,7 @@ export default function Home() {
           </div>
 
           <p className="text-center text-xs mt-4 opacity-60">
-            made for teens who want to think for themselves
+            be the main character of your own story
           </p>
         </div>
       </footer>
