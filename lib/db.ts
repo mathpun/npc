@@ -532,6 +532,18 @@ async function initDb() {
         last_touch TIMESTAMP,
         streak_days INTEGER DEFAULT 0
       );
+
+      -- Journal entries (gratitude journal / diary)
+      CREATE TABLE IF NOT EXISTS journal_entries (
+        id SERIAL PRIMARY KEY,
+        user_id TEXT NOT NULL REFERENCES users(id),
+        entry_type TEXT DEFAULT 'free',
+        prompt_id TEXT,
+        content TEXT NOT NULL,
+        voice_url TEXT,
+        mood TEXT,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      );
     `)
     console.log('Database tables initialized')
   } catch (error) {
