@@ -522,6 +522,15 @@ async function initDb() {
         UNIQUE(user_id, theme_name)
       );
 
+      -- Add details_json column if it doesn't exist
+      DO $$
+      BEGIN
+        IF NOT EXISTS (SELECT 1 FROM information_schema.columns
+                       WHERE table_name = 'personality_islands' AND column_name = 'details_json') THEN
+          ALTER TABLE personality_islands ADD COLUMN details_json TEXT;
+        END IF;
+      END $$;
+
       -- Theme analysis cache (daily analysis of user themes)
       CREATE TABLE IF NOT EXISTS theme_analysis (
         id SERIAL PRIMARY KEY,

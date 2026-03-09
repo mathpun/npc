@@ -33,11 +33,15 @@ export async function POST(request: NextRequest) {
     const body = await request.json()
     const { userId } = body
 
+    console.log('[Islands Analyze] Starting for userId:', userId)
+
     if (!userId) {
+      console.log('[Islands Analyze] Missing userId')
       return NextResponse.json({ error: 'Missing userId' }, { status: 400 })
     }
 
     const today = new Date().toISOString().split('T')[0]
+    console.log('[Islands Analyze] Today:', today)
 
     // Check if analysis already exists for today
     const existingAnalysis = await db.prepare(`
@@ -46,6 +50,7 @@ export async function POST(request: NextRequest) {
     `).get(userId, today) as { themes_json: string } | undefined
 
     if (existingAnalysis) {
+      console.log('[Islands Analyze] Found cached analysis')
       return NextResponse.json({
         themes: JSON.parse(existingAnalysis.themes_json),
         cached: true,
@@ -53,15 +58,18 @@ export async function POST(request: NextRequest) {
     }
 
     // Get user profile
+    console.log('[Islands Analyze] Fetching user profile')
     const user = await db.prepare(`
       SELECT name, nickname, interests, goals FROM users WHERE id = ?
     `).get(userId) as { name: string; nickname?: string; interests: string; goals?: string } | undefined
 
     if (!user) {
+      console.log('[Islands Analyze] User not found:', userId)
       return NextResponse.json({ error: 'User not found' }, { status: 404 })
     }
 
     // Get chat sessions with topics
+    console.log('[Islands Analyze] Fetching sessions')
     const sessions = await db.prepare(`
       SELECT session_goal, session_topic, message_count
       FROM chat_sessions
@@ -69,22 +77,27 @@ export async function POST(request: NextRequest) {
       ORDER BY started_at DESC
       LIMIT 50
     `).all(userId) as { session_goal: string | null; session_topic: string | null; message_count: number }[]
+    console.log('[Islands Analyze] Found sessions:', sessions.length)
 
     // Get recent messages for deeper analysis
+    console.log('[Islands Analyze] Fetching messages')
     const messages = await db.prepare(`
       SELECT content FROM chat_messages
       WHERE user_id = ? AND role = 'user'
       ORDER BY created_at DESC
       LIMIT 100
     `).all(userId) as { content: string }[]
+    console.log('[Islands Analyze] Found messages:', messages.length)
 
     // Get check-in data
+    console.log('[Islands Analyze] Fetching checkins')
     const checkins = await db.prepare(`
       SELECT mood, ai_summary FROM daily_checkins
       WHERE user_id = ?
       ORDER BY checkin_date DESC
       LIMIT 30
     `).all(userId) as { mood: string | null; ai_summary: string | null }[]
+    console.log('[Islands Analyze] Found checkins:', checkins.length)
 
     // Build context for Claude
     const sessionTopics = sessions
@@ -106,17 +119,23 @@ export async function POST(request: NextRequest) {
 
     // If not enough data, return some starter themes
     if (sessions.length < 3 && messages.length < 5) {
+      console.log('[Islands Analyze] Not enough data, using starter themes')
       const starterThemes: Theme[] = [
         { name: 'Self-Discovery', emoji: '🔍', description: 'Exploring who you are and what matters to you', strength: 0.5 },
         { name: 'Relationships', emoji: '💕', description: 'Connections with friends, family, and others', strength: 0.5 },
         { name: 'Growth', emoji: '🌱', description: 'Learning, improving, and becoming your best self', strength: 0.5 },
       ]
 
-      await db.prepare(`
-        INSERT INTO theme_analysis (user_id, analysis_date, themes_json)
-        VALUES (?, ?, ?)
-        ON CONFLICT (user_id, analysis_date) DO UPDATE SET themes_json = ?
-      `).run(userId, today, JSON.stringify(starterThemes), JSON.stringify(starterThemes))
+      try {
+        await db.prepare(`
+          INSERT INTO theme_analysis (user_id, analysis_date, themes_json)
+          VALUES (?, ?, ?)
+          ON CONFLICT (user_id, analysis_date) DO UPDATE SET themes_json = ?
+        `).run(userId, today, JSON.stringify(starterThemes), JSON.stringify(starterThemes))
+        console.log('[Islands Analyze] Saved starter themes to DB')
+      } catch (dbErr) {
+        console.error('[Islands Analyze] Failed to save starter themes:', dbErr)
+      }
 
       return NextResponse.json({
         themes: starterThemes,
@@ -177,11 +196,19 @@ Example of GOOD detailed island:
 
 Output ONLY a JSON array of 4-5 islands. No explanation, just valid JSON.`
 
-    const response = await getAnthropicClient().messages.create({
-      model: 'claude-sonnet-4-20250514',
-      max_tokens: 2000, // More tokens for detailed islands
-      messages: [{ role: 'user', content: prompt }],
-    })
+    console.log('[Islands Analyze] Calling Claude API')
+    let response
+    try {
+      response = await getAnthropicClient().messages.create({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 2000, // More tokens for detailed islands
+        messages: [{ role: 'user', content: prompt }],
+      })
+      console.log('[Islands Analyze] Claude API responded')
+    } catch (apiError) {
+      console.error('[Islands Analyze] Claude API error:', apiError)
+      return NextResponse.json({ error: 'AI analysis failed', details: String(apiError) }, { status: 500 })
+    }
 
     let themes: Theme[] = []
 
@@ -219,18 +246,29 @@ Output ONLY a JSON array of 4-5 islands. No explanation, just valid JSON.`
     }
 
     // Cache the analysis
-    await db.prepare(`
-      INSERT INTO theme_analysis (user_id, analysis_date, themes_json)
-      VALUES (?, ?, ?)
-      ON CONFLICT (user_id, analysis_date) DO UPDATE SET themes_json = ?
-    `).run(userId, today, JSON.stringify(themes), JSON.stringify(themes))
+    console.log('[Islands Analyze] Caching analysis with', themes.length, 'themes')
+    try {
+      await db.prepare(`
+        INSERT INTO theme_analysis (user_id, analysis_date, themes_json)
+        VALUES (?, ?, ?)
+        ON CONFLICT (user_id, analysis_date) DO UPDATE SET themes_json = ?
+      `).run(userId, today, JSON.stringify(themes), JSON.stringify(themes))
+      console.log('[Islands Analyze] Analysis cached successfully')
+    } catch (cacheErr) {
+      console.error('[Islands Analyze] Failed to cache:', cacheErr)
+      // Continue anyway - we still have the themes
+    }
 
+    console.log('[Islands Analyze] Returning', themes.length, 'themes')
     return NextResponse.json({
       themes,
       cached: false,
     })
   } catch (error) {
-    console.error('Error analyzing themes:', error)
-    return NextResponse.json({ error: 'Failed to analyze themes' }, { status: 500 })
+    console.error('[Islands Analyze] Unexpected error:', error)
+    return NextResponse.json({
+      error: 'Failed to analyze themes',
+      details: error instanceof Error ? error.message : String(error)
+    }, { status: 500 })
   }
 }
