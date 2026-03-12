@@ -366,7 +366,7 @@ export default function NavBar({ showBack = false, backHref = '/', backLabel = '
                 { href: '/about', icon: '✨', label: 'about', isLink: true, color: '#98D8C8' },
                 { href: '/privacy', icon: '🔒', label: 'privacy', isLink: true, color: '#F7DC6F' },
                 { href: '/chat?tab=growth&subtab=co-design', icon: '🛠️', label: 'co-design', isLink: true, color: '#BB8FCE' },
-                { href: 'https://forms.gle/iWyp8pUumivZDMxr7', icon: '💬', label: 'feedback', isExternal: true, color: '#85C1E9' },
+                { href: 'https://forms.gle/iWyp8pUumivZDMxr7', icon: '🔥', label: 'roast us', isExternal: true, color: '#FF6B6B' },
               ].map((item) => (
                 item.isExternal ? (
                   <a

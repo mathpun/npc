@@ -329,7 +329,7 @@ export default function Home() {
                 borderRadius: '8px',
               }}
             >
-              feedback
+              roast us 🔥
             </a>
             <Link
               href="/privacy"

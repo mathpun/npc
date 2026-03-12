@@ -36,7 +36,7 @@ export default function Footer() {
               className="font-bold hover:scale-105 transition-transform"
               style={{ color: '#666' }}
             >
-              feedback
+              roast us 🔥
             </a>
             <Link
               href="/privacy"
