@@ -139,6 +139,64 @@ export default function CoDesignPortal() {
         <p className="text-lg mt-4">Teens actually shape how this AI works!</p>
       </div>
 
+      {/* Teen Governing Board */}
+      <div
+        className="p-5 -rotate-1"
+        style={{
+          background: 'linear-gradient(135deg, #FFD700 0%, #FFA500 100%)',
+          border: '4px solid black',
+          borderRadius: '16px',
+          boxShadow: '6px 6px 0 black',
+        }}
+      >
+        <div className="text-center mb-4">
+          <h2 className="text-2xl font-bold">👑 Teen Governing Board</h2>
+          <p className="text-sm mt-2">
+            We're building a <strong>real teen advisory board</strong> that makes actual decisions about NPC.
+            Not just feedback—real power to shape the product.
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-4">
+          {[
+            { emoji: '🗳️', title: 'Vote on features', desc: 'Decide what we build next' },
+            { emoji: '💰', title: 'Budget input', desc: 'Help allocate resources' },
+            { emoji: '🛡️', title: 'Safety reviews', desc: 'Approve AI behavior changes' },
+          ].map((item) => (
+            <div
+              key={item.title}
+              className="p-3 text-center"
+              style={{
+                backgroundColor: 'rgba(255,255,255,0.9)',
+                border: '2px solid black',
+                borderRadius: '10px',
+              }}
+            >
+              <div className="text-2xl mb-1">{item.emoji}</div>
+              <div className="font-bold text-sm">{item.title}</div>
+              <div className="text-xs text-gray-600">{item.desc}</div>
+            </div>
+          ))}
+        </div>
+
+        <div className="text-center">
+          <a
+            href="https://forms.gle/iWyp8pUumivZDMxr7"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-block px-6 py-3 font-bold hover:scale-105 transition-transform"
+            style={{
+              backgroundColor: 'black',
+              color: 'white',
+              borderRadius: '9999px',
+              boxShadow: '3px 3px 0 #666',
+            }}
+          >
+            Apply to join the board →
+          </a>
+        </div>
+      </div>
+
       {/* Impact Stats */}
       <div
         className="p-4 rotate-1"
